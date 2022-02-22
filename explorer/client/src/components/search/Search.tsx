@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import mockTransactionData from '../../utils/mock_data.json';
 import styles from './Search.module.css';
 
 function Search() {
@@ -10,9 +11,22 @@ function Search() {
     const handleSubmit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            input.length < 60
-                ? navigate(`../search/${input}`)
-                : navigate(`../transactions/${input}`);
+            const data = mockTransactionData.data.find(
+                ({ id }) => id === input
+            );
+
+            console.log('Before: ', data);
+
+            if (data === undefined || !('category' in data)) {
+                navigate('../home');
+            } else if (data.category === 'transaction') {
+                navigate(`../transactions/${input}`, { state: data });
+            } else if (data.category === 'object') {
+                navigate(`../objects/${input}`, { state: data });
+            } else {
+                navigate(`../search/${input}`);
+            }
+
             setInput('');
         },
         [input, navigate, setInput]

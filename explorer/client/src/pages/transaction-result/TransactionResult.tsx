@@ -1,6 +1,6 @@
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
-import mockTransactionData from '../../utils/transaction_mock.json';
+import mockTransactionData from '../../utils/mock_data.json';
 import styles from './TransactionResult.module.css';
 
 type DataType = {
@@ -20,8 +20,11 @@ function instanceOfDataType(object: any): object is DataType {
 }
 
 function TransactionResult() {
+    const { state } = useLocation();
     const { id: txID } = useParams();
-    const data = mockTransactionData.data.find(({ id }) => id === txID);
+
+    const data =
+        state || mockTransactionData.data.find(({ id }) => id === txID);
 
     if (instanceOfDataType(data)) {
         let action: string;
