@@ -15,8 +15,6 @@ function Search() {
                 ({ id }) => id === input
             );
 
-            console.log('Before: ', data);
-
             if (data === undefined || !('category' in data)) {
                 navigate('../home');
             } else if (data.category === 'transaction') {

@@ -75,12 +75,20 @@
             "deleted": ["27620DBA8558B18930D5BDBB96423241B5F71788"]
         },
         {
+            "id": "ProblemTransaction",
+            "category": "transaction"
+        },
+        {
             "id": "16519CAZ7447A07829C4ACAA85312130A4E60677",
             "category": "object",
             "owner": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
             "version": 0,
             "readonly": true,
             "type": "0x2::Coin::Coin<0x2::GAS::GAS>"
+        },
+        {
+            "id": "ProblemObject",
+            "category": "object"
         }
     ]
 }

@@ -90,7 +90,9 @@ function TransactionResult() {
     }
     return (
         <dl className={styles.data}>
-            <dt>This transaction could not be found:</dt>
+            <dt>
+                There was an issue with the data on the following transaction:
+            </dt>
             <dd>{txID}</dd>
         </dl>
     );
