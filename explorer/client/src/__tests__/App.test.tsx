@@ -32,7 +32,7 @@ const problemTransactionID = 'ProblemTransaction';
 const successObjectID = '16519CAZ7447A07829C4ACAA85312130A4E60677';
 const problemObjectID = 'ProblemObject';
 
-const noDataID = 
+const noDataID =
     'A1ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddef';
 
 describe('End-to-end Tests', () => {
@@ -115,11 +115,11 @@ describe('End-to-end Tests', () => {
     });
 
     it('handles an ID with no associated data point', () => {
-      render(<App />, { wrapper: MemoryRouter });
-      searchText(noDataID);
-      expect(
-        screen.getByText('Data on the following query could not be found:')
-      ).toBeInTheDocument();
+        render(<App />, { wrapper: MemoryRouter });
+        searchText(noDataID);
+        expect(
+            screen.getByText('Data on the following query could not be found:')
+        ).toBeInTheDocument();
     });
 
     describe('Returns Home', () => {

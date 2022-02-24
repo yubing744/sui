@@ -44,17 +44,17 @@ function ObjectResult() {
                 <dt>Type</dt>
                 <dd>{data.type}</dd>
 
-                <dt>Image</dt>
-                <dd>
-                  {
-                    data?.svg &&
-                    <img
-                      alt="NFT"
-                      src={`data:image/svg+xml;utf8,${encodeURIComponent(data.svg)}`}
-                    />
-                  }
-                </dd>
-
+                {data?.svg && (
+                    <>
+                        <dt>Image</dt>
+                        <img
+                            alt="NFT"
+                            src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                                data.svg
+                            )}`}
+                        />
+                    </>
+                )}
             </dl>
         );
     }
