@@ -108,7 +108,8 @@
             "owner": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
             "version": 1,
             "readonly": false,
-            "type": "0x2::Eggs::Eggs"
+            "type": "0x2::Shield::Shield",
+            "svg": "<svg xmlns='http://www.w3.org/2000/svg' height='48px' viewBox='0 0 24 24' width='48px' fill='#000000'><path d='M0 0h24v24H0z' fill='none'/><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z'/></svg>"
         },
         {
             "id": "26F6E55891D7286EF7861252329383CD534C1781",

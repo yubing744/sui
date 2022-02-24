@@ -9,6 +9,7 @@ type DataType = {
     version: number;
     readonly: boolean;
     type: string;
+    svg?: string;
 };
 
 function instanceOfDataType(object: any): object is DataType {
@@ -42,6 +43,18 @@ function ObjectResult() {
 
                 <dt>Type</dt>
                 <dd>{data.type}</dd>
+
+                <dt>Image</dt>
+                <dd>
+                  {
+                    data?.svg &&
+                    <img
+                      alt="NFT"
+                      src={`data:image/svg+xml;utf8,${encodeURIComponent(data.svg)}`}
+                    />
+                  }
+                </dd>
+
             </dl>
         );
     }
