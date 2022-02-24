@@ -82,9 +82,41 @@
             "id": "16519CAZ7447A07829C4ACAA85312130A4E60677",
             "category": "object",
             "owner": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
-            "version": 0,
+            "version": 1,
             "readonly": true,
+            "type": "0x2::Pear::Pear"
+        },
+        {
+            "id": "4B80Z282907664Z9DA61E1B00C3D29367ZC0CE21",
+            "category": "object",
+            "owner": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
+            "version": 5,
+            "readonly": false,
             "type": "0x2::Coin::Coin<0x2::GAS::GAS>"
+        },
+        {
+            "id": "05408BZY6336Z96718B3ZBZZ74201029Z3D59566",
+            "category": "object",
+            "owner": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
+            "version": 1,
+            "readonly": false,
+            "type": "0x2::Ham::Ham"
+        },
+        {
+            "id": "94397AYX5225Y85607A2YAYY63190918Y2C48455",
+            "category": "object",
+            "owner": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
+            "version": 1,
+            "readonly": false,
+            "type": "0x2::Eggs::Eggs"
+        },
+        {
+            "id": "26F6E55891D7286EF7861252329383CD534C1781",
+            "category": "object",
+            "owner": "79703994bb820c57bbaac14d35afc195f6146a2480ffc81c9da6c54dfb8c6df0",
+            "version": 1,
+            "readonly": false,
+            "type": "0x2::Coin::Coin<0x2::USD::USD>"
         },
         {
             "id": "ProblemObject",
