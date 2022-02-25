@@ -9,8 +9,10 @@ type DataType = {
     version: number;
     readonly: boolean;
     type: string;
-    svg?: string;
-    base64?: string;
+    image?: {
+        category: string;
+        data: string;
+    };
 };
 
 function instanceOfDataType(object: any): object is DataType {
@@ -30,26 +32,25 @@ function ObjectResult() {
     if (instanceOfDataType(data)) {
         return (
             <div className={styles.resultbox}>
-                {data?.svg && (
+                {data?.image?.data && (
                     <img
                         className={styles.imagebox}
                         alt="NFT"
-                        src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                            data.svg
-                        )}`}
+                        src={
+                            data.image.category === 'svg'
+                                ? `data:image/svg+xml;utf8,${encodeURIComponent(
+                                      data.image.data
+                                  )}`
+                                : data.image.category === 'base64'
+                                ? `data:image/png;base64,${data.image.data}`
+                                : ''
+                        }
                     />
                 )}
 
-                {data?.base64 && (
-                    <img
-                        className={styles.imagebox}
-                        alt="NFT"
-                        src={`data:image/png;base64,${data.base64}`}
-                    />
-                )}
                 <dl
                     className={`${styles.textbox} ${
-                        data?.svg || data?.base64
+                        data?.image?.data
                             ? styles.accommodate
                             : styles.noaccommodate
                     }`}
