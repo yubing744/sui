@@ -35,3 +35,7 @@
 .data > dd.action-delete {
     @apply h-[1.5rem] border-none bg-orange-300;
 }
+
+.data > img {
+    @apply max-w-[90vw];
+}

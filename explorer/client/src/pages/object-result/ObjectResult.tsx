@@ -10,6 +10,7 @@ type DataType = {
     readonly: boolean;
     type: string;
     svg?: string;
+    base64?: string;
 };
 
 function instanceOfDataType(object: any): object is DataType {
@@ -46,12 +47,20 @@ function ObjectResult() {
 
                 {data?.svg && (
                     <>
-                        <dt>Image</dt>
                         <img
                             alt="NFT"
                             src={`data:image/svg+xml;utf8,${encodeURIComponent(
                                 data.svg
                             )}`}
+                        />
+                    </>
+                )}
+
+                {data?.base64 && (
+                    <>
+                        <img
+                            alt="NFT"
+                            src={`data:image/png;base64,${data.base64}`}
                         />
                     </>
                 )}
