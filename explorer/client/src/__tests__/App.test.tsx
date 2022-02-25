@@ -23,6 +23,10 @@ function expectTransactionStatus(result: 'fail' | 'success') {
     expect(screen.getByTestId('transaction-status')).toHaveTextContent(result);
 }
 
+function expectReadOnlyStatus(result: 'Mutable' | 'Immutable') {
+    expect(screen.getByTestId('read-only-text')).toHaveTextContent(result);
+}
+
 const successTransactionID =
     'A1dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
 const failTransactionID =
@@ -34,6 +38,9 @@ const problemObjectID = 'ProblemObject';
 
 const noDataID =
     'A1ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddef';
+
+const immutableObject = '16519CAZ7447A07829C4ACAA85312130A4E60677';
+const mutableObject = '4B80Z282907664Z9DA61E1B00C3D29367ZC0CE21';
 
 describe('End-to-end Tests', () => {
     it('renders the home page', () => {
@@ -101,6 +108,18 @@ describe('End-to-end Tests', () => {
             expect(screen.getByText('Version')).toBeInTheDocument();
             expect(screen.getByText('Read Only?')).toBeInTheDocument();
             expect(screen.getByText('Type')).toBeInTheDocument();
+        });
+
+        it('when object is mutable', () => {
+            render(<App />, { wrapper: MemoryRouter });
+            searchText(mutableObject);
+            expectReadOnlyStatus('Mutable');
+        });
+
+        it('when object is immutable', () => {
+            render(<App />, { wrapper: MemoryRouter });
+            searchText(immutableObject);
+            expectReadOnlyStatus('Immutable');
         });
 
         it('when object data has missing info', () => {

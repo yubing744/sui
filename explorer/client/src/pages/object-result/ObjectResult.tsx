@@ -65,7 +65,21 @@ function ObjectResult() {
                     <dd>{data.version}</dd>
 
                     <dt>Read Only?</dt>
-                    <dd>{data.readonly ? 'Yes' : 'No'}</dd>
+                    {data.readonly ? (
+                        <dd
+                            data-testid="read-only-text"
+                            className={styles.immutable}
+                        >
+                            Immutable
+                        </dd>
+                    ) : (
+                        <dd
+                            data-testid="read-only-text"
+                            className={styles.mutable}
+                        >
+                            Mutable
+                        </dd>
+                    )}
 
                     <dt>Type</dt>
                     <dd>{data.type}</dd>

@@ -28,6 +28,14 @@ img {
   border-solid border-gray-500 rounded-md p-1 align-middle;
 }
 
+.textbox > dd.mutable {
+    @apply bg-blue-300 border-none;
+}
+
+.textbox > dd.immutable {
+    @apply bg-gray-300 border-none;
+}
+
 .textbox > dd:last-child {
     @apply mb-[10vh];
 }
