@@ -9,3 +9,7 @@
 .search {
     @apply bg-black text-white pb-4 w-[100vw];
 }
+
+main {
+    @apply relative;
+}

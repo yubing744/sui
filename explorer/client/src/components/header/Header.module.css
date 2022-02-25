@@ -4,9 +4,5 @@
 }
 
 .nav {
-    @apply mt-[1vh] ml-[5vw];
-}
-
-header {
-    @apply h-[2rem];
+    @apply ml-[5vw];
 }

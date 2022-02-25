@@ -1,41 +1,33 @@
-.data > dt {
+.resultbox {
+    @apply flex flex-wrap;
+}
+
+.imagebox {
+    @apply w-[100vw] lg:w-[50vw] lg:h-[78vh] py-[1vh];
+}
+
+img {
+    @apply object-scale-down;
+}
+
+.accommodate {
+    @apply w-[90vw] lg:w-[40vw] ml-[5vw];
+}
+
+.noaccommodate {
+    @apply mx-[5vw] w-[90vw];
+}
+
+.textbox > dt {
     @apply font-bold text-lg mt-[0.5rem];
 }
 
-.data > dd {
+.textbox > dd {
     @apply font-mono text-gray-900 overflow-hidden break-all 
-  text-sm h-[4rem] sm:h-[1.5rem] mb-[0.5rem]
+  text-sm h-[4rem] lg:h-[3rem] xl:h-[1.5rem] mb-[0.5rem]  
   border-solid border-gray-500 rounded-md p-1 align-middle;
 }
 
-.data > dd:last-child {
+.textbox > dd:last-child {
     @apply mb-[10vh];
-}
-
-.data {
-    @apply mx-[5vw];
-}
-
-.data > dd.status-success {
-    @apply h-[1.5rem] border-none bg-green-300;
-}
-
-.data > dd.status-fail {
-    @apply h-[1.5rem] border-none bg-red-300;
-}
-
-.data > dd.action-create {
-    @apply h-[1.5rem] border-none bg-lime-300;
-}
-
-.data > dd.action-mutate {
-    @apply h-[1.5rem] border-none bg-blue-300;
-}
-
-.data > dd.action-delete {
-    @apply h-[1.5rem] border-none bg-orange-300;
-}
-
-.data > img {
-    @apply max-w-[90vw];
 }

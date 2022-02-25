@@ -29,42 +29,47 @@ function ObjectResult() {
 
     if (instanceOfDataType(data)) {
         return (
-            <dl className={styles.data}>
-                <dt>Object ID</dt>
-                <dd>{data.id}</dd>
-
-                <dt>Owner</dt>
-                <dd>{data.owner}</dd>
-
-                <dt>Version</dt>
-                <dd>{data.version}</dd>
-
-                <dt>Read Only?</dt>
-                <dd>{data.readonly ? 'Yes' : 'No'}</dd>
-
-                <dt>Type</dt>
-                <dd>{data.type}</dd>
-
+            <div className={styles.resultbox}>
                 {data?.svg && (
-                    <>
-                        <img
-                            alt="NFT"
-                            src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                                data.svg
-                            )}`}
-                        />
-                    </>
+                    <img
+                        className={styles.imagebox}
+                        alt="NFT"
+                        src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                            data.svg
+                        )}`}
+                    />
                 )}
 
                 {data?.base64 && (
-                    <>
-                        <img
-                            alt="NFT"
-                            src={`data:image/png;base64,${data.base64}`}
-                        />
-                    </>
+                    <img
+                        className={styles.imagebox}
+                        alt="NFT"
+                        src={`data:image/png;base64,${data.base64}`}
+                    />
                 )}
-            </dl>
+                <dl
+                    className={`${styles.textbox} ${
+                        data?.svg || data?.base64
+                            ? styles.accommodate
+                            : styles.noaccommodate
+                    }`}
+                >
+                    <dt>Object ID</dt>
+                    <dd>{data.id}</dd>
+
+                    <dt>Owner</dt>
+                    <dd>{data.owner}</dd>
+
+                    <dt>Version</dt>
+                    <dd>{data.version}</dd>
+
+                    <dt>Read Only?</dt>
+                    <dd>{data.readonly ? 'Yes' : 'No'}</dd>
+
+                    <dt>Type</dt>
+                    <dd>{data.type}</dd>
+                </dl>
+            </div>
         );
     }
     return (
