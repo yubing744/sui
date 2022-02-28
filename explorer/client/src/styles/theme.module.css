@@ -1,0 +1,17 @@
+.textbox > dt {
+    @apply font-bold text-lg mt-[0.5rem];
+}
+
+.textbox > dd {
+    @apply font-mono text-gray-900 overflow-hidden break-all 
+  text-sm h-[4rem] lg:h-[3rem] xl:h-[1.5rem] mb-[0.5rem]  
+  border-solid border-gray-500 rounded-md p-1 align-middle;
+}
+
+.textbox > dd:last-child {
+    @apply mb-[10vh];
+}
+
+dl.textbox {
+    @apply w-[90vw] mx-auto;
+}

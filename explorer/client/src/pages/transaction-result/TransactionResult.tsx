@@ -1,5 +1,6 @@
 import { useLocation, useParams } from 'react-router-dom';
 
+import theme from '../../styles/theme.module.css';
 import mockTransactionData from '../../utils/mock_data.json';
 import styles from './TransactionResult.module.css';
 
@@ -66,7 +67,7 @@ function TransactionResult() {
         }
 
         return (
-            <dl className={styles.data}>
+            <dl className={theme.textbox}>
                 <dt>Transaction ID</dt>
                 <dd>{data.id}</dd>
 
@@ -89,7 +90,7 @@ function TransactionResult() {
         );
     }
     return (
-        <dl className={styles.data}>
+        <dl className={theme.textbox}>
             <dt>
                 There was an issue with the data on the following transaction:
             </dt>

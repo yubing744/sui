@@ -1,5 +1,6 @@
 import { useLocation, useParams } from 'react-router-dom';
 
+import theme from '../../styles/theme.module.css';
 import mockTransactionData from '../../utils/mock_data.json';
 import styles from './ObjectResult.module.css';
 
@@ -49,7 +50,7 @@ function ObjectResult() {
                 )}
 
                 <dl
-                    className={`${styles.textbox} ${
+                    className={`${theme.textbox} ${
                         data?.image?.data
                             ? styles.accommodate
                             : styles.noaccommodate
@@ -88,7 +89,7 @@ function ObjectResult() {
         );
     }
     return (
-        <dl className={styles.data}>
+        <dl className={theme.textbox}>
             <dt>There was an issue with the data on the following object:</dt>
             <dd>{objID}</dd>
         </dl>
