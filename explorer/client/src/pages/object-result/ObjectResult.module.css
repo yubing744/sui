@@ -1,9 +1,11 @@
 .resultbox {
-    @apply flex flex-wrap;
+    @apply flex flex-wrap w-full;
 }
 
 img.imagebox {
-    @apply w-[90vw] mx-auto mt-[1vh] object-scale-down lg:w-[50vw] lg:h-[70vh];
+    @apply w-[88vw] h-[88vw] 
+    border-solid border-stone-300 rounded-lg p-[1vw] mx-auto mt-[1vh] object-scale-down 
+    lg:w-[40vw] lg:h-[40vw];
 }
 
 dl.accommodate {
