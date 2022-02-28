@@ -5,7 +5,7 @@
 img.imagebox {
     @apply w-[88vw] h-[88vw] 
     border-solid border-stone-300 rounded-lg p-[1vw] mx-auto mt-[1vh] object-scale-down 
-    lg:w-[40vw] lg:h-[40vw];
+    lg:w-[35rem] lg:h-[35rem] mb-[10vh];
 }
 
 dl.accommodate {
