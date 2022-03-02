@@ -6,7 +6,6 @@
     @apply ml-[5vw];
 }
 
-.codebox,
 .imagebox {
     @apply border-solid border-stone-300
     rounded-lg p-[1vw] mx-auto mt-[1vh] 
@@ -18,7 +17,8 @@ img.imagebox {
 }
 
 .codebox {
-    @apply overflow-scroll;
+    @apply overflow-hidden resize-x
+    border-solid border-stone-300 rounded-lg mt-[1vh] w-[88vw];
 }
 
 dl.accommodate {

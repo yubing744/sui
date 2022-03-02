@@ -1,9 +1,12 @@
 import React, { useState, useCallback } from 'react';
+import AceEditor from 'react-ace';
 import { useLocation, useParams } from 'react-router-dom';
 
 import theme from '../../styles/theme.module.css';
 import mockTransactionData from '../../utils/mock_data.json';
 import styles from './ObjectResult.module.css';
+
+import 'ace-builds/src-noconflict/theme-github';
 
 type DataType = {
     id: string;
@@ -56,11 +59,14 @@ function DisplayBox({ data }: { data: DataType }) {
     if (data.display?.category === 'moveScript') {
         return (
             <div className={styles['display-container']}>
-                <pre>
-                    <textarea className={styles.codebox}>
-                        {data.display.data}
-                    </textarea>
-                </pre>
+                <AceEditor
+                    theme="github"
+                    value={data.display.data}
+                    showGutter={true}
+                    readOnly={true}
+                    fontSize="0.8rem"
+                    className={styles.codebox}
+                />
             </div>
         );
     }
