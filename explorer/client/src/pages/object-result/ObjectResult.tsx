@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import theme from '../../styles/theme.module.css';
@@ -29,6 +29,11 @@ function DisplayBox({ data }: { data: DataType }) {
 
     const imageStyle = hasDisplayLoaded ? {} : { display: 'none' };
 
+    const handleImageLoad = useCallback(
+      () => setHasDisplayLoaded(true), 
+      [setHasDisplayLoaded]
+    );
+
     if (data.display?.category === 'imageURL') {
         return (
             <div className={styles['display-container']}>
@@ -42,7 +47,7 @@ function DisplayBox({ data }: { data: DataType }) {
                     style={imageStyle}
                     alt="NFT"
                     src={data.display.data}
-                    onLoad={() => setHasDisplayLoaded(true)}
+                    onLoad={handleImageLoad}
                 />
             </div>
         );
