@@ -1,5 +1,5 @@
 .footer {
-    @apply fixed bottom-0 bg-black w-full px-[5vw];
+    @apply fixed bottom-0 bg-black w-full px-[5vw] z-10;
 }
 
 .links > a {
