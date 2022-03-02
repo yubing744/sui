@@ -30,8 +30,8 @@ function DisplayBox({ data }: { data: DataType }) {
     const imageStyle = hasDisplayLoaded ? {} : { display: 'none' };
 
     const handleImageLoad = useCallback(
-      () => setHasDisplayLoaded(true), 
-      [setHasDisplayLoaded]
+        () => setHasDisplayLoaded(true),
+        [setHasDisplayLoaded]
     );
 
     if (data.display?.category === 'imageURL') {
@@ -49,6 +49,18 @@ function DisplayBox({ data }: { data: DataType }) {
                     src={data.display.data}
                     onLoad={handleImageLoad}
                 />
+            </div>
+        );
+    }
+
+    if (data.display?.category === 'moveScript') {
+        return (
+            <div className={styles['display-container']}>
+                <pre>
+                    <textarea className={styles.codebox}>
+                        {data.display.data}
+                    </textarea>
+                </pre>
             </div>
         );
     }
