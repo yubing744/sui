@@ -42,11 +42,12 @@ rustyline-derive = "0.6.0"
 colored = "2.0.0"
 unescape = "0.1.0"
 
-# Deps for rest server
+# Deps for rest client & server
 dropshot = "0.6.0"
 http = "0.2.6"
 hyper = "0.14.16"
 schemars = "0.8.8"
+reqwest = { version = "0.11.9", features = ["json"] }
 
 move-package = { git = "https://github.com/diem/move", rev = "b5146b4fb4ecc71fc98ab8ea56d139d0b9f8d940" }
 move-core-types = { git = "https://github.com/diem/move", rev = "b5146b4fb4ecc71fc98ab8ea56d139d0b9f8d940", features = ["address20"] }
@@ -78,3 +79,7 @@ path = "src/sui-move.rs"
 [[bin]]
 name = "rest_server"
 path = "src/rest_server.rs"
+
+[[bin]]
+name = "rest_client"
+path = "src/rest_client.rs"
