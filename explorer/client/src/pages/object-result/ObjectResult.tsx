@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import theme from '../../styles/theme.module.css';
@@ -10,7 +11,7 @@ type DataType = {
     version: number;
     readonly: boolean;
     type: string;
-    image?: {
+    display?: {
         category: string;
         data: string;
     };
@@ -23,6 +24,33 @@ function instanceOfDataType(object: any): object is DataType {
     );
 }
 
+function DisplayBox({ data }: { data: DataType }) {
+    const [hasDisplayLoaded, setHasDisplayLoaded] = useState(false);
+
+    const imageStyle = hasDisplayLoaded ? {} : { display: 'none' };
+
+    if (data.display?.category === 'imageURL') {
+        return (
+            <div className={styles['display-container']}>
+                {!hasDisplayLoaded && (
+                    <div className={styles.imagebox}>
+                        Please wait for display to load
+                    </div>
+                )}
+                <img
+                    className={styles.imagebox}
+                    style={imageStyle}
+                    alt="NFT"
+                    src={data.display.data}
+                    onLoad={() => setHasDisplayLoaded(true)}
+                />
+            </div>
+        );
+    }
+
+    return <div />;
+}
+
 function ObjectResult() {
     const { state } = useLocation();
     const { id: objID } = useParams();
@@ -33,25 +61,10 @@ function ObjectResult() {
     if (instanceOfDataType(data)) {
         return (
             <div className={styles.resultbox}>
-                {data?.image?.data && (
-                    <img
-                        className={styles.imagebox}
-                        alt="NFT"
-                        src={
-                            data.image.category === 'svg'
-                                ? `data:image/svg+xml;utf8,${encodeURIComponent(
-                                      data.image.data
-                                  )}`
-                                : data.image.category === 'base64'
-                                ? `data:image/png;base64,${data.image.data}`
-                                : ''
-                        }
-                    />
-                )}
-
+                {data?.display?.data && <DisplayBox data={data} />}
                 <dl
                     className={`${theme.textbox} ${
-                        data?.image?.data
+                        data?.display?.data
                             ? styles.accommodate
                             : styles.noaccommodate
                     }`}

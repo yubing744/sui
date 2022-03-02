@@ -2,10 +2,18 @@
     @apply flex flex-wrap w-full;
 }
 
+.display-container {
+    @apply ml-[5vw];
+}
+
+.imagebox {
+    @apply border-solid border-stone-300
+    rounded-lg p-[1vw] mx-auto mt-[1vh] 
+    w-[88vw] h-[88vw] lg:w-[35rem] lg:h-[35rem] mb-[10vh];
+}
+
 img.imagebox {
-    @apply w-[88vw] h-[88vw] 
-    border-solid border-stone-300 rounded-lg p-[1vw] mx-auto mt-[1vh] object-scale-down 
-    lg:w-[35rem] lg:h-[35rem] mb-[10vh];
+    @apply object-scale-down;
 }
 
 dl.accommodate {
