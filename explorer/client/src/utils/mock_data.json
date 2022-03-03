@@ -84,7 +84,7 @@
             "owner": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
             "version": 1,
             "readonly": true,
-            "type": "0x2::Pear::Pear"
+            "type": "0x2::Coin::Coin<0x2::USD::USD>"
         },
         {
             "id": "ProblemObject",
@@ -107,16 +107,45 @@
             "type": "0x2::Coin::Coin<0x2::USD::USD>"
         },
         {
-            "id": "imageURL",
+            "id": "Farm",
             "category": "object",
             "owner": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
+            "version": 2,
+            "readonly": false,
+            "type": "0x2::Farm::Farm",
+            "description": {
+                "title": "New Farm",
+                "lore": "This is a new farm. Farms can be customized with Farm Cosmetics and populated with monsters."
+            },
+            "properties": {
+                "universe": "Mysten Labs Universe"
+            },
+            "components": ["FarmCosmeticPlant", "BumbleBee"],
+            "contract": "smartContract"
+        },
+        {
+            "id": "FarmCosmeticPlant",
+            "category": "object",
+            "owner": "Farm",
             "version": 1,
             "readonly": false,
-            "type": "0x2::Orchid::Orchid",
+            "type": "0x2::FarmCosmetic::Plant",
             "display": {
                 "category": "imageURL",
                 "data": "https://drive.google.com/uc?export=view&id=1LFJnwkglgYppjVhNQC9uXQGJlq3Tq8fU"
-            }
+            },
+            "description": {
+                "title": "Healing Plant of Full Revive",
+                "lore": "This rare flower originates from the High Mountain. It is said to restore all the user's health"
+            },
+            "properties": {
+                "effect": "Restores all health of a monster",
+                "universe": "Mysten Labs Universe",
+                "craftable": "no",
+                "supply": "fixed at 100 plants"
+            },
+            "components": [],
+            "contract": "smartContract"
         },
         {
             "id": "smartContract",

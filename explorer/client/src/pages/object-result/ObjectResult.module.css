@@ -32,3 +32,19 @@ dd.mutable {
 dd.immutable {
     @apply h-[1.5rem] border-none bg-gray-300;
 }
+
+dd.unconstrained {
+    @apply h-fit break-normal flex flex-wrap;
+}
+
+div.property {
+    @apply w-[10rem] p-[0.5rem] text-center border-solid m-1 rounded-xl bg-slate-200;
+}
+
+div.property > p {
+    @apply m-0;
+}
+
+.key {
+    @apply font-extrabold;
+}

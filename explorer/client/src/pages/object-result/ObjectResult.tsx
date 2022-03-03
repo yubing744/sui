@@ -10,6 +10,7 @@ import 'ace-builds/src-noconflict/theme-github';
 
 type DataType = {
     id: string;
+    category: string;
     owner: string;
     version: number;
     readonly: boolean;
@@ -18,6 +19,15 @@ type DataType = {
         category: string;
         data: string;
     };
+    description?: {
+        title: string;
+        lore: string;
+    };
+    properties?: {
+        [key: string]: string;
+    };
+    components?: string[];
+    contract?: string;
 };
 
 function instanceOfDataType(object: any): object is DataType {
@@ -92,11 +102,42 @@ function ObjectResult() {
                             : styles.noaccommodate
                     }`}
                 >
-                    <dt>Object ID</dt>
-                    <dd>{data.id}</dd>
+                    {data?.description && (
+                        <>
+                            <h2>{data.description.title}</h2>
+                            <dt>Description</dt>
+                            <dd className={styles.unconstrained}>
+                                {data.description.lore}
+                            </dd>
+                        </>
+                    )}
+
+                    <dt>Component Objects</dt>
+                    <dd>
+                        {data.components ? data.components.join(', ') : '-'}
+                    </dd>
+
+                    <dt>Properties</dt>
+                    <dd className={styles.unconstrained}>
+                        {data.properties &&
+                            Object.entries(data.properties).map(
+                                ([key, value]) => (
+                                    <div className={styles.property}>
+                                        <p className={styles.key}>{key}</p>
+                                        <p>{value}</p>
+                                    </div>
+                                )
+                            )}
+                    </dd>
 
                     <dt>Owner</dt>
                     <dd>{data.owner}</dd>
+
+                    <dt>Contract ID</dt>
+                    <dd>{data?.contract}</dd>
+
+                    <dt>Object ID</dt>
+                    <dd>{data.id}</dd>
 
                     <dt>Version</dt>
                     <dd>{data.version}</dd>

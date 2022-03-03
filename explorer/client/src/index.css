@@ -5,22 +5,20 @@ body {
 }
 
 .ace_active-line {
-  background-color: rgb(203 213 225) !important;
+    background-color: rgb(203 213 225) !important;
 }
 
 .ace_gutter-layer {
-  color: black !important;
+    color: black !important;
 }
 
 .ace_editor {
-  width: 80vw !important;
-  font-family: "Ubuntu Mono", "Courier New", monospace; 
+    width: 80vw !important;
+    font-family: 'Ubuntu Mono', 'Courier New', monospace;
 }
-
 
 @media only screen and (min-width: 1024px) {
-  .ace_editor {
-     width: 35rem !important;
-}
-
+    .ace_editor {
+        width: 35rem !important;
+    }
 }
