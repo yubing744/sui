@@ -11,6 +11,7 @@ type DataType = {
     created?: string[];
     deleted?: string[];
     mutated?: string[];
+    recipients: string[];
 };
 
 function instanceOfDataType(object: any): object is DataType {
@@ -78,7 +79,7 @@ function TransactionResult() {
                     {data.status}
                 </dd>
 
-                <dt>Sender</dt>
+                <dt>From</dt>
                 <dd>{data.sender}</dd>
 
                 <dt>Event</dt>
@@ -88,6 +89,16 @@ function TransactionResult() {
                 {objectIDs.map((objectID, index) => (
                     <dd key={`object-${index}`}>{objectID}</dd>
                 ))}
+
+                <dt>To</dt>
+                {data.recipients.length !== 0 
+                  ? data.recipients.map((objectID, index) => (
+                    <dd key={`recipient-${index}`}>{objectID}</dd>
+                ))
+                  : <dd/>
+                }
+
+
             </dl>
         );
     }

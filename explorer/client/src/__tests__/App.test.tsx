@@ -21,7 +21,7 @@ function searchText(text: string) {
     fireEvent.submit(screen.getByRole('form', { name: /search form/i }));
 }
 
-function expectTransactionStatus(result: 'fail' | 'success') {
+function expectTransactionStatus(result: 'fail' | 'success' | 'pending') {
     expect(screen.getByTestId('transaction-status')).toHaveTextContent(result);
 }
 
@@ -82,9 +82,10 @@ describe('End-to-end Tests', () => {
             searchText(successTransactionID);
             expect(screen.getByText('Transaction ID')).toBeInTheDocument();
             expectTransactionStatus('success');
-            expect(screen.getByText('Sender')).toBeInTheDocument();
+            expect(screen.getByText('From')).toBeInTheDocument();
             expect(screen.getByText('Event')).toBeInTheDocument();
             expect(screen.getByText('Object')).toBeInTheDocument();
+            expect(screen.getByText('To')).toBeInTheDocument();
         });
 
         it('when transaction was a failure', () => {
