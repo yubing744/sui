@@ -6,7 +6,7 @@ import styles from './TransactionResult.module.css';
 
 type DataType = {
     id: string;
-    status: string;
+    status: 'success' | 'fail' | 'pending';
     sender: string;
     created?: string[];
     deleted?: string[];
@@ -48,7 +48,9 @@ function TransactionResult() {
         const statusClass =
             data.status === 'success'
                 ? styles['status-success']
-                : styles['status-fail'];
+                : data.status === 'fail'
+                ? styles['status-fail']
+                : styles['status-pending'];
 
         let actionClass;
 
@@ -79,7 +81,7 @@ function TransactionResult() {
                 <dt>Sender</dt>
                 <dd>{data.sender}</dd>
 
-                <dt>Did</dt>
+                <dt>Event</dt>
                 <dd className={actionClass}>{action}</dd>
 
                 <dt>Object</dt>

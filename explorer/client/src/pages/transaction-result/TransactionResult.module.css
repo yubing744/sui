@@ -6,6 +6,10 @@ dd.status-fail {
     @apply h-[1.5rem] border-none bg-red-300;
 }
 
+dd.status-pending {
+    @apply h-[1.5rem] border-none bg-orange-300;
+}
+
 dd.action-create {
     @apply h-[1.5rem] border-none bg-lime-300;
 }

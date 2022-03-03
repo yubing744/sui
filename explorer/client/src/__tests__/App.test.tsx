@@ -13,7 +13,9 @@ function expectHome() {
 
 function searchText(text: string) {
     fireEvent.change(
-        screen.getByPlaceholderText(/Search transactions by ID/i),
+        screen.getByPlaceholderText(
+            /Search transactions, objects or addresses by ID/i
+        ),
         { target: { value: text } }
     );
     fireEvent.submit(screen.getByRole('form', { name: /search form/i }));
@@ -31,6 +33,9 @@ const successTransactionID =
     'A1dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
 const failTransactionID =
     'A2dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+const pendingTransactionID =
+    'A2Bddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+
 const problemTransactionID = 'ProblemTransaction';
 
 const successObjectID = '16519CAZ7447A07829C4ACAA85312130A4E60677';
@@ -78,7 +83,7 @@ describe('End-to-end Tests', () => {
             expect(screen.getByText('Transaction ID')).toBeInTheDocument();
             expectTransactionStatus('success');
             expect(screen.getByText('Sender')).toBeInTheDocument();
-            expect(screen.getByText('Did')).toBeInTheDocument();
+            expect(screen.getByText('Event')).toBeInTheDocument();
             expect(screen.getByText('Object')).toBeInTheDocument();
         });
 
@@ -86,6 +91,12 @@ describe('End-to-end Tests', () => {
             render(<App />, { wrapper: MemoryRouter });
             searchText(failTransactionID);
             expectTransactionStatus('fail');
+        });
+
+        it('when transaction was pending', () => {
+            render(<App />, { wrapper: MemoryRouter });
+            searchText(pendingTransactionID);
+            expectTransactionStatus('pending');
         });
 
         it('when transaction data has missing info', () => {
