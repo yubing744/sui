@@ -159,24 +159,34 @@ function ObjectResult() {
                         </dl>
                     )}
 
-                    <h3
-                        className={styles.clickableheader}
-                        onClick={() => setShowProperties(!showProperties)}
-                    >
-                        Properties {showProperties ? '-' : '+'}
-                    </h3>
-                    {showProperties && (
-                        <dd className={styles.unconstrained}>
-                            {data.properties &&
-                                Object.entries(data.properties).map(
-                                    ([key, value]) => (
-                                        <div className={styles.property}>
-                                            <p className={styles.key}>{key}</p>
-                                            <p>{value}</p>
-                                        </div>
-                                    )
-                                )}
-                        </dd>
+                    {!(data.display?.category === 'moveScript') && (
+                        <>
+                            <h3
+                                className={styles.clickableheader}
+                                onClick={() =>
+                                    setShowProperties(!showProperties)
+                                }
+                            >
+                                Properties {showProperties ? '-' : '+'}
+                            </h3>
+                            {showProperties && (
+                                <dd className={styles.unconstrained}>
+                                    {data.properties &&
+                                        Object.entries(data.properties).map(
+                                            ([key, value]) => (
+                                                <div
+                                                    className={styles.property}
+                                                >
+                                                    <p className={styles.key}>
+                                                        {key}
+                                                    </p>
+                                                    <p>{value}</p>
+                                                </div>
+                                            )
+                                        )}
+                                </dd>
+                            )}
+                        </>
                     )}
 
                     <h3
@@ -192,15 +202,19 @@ function ObjectResult() {
                             <dt>Owner</dt>
                             <dd>{data.owner}</dd>
 
-                            <dt>Contract ID</dt>
-                            <dd>{data?.contract}</dd>
+                            {!(data.display?.category === 'moveScript') && (
+                                <>
+                                    <dt>Contract ID</dt>
+                                    <dd>{data?.contract}</dd>
 
-                            <dt>Component Objects</dt>
-                            <dd className={styles.unconstrained}>
-                                {data.components
-                                    ? data.components.join(', ')
-                                    : ''}
-                            </dd>
+                                    <dt>Component Objects</dt>
+                                    <dd className={styles.unconstrained}>
+                                        {data.components
+                                            ? data.components.join(', ')
+                                            : ''}
+                                    </dd>
+                                </>
+                            )}
                         </dl>
                     )}
                     <br className="h-10vh" />
