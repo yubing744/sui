@@ -113,8 +113,8 @@ function ObjectResult() {
                     )}
 
                     <dt>Component Objects</dt>
-                    <dd>
-                        {data.components ? data.components.join(', ') : '-'}
+                    <dd className={styles.unconstrained}>
+                        {data.components ? data.components.join(', ') : ''}
                     </dd>
 
                     <dt>Properties</dt>

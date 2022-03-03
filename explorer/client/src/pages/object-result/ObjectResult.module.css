@@ -34,11 +34,11 @@ dd.immutable {
 }
 
 dd.unconstrained {
-    @apply h-fit break-normal flex flex-wrap;
+    @apply h-fit break-normal flex flex-wrap min-h-[1.5rem];
 }
 
 div.property {
-    @apply w-[10rem] p-[0.5rem] text-center border-solid m-1 rounded-xl bg-slate-200;
+    @apply w-[10rem] p-[0.5rem] text-center border-solid m-1 rounded-xl bg-slate-200 mx-auto;
 }
 
 div.property > p {
