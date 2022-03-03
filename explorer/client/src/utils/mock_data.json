@@ -42,7 +42,9 @@
             "sender": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
             "status": "success",
             "mutated": ["27620DBA8558B18930D5BDBB96423241B5F71788"],
-            "recipients": ["99c0febe1afe7ec46343ce856083eb721879c91ed68672ecb228f88be197847a"]
+            "recipients": [
+                "99c0febe1afe7ec46343ce856083eb721879c91ed68672ecb228f88be197847a"
+            ]
         },
         {
             "id": "A5dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
@@ -66,7 +68,9 @@
             "sender": "99c0febe1afe7ec46343ce856083eb721879c91ed68672ecb228f88be197847a",
             "status": "success",
             "mutated": ["27620DBA8558B18930D5BDBB96423241B5F71788"],
-            "recipients": ["abdece1c9e28ffc8973e793f3c65a00d311aa9ea6946a9a3c89d2400e9071ffe"] 
+            "recipients": [
+                "abdece1c9e28ffc8973e793f3c65a00d311aa9ea6946a9a3c89d2400e9071ffe"
+            ]
         },
         {
             "id": "A8dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
@@ -74,7 +78,9 @@
             "sender": "99c0febe1afe7ec46343ce856083eb721879c91ed68672ecb228f88be197847a",
             "status": "success",
             "mutated": ["26F6E55891D7286EF7861252329383CD534C1781"],
-            "recipients": ["79703994bb820c57bbaac14d35afc195f6146a2480ffc81c9da6c54dfb8c6df0"]
+            "recipients": [
+                "79703994bb820c57bbaac14d35afc195f6146a2480ffc81c9da6c54dfb8c6df0"
+            ]
         },
         {
             "id": "A9dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
@@ -82,7 +88,9 @@
             "sender": "abdece1c9e28ffc8973e793f3c65a00d311aa9ea6946a9a3c89d2400e9071ffe",
             "status": "success",
             "mutated": ["27620DBA8558B18930D5BDBB96423241B5F71788"],
-            "recipients": ["79703994bb820c57bbaac14d35afc195f6146a2480ffc81c9da6c54dfb8c6df0"]
+            "recipients": [
+                "79703994bb820c57bbaac14d35afc195f6146a2480ffc81c9da6c54dfb8c6df0"
+            ]
         },
         {
             "id": "B1dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",

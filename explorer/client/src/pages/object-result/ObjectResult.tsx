@@ -30,6 +30,9 @@ type DataType = {
     contract?: string;
 };
 
+const IS_SMART_CONTRACT = (data: DataType) =>
+    data.display?.category === 'moveScript';
+
 function instanceOfDataType(object: any): object is DataType {
     return (
         object !== undefined &&
@@ -66,12 +69,12 @@ function DisplayBox({ data }: { data: DataType }) {
         );
     }
 
-    if (data.display?.category === 'moveScript') {
+    if (IS_SMART_CONTRACT(data)) {
         return (
             <div className={styles['display-container']}>
                 <AceEditor
                     theme="github"
-                    value={data.display.data}
+                    value={data.display?.data}
                     showGutter={true}
                     readOnly={true}
                     fontSize="0.8rem"
@@ -159,7 +162,7 @@ function ObjectResult() {
                         </dl>
                     )}
 
-                    {!(data.display?.category === 'moveScript') && (
+                    {!IS_SMART_CONTRACT(data) && (
                         <>
                             <h3
                                 className={styles.clickableheader}
@@ -199,10 +202,12 @@ function ObjectResult() {
                     </h3>
                     {showConnectedEntities && (
                         <dl className={AdaptiveTextBoxStyle(data)}>
-                            <dt>Owner</dt>
+                            <dt>
+                                {IS_SMART_CONTRACT(data) ? 'Creator' : 'Owner'}
+                            </dt>
                             <dd>{data.owner}</dd>
 
-                            {!(data.display?.category === 'moveScript') && (
+                            {!IS_SMART_CONTRACT(data) && (
                                 <>
                                     <dt>Contract ID</dt>
                                     <dd>{data?.contract}</dd>

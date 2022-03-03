@@ -91,14 +91,13 @@ function TransactionResult() {
                 ))}
 
                 <dt>To</dt>
-                {data.recipients.length !== 0 
-                  ? data.recipients.map((objectID, index) => (
-                    <dd key={`recipient-${index}`}>{objectID}</dd>
-                ))
-                  : <dd/>
-                }
-
-
+                {data.recipients.length !== 0 ? (
+                    data.recipients.map((objectID, index) => (
+                        <dd key={`recipient-${index}`}>{objectID}</dd>
+                    ))
+                ) : (
+                    <dd />
+                )}
             </dl>
         );
     }
