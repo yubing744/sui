@@ -25,6 +25,10 @@ dl.accommodate {
     @apply lg:w-[40vw];
 }
 
+dl.accommodate > dd:last-child {
+    @apply mb-0;
+}
+
 dd.mutable {
     @apply h-[1.5rem] border-none bg-blue-300;
 }
@@ -47,4 +51,8 @@ div.property > p {
 
 .key {
     @apply font-extrabold;
+}
+
+h3.clickableheader {
+    @apply hover:bg-slate-200 p-1 cursor-pointer;
 }

@@ -104,10 +104,6 @@ describe('End-to-end Tests', () => {
             render(<App />, { wrapper: MemoryRouter });
             searchText(successObjectID);
             expect(screen.getByText('Object ID')).toBeInTheDocument();
-            expect(screen.getByText('Owner')).toBeInTheDocument();
-            expect(screen.getByText('Version')).toBeInTheDocument();
-            expect(screen.getByText('Read Only?')).toBeInTheDocument();
-            expect(screen.getByText('Type')).toBeInTheDocument();
         });
 
         it('when object is mutable', () => {

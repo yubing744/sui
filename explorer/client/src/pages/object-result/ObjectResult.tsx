@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import AceEditor from 'react-ace';
 import { useLocation, useParams } from 'react-router-dom';
 
@@ -91,76 +91,119 @@ function ObjectResult() {
     const data =
         state || mockTransactionData.data.find(({ id }) => id === objID);
 
+    const AdaptiveTextBoxStyle = (data: DataType) =>
+        `${theme.textbox} ${
+            data?.display?.data ? styles.accommodate : styles.noaccommodate
+        }`;
+
+    const [showDescription, setShowDescription] = useState(true);
+    const [showProperties, setShowProperties] = useState(false);
+    const [showConnectedEntities, setShowConnectedEntities] = useState(false);
+
+    useEffect(() => {
+        setShowDescription(true);
+        setShowProperties(false);
+        setShowConnectedEntities(false);
+    }, [data, setShowDescription, setShowProperties, setShowConnectedEntities]);
+
     if (instanceOfDataType(data)) {
         return (
             <div className={styles.resultbox}>
                 {data?.display?.data && <DisplayBox data={data} />}
-                <dl
-                    className={`${theme.textbox} ${
-                        data?.display?.data
-                            ? styles.accommodate
-                            : styles.noaccommodate
-                    }`}
-                >
-                    {data?.description && (
-                        <>
-                            <h2>{data.description.title}</h2>
-                            <dt>Description</dt>
-                            <dd className={styles.unconstrained}>
-                                {data.description.lore}
-                            </dd>
-                        </>
+                <dl className={AdaptiveTextBoxStyle(data)}>
+                    {data?.description?.title && (
+                        <h2>{data.description.title}</h2>
                     )}
 
-                    <dt>Component Objects</dt>
-                    <dd className={styles.unconstrained}>
-                        {data.components ? data.components.join(', ') : ''}
-                    </dd>
-
-                    <dt>Properties</dt>
-                    <dd className={styles.unconstrained}>
-                        {data.properties &&
-                            Object.entries(data.properties).map(
-                                ([key, value]) => (
-                                    <div className={styles.property}>
-                                        <p className={styles.key}>{key}</p>
-                                        <p>{value}</p>
-                                    </div>
-                                )
+                    <h3
+                        className={styles.clickableheader}
+                        onClick={() => setShowDescription(!showDescription)}
+                    >
+                        Description {showDescription ? '-' : '+'}
+                    </h3>
+                    {showDescription && (
+                        <dl className={AdaptiveTextBoxStyle(data)}>
+                            {data?.description && (
+                                <>
+                                    <dt>Lore</dt>
+                                    <dd className={styles.unconstrained}>
+                                        {data.description.lore}
+                                    </dd>
+                                </>
                             )}
-                    </dd>
+                            <dt>Object ID</dt>
+                            <dd>{data.id}</dd>
 
-                    <dt>Owner</dt>
-                    <dd>{data.owner}</dd>
+                            <dt>Version</dt>
+                            <dd>{data.version}</dd>
 
-                    <dt>Contract ID</dt>
-                    <dd>{data?.contract}</dd>
+                            <dt>Read Only?</dt>
+                            {data.readonly ? (
+                                <dd
+                                    data-testid="read-only-text"
+                                    className={styles.immutable}
+                                >
+                                    Immutable
+                                </dd>
+                            ) : (
+                                <dd
+                                    data-testid="read-only-text"
+                                    className={styles.mutable}
+                                >
+                                    Mutable
+                                </dd>
+                            )}
 
-                    <dt>Object ID</dt>
-                    <dd>{data.id}</dd>
+                            <dt>Type</dt>
+                            <dd>{data.type}</dd>
+                        </dl>
+                    )}
 
-                    <dt>Version</dt>
-                    <dd>{data.version}</dd>
-
-                    <dt>Read Only?</dt>
-                    {data.readonly ? (
-                        <dd
-                            data-testid="read-only-text"
-                            className={styles.immutable}
-                        >
-                            Immutable
-                        </dd>
-                    ) : (
-                        <dd
-                            data-testid="read-only-text"
-                            className={styles.mutable}
-                        >
-                            Mutable
+                    <h3
+                        className={styles.clickableheader}
+                        onClick={() => setShowProperties(!showProperties)}
+                    >
+                        Properties {showProperties ? '-' : '+'}
+                    </h3>
+                    {showProperties && (
+                        <dd className={styles.unconstrained}>
+                            {data.properties &&
+                                Object.entries(data.properties).map(
+                                    ([key, value]) => (
+                                        <div className={styles.property}>
+                                            <p className={styles.key}>{key}</p>
+                                            <p>{value}</p>
+                                        </div>
+                                    )
+                                )}
                         </dd>
                     )}
 
-                    <dt>Type</dt>
-                    <dd>{data.type}</dd>
+                    <h3
+                        className={styles.clickableheader}
+                        onClick={() =>
+                            setShowConnectedEntities(!showConnectedEntities)
+                        }
+                    >
+                        Connected Entities {showConnectedEntities ? '-' : '+'}
+                    </h3>
+                    {showConnectedEntities && (
+                        <dl className={AdaptiveTextBoxStyle(data)}>
+                            <dt>Owner</dt>
+                            <dd>{data.owner}</dd>
+
+                            <dt>Contract ID</dt>
+                            <dd>{data?.contract}</dd>
+
+                            <dt>Component Objects</dt>
+                            <dd className={styles.unconstrained}>
+                                {data.components
+                                    ? data.components.join(', ')
+                                    : ''}
+                            </dd>
+                        </dl>
+                    )}
+                    <br className="h-10vh" />
                 </dl>
             </div>
         );
