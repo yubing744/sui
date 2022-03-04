@@ -47,6 +47,11 @@ const noDataID =
 const immutableObject = '16519CAZ7447A07829C4ACAA85312130A4E60677';
 const mutableObject = '4B80Z282907664Z9DA61E1B00C3D29367ZC0CE21';
 
+const addressID =
+    '78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d';
+
+const problemAddressID = 'problemAddress';
+
 describe('End-to-end Tests', () => {
     it('renders the home page', () => {
         render(<App />, { wrapper: MemoryRouter });
@@ -136,6 +141,24 @@ describe('End-to-end Tests', () => {
             expect(
                 screen.getByText(
                     'There was an issue with the data on the following object:'
+                )
+            ).toBeInTheDocument();
+        });
+    });
+
+    describe('Displays data on addresses', () => {
+        it('when address has required fields', () => {
+            render(<App />, { wrapper: MemoryRouter });
+            searchText(addressID);
+            expect(screen.getByText('Address ID')).toBeInTheDocument();
+            expect(screen.getByText('Owned Objects')).toBeInTheDocument();
+        });
+        it('when address has missing fields', () => {
+            render(<App />, { wrapper: MemoryRouter });
+            searchText(problemAddressID);
+            expect(
+                screen.getByText(
+                    'There was an issue with the data on the following address:'
                 )
             ).toBeInTheDocument();
         });

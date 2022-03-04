@@ -1,6 +1,20 @@
 {
     "data": [
         {
+            "id": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
+            "category": "address",
+            "objects": [
+                "4B80Z282907664Z9DA61E1B00C3D29367ZC0CE21",
+                "16519CAZ7447A07829C4ACAA85312130A4E60677",
+                "05408BZY6336Z96718B3ZBZZ74201029Z3D59566",
+                "94397AYX5225Y85607A2YAYY63190918Y2C48455"
+            ]
+        },
+        {
+            "id": "problemAddress",
+            "category": "address"
+        },
+        {
             "id": "A1dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
             "category": "transaction",
             "sender": "78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d",
