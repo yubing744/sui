@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import mockTransactionData from '../../utils/mock_data.json';
+import { navigateWithUnknown } from '../../utils/utility_functions';
 import styles from './Search.module.css';
 
 function Search() {
@@ -11,20 +11,7 @@ function Search() {
     const handleSubmit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const data = mockTransactionData.data.find(
-                ({ id }) => id === input
-            );
-
-            if (data === undefined || !('category' in data)) {
-                navigate(`../missing/${input}`);
-            } else if (data.category === 'transaction') {
-                navigate(`../transactions/${input}`, { state: data });
-            } else if (data.category === 'object') {
-                navigate(`../objects/${input}`, { state: data });
-            } else {
-                navigate(`../missing/${input}`);
-            }
-
+            navigateWithUnknown(input, navigate);
             setInput('');
         },
         [input, navigate, setInput]

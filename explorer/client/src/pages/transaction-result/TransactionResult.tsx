@@ -1,5 +1,6 @@
 import { useLocation, useParams } from 'react-router-dom';
 
+import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
 import mockTransactionData from '../../utils/mock_data.json';
 import styles from './TransactionResult.module.css';
@@ -72,7 +73,13 @@ function TransactionResult() {
         return (
             <dl className={theme.textbox}>
                 <dt>Transaction ID</dt>
-                <dd>{data.id}</dd>
+                <dd>
+                    <Longtext
+                        text={data.id}
+                        category="transactions"
+                        isLink={false}
+                    />
+                </dd>
 
                 <dt>Status</dt>
                 <dd data-testid="transaction-status" className={statusClass}>
@@ -80,20 +87,26 @@ function TransactionResult() {
                 </dd>
 
                 <dt>From</dt>
-                <dd>{data.sender}</dd>
+                <dd>
+                    <Longtext text={data.sender} category="addresses" />
+                </dd>
 
                 <dt>Event</dt>
                 <dd className={actionClass}>{action}</dd>
 
                 <dt>Object</dt>
                 {objectIDs.map((objectID, index) => (
-                    <dd key={`object-${index}`}>{objectID}</dd>
+                    <dd key={`object-${index}`}>
+                        <Longtext text={objectID} category="objects" />
+                    </dd>
                 ))}
 
                 <dt>To</dt>
                 {data.recipients.length !== 0 ? (
-                    data.recipients.map((objectID, index) => (
-                        <dd key={`recipient-${index}`}>{objectID}</dd>
+                    data.recipients.map((address, index) => (
+                        <dd key={`recipient-${index}`}>
+                            <Longtext text={address} category="addresses" />
+                        </dd>
                     ))
                 ) : (
                     <dd />

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import AceEditor from 'react-ace';
 import { useLocation, useParams } from 'react-router-dom';
 
+import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
 import mockTransactionData from '../../utils/mock_data.json';
 import styles from './ObjectResult.module.css';
@@ -135,7 +136,13 @@ function ObjectResult() {
                                 </>
                             )}
                             <dt>Object ID</dt>
-                            <dd>{data.id}</dd>
+                            <dd>
+                                <Longtext
+                                    text={data.id}
+                                    category="objects"
+                                    isLink={false}
+                                />
+                            </dd>
 
                             <dt>Version</dt>
                             <dd>{data.version}</dd>
@@ -205,19 +212,40 @@ function ObjectResult() {
                             <dt>
                                 {IS_SMART_CONTRACT(data) ? 'Creator' : 'Owner'}
                             </dt>
-                            <dd>{data.owner}</dd>
+                            <dd>
+                                <Longtext
+                                    text={data.owner}
+                                    category="unknown"
+                                />
+                            </dd>
 
                             {!IS_SMART_CONTRACT(data) && (
                                 <>
                                     <dt>Contract ID</dt>
-                                    <dd>{data?.contract}</dd>
+                                    <dd>
+                                        {data.contract && (
+                                            <Longtext
+                                                text={data.contract}
+                                                category="objects"
+                                            />
+                                        )}
+                                    </dd>
 
                                     <dt>Component Objects</dt>
-                                    <dd className={styles.unconstrained}>
-                                        {data.components
-                                            ? data.components.join(', ')
-                                            : ''}
-                                    </dd>
+                                    {!data.components && (
+                                        <dd className={styles.unconstrained} />
+                                    )}
+                                    {data.components &&
+                                        data.components.map(
+                                            (objectID, index) => (
+                                                <dd key={`object-${index}`}>
+                                                    <Longtext
+                                                        text={objectID}
+                                                        category="objects"
+                                                    />
+                                                </dd>
+                                            )
+                                        )}
                                 </>
                             )}
                         </dl>
