@@ -7,7 +7,8 @@ const Header = () => {
         <header>
             <nav className={styles.nav}>
                 <Link to="/" aria-label="logo" className={styles.logo}>
-                    Mysten Labs
+                    <span className={styles.leadlogo}>Mysten</span>
+                    <span className={styles.endlogo}>Labs</span>
                 </Link>
             </nav>
         </header>

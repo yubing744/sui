@@ -9,7 +9,7 @@ function App() {
         <div className={styles.app}>
             <Header />
             <div className={styles.search}>
-                <h2>The Sui Explorer</h2>
+                <h2 className={styles.suititle}>The Sui Explorer</h2>
                 <Search />
             </div>
             <main>

@@ -4,5 +4,13 @@
 }
 
 .nav {
-    @apply ml-[5vw];
+    @apply ml-[5vw] my-[1vh];
+}
+
+.leadlogo {
+    font-weight: 700;
+}
+
+.endlogo {
+    font-weight: 400;
 }

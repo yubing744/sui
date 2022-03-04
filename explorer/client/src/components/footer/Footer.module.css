@@ -2,6 +2,10 @@
     @apply fixed bottom-0 bg-black w-full px-[5vw] z-10;
 }
 
+nav.links {
+    @apply text-left leading-[5vh] h-[5vh];
+}
+
 .links > a {
-    @apply text-white no-underline hover:underline leading-[5vh] mr-[5vw];
+    @apply text-white  no-underline hover:underline mr-[5vw] font-light text-sm sm:text-lg my-[5vh];
 }
