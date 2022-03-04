@@ -8,16 +8,13 @@ import {
 import App from '../app/App';
 
 function expectHome() {
-    expect(screen.getByText(/Latest Transactions/i)).toBeInTheDocument();
+    expect(screen.getByTestId('home-page')).toBeInTheDocument();
 }
 
 function searchText(text: string) {
-    fireEvent.change(
-        screen.getByPlaceholderText(
-            /Search transactions, objects or addresses by ID/i
-        ),
-        { target: { value: text } }
-    );
+    fireEvent.change(screen.getByPlaceholderText(/Search by ID/i), {
+        target: { value: text },
+    });
     fireEvent.submit(screen.getByRole('form', { name: /search form/i }));
 }
 

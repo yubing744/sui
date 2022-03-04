@@ -32,7 +32,7 @@ function Search() {
             <input
                 className={styles.searchtext}
                 id="search"
-                placeholder="Search transactions, objects or addresses by ID"
+                placeholder="Search by ID"
                 value={input}
                 onChange={handleTextChange}
                 type="text"
