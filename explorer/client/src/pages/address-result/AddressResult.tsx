@@ -1,5 +1,6 @@
 import { useLocation, useParams } from 'react-router-dom';
 
+import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
 import mockTransactionData from '../../utils/mock_data.json';
@@ -42,10 +43,10 @@ function AddressResult() {
         );
     }
     return (
-        <dl className={theme.textbox}>
-            <dt>There was an issue with the data on the following address:</dt>
-            <dd>{addressID}</dd>
-        </dl>
+        <ErrorResult
+            id={addressID}
+            errorMsg="There was an issue with the data on the following address"
+        />
     );
 }
 

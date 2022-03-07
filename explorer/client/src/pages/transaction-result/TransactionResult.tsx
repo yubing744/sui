@@ -1,5 +1,6 @@
 import { useLocation, useParams } from 'react-router-dom';
 
+import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
 import mockTransactionData from '../../utils/mock_data.json';
@@ -71,8 +72,8 @@ function TransactionResult() {
         }
 
         return (
-            <div>
-                <div className={theme.textrow}>
+            <div className={theme.textresults}>
+                <div>
                     <div>Transaction ID</div>
                     <div>
                         <Longtext
@@ -83,7 +84,7 @@ function TransactionResult() {
                     </div>
                 </div>
 
-                <div className={theme.textrow}>
+                <div>
                     <div>Status</div>
                     <div
                         data-testid="transaction-status"
@@ -93,19 +94,19 @@ function TransactionResult() {
                     </div>
                 </div>
 
-                <div className={theme.textrow}>
+                <div>
                     <div>From</div>
                     <div>
                         <Longtext text={data.sender} category="addresses" />
                     </div>
                 </div>
 
-                <div className={theme.textrow}>
+                <div>
                     <div>Event</div>
                     <div className={actionClass}>{action}</div>
                 </div>
 
-                <div className={theme.textrow}>
+                <div>
                     <div>Object</div>
                     <div>
                         {objectIDs.map((objectID, index) => (
@@ -116,7 +117,7 @@ function TransactionResult() {
                     </div>
                 </div>
 
-                <div className={theme.textrow}>
+                <div>
                     <div>To</div>
                     <div>
                         {data.recipients.length !== 0 ? (
@@ -137,12 +138,10 @@ function TransactionResult() {
         );
     }
     return (
-        <dl className={theme.textbox}>
-            <dt>
-                There was an issue with the data on the following transaction:
-            </dt>
-            <dd>{txID}</dd>
-        </dl>
+        <ErrorResult
+            id={txID}
+            errorMsg="There was an issue with the data on the following transaction"
+        />
     );
 }
 

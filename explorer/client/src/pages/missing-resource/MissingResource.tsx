@@ -1,15 +1,15 @@
 import { useParams } from 'react-router-dom';
 
-import styles from './MissingResource.module.css';
+import ErrorResult from '../../components/error-result/ErrorResult';
 
 const MissingResource = () => {
     const { id } = useParams();
 
     return (
-        <dl className={styles.data}>
-            <dt>Data on the following query could not be found:</dt>
-            <dd>{id}</dd>
-        </dl>
+        <ErrorResult
+            id={id}
+            errorMsg="Data on the following query could not be found"
+        />
     );
 };
 

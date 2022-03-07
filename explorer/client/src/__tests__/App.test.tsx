@@ -107,7 +107,7 @@ describe('End-to-end Tests', () => {
             searchText(problemTransactionID);
             expect(
                 screen.getByText(
-                    'There was an issue with the data on the following transaction:'
+                    'There was an issue with the data on the following transaction'
                 )
             ).toBeInTheDocument();
         });
@@ -137,7 +137,7 @@ describe('End-to-end Tests', () => {
             searchText(problemObjectID);
             expect(
                 screen.getByText(
-                    'There was an issue with the data on the following object:'
+                    'There was an issue with the data on the following object'
                 )
             ).toBeInTheDocument();
         });
@@ -155,7 +155,7 @@ describe('End-to-end Tests', () => {
             searchText(problemAddressID);
             expect(
                 screen.getByText(
-                    'There was an issue with the data on the following address:'
+                    'There was an issue with the data on the following address'
                 )
             ).toBeInTheDocument();
         });
@@ -165,7 +165,7 @@ describe('End-to-end Tests', () => {
         render(<App />, { wrapper: MemoryRouter });
         searchText(noDataID);
         expect(
-            screen.getByText('Data on the following query could not be found:')
+            screen.getByText('Data on the following query could not be found')
         ).toBeInTheDocument();
     });
 

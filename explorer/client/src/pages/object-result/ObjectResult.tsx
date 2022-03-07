@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import AceEditor from 'react-ace';
 import { useLocation, useParams } from 'react-router-dom';
 
+import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
 import mockTransactionData from '../../utils/mock_data.json';
@@ -258,10 +259,10 @@ function ObjectResult() {
         );
     }
     return (
-        <dl className={theme.textbox}>
-            <dt>There was an issue with the data on the following object:</dt>
-            <dd>{objID}</dd>
-        </dl>
+        <ErrorResult
+            id={objID}
+            errorMsg="There was an issue with the data on the following object"
+        />
     );
 }
 
