@@ -1,5 +1,5 @@
 div.textresults > div {
-    @apply mb-[5vh] sm:table mx-[5vw];
+    @apply mb-[5vh] sm:table ml-[5vw];
 }
 
 div.textresults > div:first-child {
@@ -12,7 +12,7 @@ div.textresults > div:last-child {
 
 div.textresults > div > div:first-child {
     @apply font-mono tracking-tight font-semibold block
-    sm:w-[10vw]  sm:table-cell sm:text-right sm:pr-[2vw];
+    sm:w-[15vw] sm:table-cell sm:text-right sm:pr-[2vw];
 }
 
 div.textresults > div > div:nth-child(2) {
