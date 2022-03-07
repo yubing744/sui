@@ -1,9 +1,10 @@
 .textbox > dt {
-    @apply font-bold text-lg mt-[0.5rem];
+    @apply font-mono text-xl leading-6 tracking-tight font-semibold;
 }
 
 .textbox > dd {
-    @apply font-mono text-gray-900 overflow-hidden break-all 
+    @apply font-mono h-[1rem] leading-6 tracking-tight 
+    text-gray-900 overflow-hidden break-all 
   text-sm h-[4rem] lg:h-[3rem] xl:h-[1.5rem] mb-[0.5rem]  
   border-solid border-gray-500 rounded-md p-1 align-middle;
 }

@@ -116,15 +116,17 @@ function ObjectResult() {
                 {data?.display?.data && <DisplayBox data={data} />}
                 <dl className={AdaptiveTextBoxStyle(data)}>
                     {data?.description?.title && (
-                        <h2>{data.description.title}</h2>
+                        <h1 className={styles.title}>
+                            {data.description.title}
+                        </h1>
                     )}
 
-                    <h3
+                    <h2
                         className={styles.clickableheader}
                         onClick={() => setShowDescription(!showDescription)}
                     >
                         Description {showDescription ? '-' : '+'}
-                    </h3>
+                    </h2>
                     {showDescription && (
                         <dl className={AdaptiveTextBoxStyle(data)}>
                             {data?.description && (
@@ -171,14 +173,14 @@ function ObjectResult() {
 
                     {!IS_SMART_CONTRACT(data) && (
                         <>
-                            <h3
+                            <h2
                                 className={styles.clickableheader}
                                 onClick={() =>
                                     setShowProperties(!showProperties)
                                 }
                             >
                                 Properties {showProperties ? '-' : '+'}
-                            </h3>
+                            </h2>
                             {showProperties && (
                                 <dd className={styles.unconstrained}>
                                     {data.properties &&
@@ -199,14 +201,14 @@ function ObjectResult() {
                         </>
                     )}
 
-                    <h3
+                    <h2
                         className={styles.clickableheader}
                         onClick={() =>
                             setShowConnectedEntities(!showConnectedEntities)
                         }
                     >
                         Connected Entities {showConnectedEntities ? '-' : '+'}
-                    </h3>
+                    </h2>
                     {showConnectedEntities && (
                         <dl className={AdaptiveTextBoxStyle(data)}>
                             <dt>

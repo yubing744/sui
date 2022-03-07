@@ -6,7 +6,7 @@ module.exports = {
         fontFamily: {
             sans: ['Inter', ...defaultTheme.fontFamily.sans],
             advanced: ['Inter', 'cursive'],
-            mono: ['Ubuntu Mono', ...defaultTheme.fontFamily.mono],
+            mono: ['Space Mono', ...defaultTheme.fontFamily.mono],
         },
     },
     plugins: [],

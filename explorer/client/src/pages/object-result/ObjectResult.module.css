@@ -21,6 +21,11 @@ img.imagebox {
     border-solid border-stone-300 rounded-lg mt-[1vh] w-[88vw];
 }
 
+dl.accommodate,
+dl.noaccommodate {
+    @apply ml-[2vw];
+}
+
 dl.accommodate {
     @apply lg:w-[40vw];
 }
@@ -53,6 +58,11 @@ div.property > p {
     @apply font-extrabold;
 }
 
-h3.clickableheader {
-    @apply hover:bg-slate-200 p-1 cursor-pointer;
+h2.clickableheader {
+    @apply hover:bg-slate-200 p-1 cursor-pointer
+    font-semibold text-2xl leading-6;
+}
+
+h1.title {
+    @apply font-semibold text-3xl leading-6;
 }
