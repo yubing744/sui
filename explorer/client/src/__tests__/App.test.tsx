@@ -26,26 +26,21 @@ function expectReadOnlyStatus(result: 'Mutable' | 'Immutable') {
     expect(screen.getByTestId('read-only-text')).toHaveTextContent(result);
 }
 
-const successTransactionID =
-    'A1dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
-const failTransactionID =
-    'A2dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
-const pendingTransactionID =
-    'A2Bddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd';
+const successTransactionID = 'txCreateSuccess';
+const failTransactionID = 'txFails';
+const pendingTransactionID = 'txSendPending';
 
-const problemTransactionID = 'ProblemTransaction';
+const problemTransactionID = 'txProblem';
 
-const successObjectID = '16519CAZ7447A07829C4ACAA85312130A4E60677';
+const successObjectID = 'CollectionObject';
 const problemObjectID = 'ProblemObject';
 
-const noDataID =
-    'A1ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddef';
+const noDataID = 'nonsenseQuery';
 
-const immutableObject = '16519CAZ7447A07829C4ACAA85312130A4E60677';
-const mutableObject = '4B80Z282907664Z9DA61E1B00C3D29367ZC0CE21';
+const immutableObject = 'ComponentObject';
+const mutableObject = 'CollectionObject';
 
-const addressID =
-    '78b786a771e314eabc378d81c87c8777715b5e9e509b3b2bded677f14ad5931d';
+const addressID = 'receiverAddress';
 
 const problemAddressID = 'problemAddress';
 
