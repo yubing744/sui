@@ -44,7 +44,7 @@ function TransactionResult() {
             objectIDs = data.mutated;
         } else {
             action = 'Fail';
-            objectIDs = ['-'];
+            objectIDs = [];
         }
 
         const statusClass =
@@ -71,47 +71,69 @@ function TransactionResult() {
         }
 
         return (
-            <dl className={theme.textbox}>
-                <dt>Transaction ID</dt>
-                <dd>
-                    <Longtext
-                        text={data.id}
-                        category="transactions"
-                        isLink={false}
-                    />
-                </dd>
+            <div>
+                <div className={theme.textrow}>
+                    <div>Transaction ID</div>
+                    <div>
+                        <Longtext
+                            text={data.id}
+                            category="transactions"
+                            isLink={false}
+                        />
+                    </div>
+                </div>
 
-                <dt>Status</dt>
-                <dd data-testid="transaction-status" className={statusClass}>
-                    {data.status}
-                </dd>
+                <div className={theme.textrow}>
+                    <div>Status</div>
+                    <div
+                        data-testid="transaction-status"
+                        className={statusClass}
+                    >
+                        {data.status}
+                    </div>
+                </div>
 
-                <dt>From</dt>
-                <dd>
-                    <Longtext text={data.sender} category="addresses" />
-                </dd>
+                <div className={theme.textrow}>
+                    <div>From</div>
+                    <div>
+                        <Longtext text={data.sender} category="addresses" />
+                    </div>
+                </div>
 
-                <dt>Event</dt>
-                <dd className={actionClass}>{action}</dd>
+                <div className={theme.textrow}>
+                    <div>Event</div>
+                    <div className={actionClass}>{action}</div>
+                </div>
 
-                <dt>Object</dt>
-                {objectIDs.map((objectID, index) => (
-                    <dd key={`object-${index}`}>
-                        <Longtext text={objectID} category="objects" />
-                    </dd>
-                ))}
+                <div className={theme.textrow}>
+                    <div>Object</div>
+                    <div>
+                        {objectIDs.map((objectID, index) => (
+                            <div key={`object-${index}`}>
+                                <Longtext text={objectID} category="objects" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-                <dt>To</dt>
-                {data.recipients.length !== 0 ? (
-                    data.recipients.map((address, index) => (
-                        <dd key={`recipient-${index}`}>
-                            <Longtext text={address} category="addresses" />
-                        </dd>
-                    ))
-                ) : (
-                    <dd />
-                )}
-            </dl>
+                <div className={theme.textrow}>
+                    <div>To</div>
+                    <div>
+                        {data.recipients.length !== 0 ? (
+                            data.recipients.map((address, index) => (
+                                <div key={`recipient-${index}`}>
+                                    <Longtext
+                                        text={address}
+                                        category="addresses"
+                                    />
+                                </div>
+                            ))
+                        ) : (
+                            <div />
+                        )}
+                    </div>
+                </div>
+            </div>
         );
     }
     return (

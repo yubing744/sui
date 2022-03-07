@@ -1,18 +1,24 @@
-.textbox > dt {
-    @apply font-mono text-xl leading-6 tracking-tight font-semibold;
+div.textrow {
+    @apply mb-[5vh] sm:table mx-[5vw];
 }
 
-.textbox > dd {
-    @apply font-mono h-[1rem] leading-6 tracking-tight 
-    text-gray-900 overflow-hidden break-all 
-  text-sm h-[4rem] lg:h-[3rem] xl:h-[1.5rem] mb-[0.5rem]  
-  border-solid border-gray-500 rounded-md p-1 align-middle;
+div.textrow:first-child {
+    @apply mt-[5vh];
 }
 
-.textbox > dd:last-child {
+div.textrow:last-child {
     @apply mb-[10vh];
 }
 
-dl.textbox {
-    @apply w-[90vw] mx-auto;
+.textrow > div:first-child {
+    @apply font-mono tracking-tight font-semibold block
+    sm:w-[20vw]  sm:table-cell sm:text-right sm:pr-[2vw];
+}
+
+.textrow > div:nth-child(2) {
+    @apply font-mono tracking-tight text-gray-900 break-all rounded-md block sm:table-cell;
+}
+
+.textrow > div:nth-child(2) > div {
+    @apply mb-[2vh];
 }
