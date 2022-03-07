@@ -96,11 +96,6 @@ function ObjectResult() {
     const data =
         state || mockTransactionData.data.find(({ id }) => id === objID);
 
-    const AdaptiveTextBoxStyle = (data: DataType) =>
-        `${theme.textbox} ${
-            data?.display?.data ? styles.accommodate : styles.noaccommodate
-        }`;
-
     const [showDescription, setShowDescription] = useState(true);
     const [showProperties, setShowProperties] = useState(false);
     const [showConnectedEntities, setShowConnectedEntities] = useState(false);
@@ -115,7 +110,7 @@ function ObjectResult() {
         return (
             <div className={styles.resultbox}>
                 {data?.display?.data && <DisplayBox data={data} />}
-                <dl className={AdaptiveTextBoxStyle(data)}>
+                <div className={styles.textbox}>
                     {data?.description?.title && (
                         <h1 className={styles.title}>
                             {data.description.title}
@@ -129,47 +124,55 @@ function ObjectResult() {
                         Description {showDescription ? '-' : '+'}
                     </h2>
                     {showDescription && (
-                        <dl className={AdaptiveTextBoxStyle(data)}>
+                        <div className={theme.textresults}>
                             {data?.description && (
-                                <>
-                                    <dt>Lore</dt>
-                                    <dd className={styles.unconstrained}>
+                                <div>
+                                    <div>Lore</div>
+                                    <div className={styles.unconstrained}>
                                         {data.description.lore}
-                                    </dd>
-                                </>
+                                    </div>
+                                </div>
                             )}
-                            <dt>Object ID</dt>
-                            <dd>
-                                <Longtext
-                                    text={data.id}
-                                    category="objects"
-                                    isLink={false}
-                                />
-                            </dd>
+                            <div>
+                                <div>Object ID</div>
+                                <div>
+                                    <Longtext
+                                        text={data.id}
+                                        category="objects"
+                                        isLink={false}
+                                    />
+                                </div>
+                            </div>
 
-                            <dt>Version</dt>
-                            <dd>{data.version}</dd>
+                            <div>
+                                <div>Version</div>
+                                <div>{data.version}</div>
+                            </div>
 
-                            <dt>Read Only?</dt>
-                            {data.readonly ? (
-                                <dd
-                                    data-testid="read-only-text"
-                                    className={styles.immutable}
-                                >
-                                    Immutable
-                                </dd>
-                            ) : (
-                                <dd
-                                    data-testid="read-only-text"
-                                    className={styles.mutable}
-                                >
-                                    Mutable
-                                </dd>
-                            )}
+                            <div>
+                                <div>Read Only?</div>
+                                {data.readonly ? (
+                                    <div
+                                        data-testid="read-only-text"
+                                        className={styles.immutable}
+                                    >
+                                        Immutable
+                                    </div>
+                                ) : (
+                                    <div
+                                        data-testid="read-only-text"
+                                        className={styles.mutable}
+                                    >
+                                        Mutable
+                                    </div>
+                                )}
+                            </div>
 
-                            <dt>Type</dt>
-                            <dd>{data.type}</dd>
-                        </dl>
+                            <div>
+                                <div>Type</div>
+                                <div>{data.type}</div>
+                            </div>
+                        </div>
                     )}
 
                     {!IS_SMART_CONTRACT(data) && (
@@ -183,7 +186,7 @@ function ObjectResult() {
                                 Properties {showProperties ? '-' : '+'}
                             </h2>
                             {showProperties && (
-                                <dd className={styles.unconstrained}>
+                                <div className={styles.propertybox}>
                                     {data.properties &&
                                         Object.entries(data.properties).map(
                                             ([key, value]) => (
@@ -197,7 +200,7 @@ function ObjectResult() {
                                                 </div>
                                             )
                                         )}
-                                </dd>
+                                </div>
                             )}
                         </>
                     )}
@@ -211,50 +214,61 @@ function ObjectResult() {
                         Connected Entities {showConnectedEntities ? '-' : '+'}
                     </h2>
                     {showConnectedEntities && (
-                        <dl className={AdaptiveTextBoxStyle(data)}>
-                            <dt>
-                                {IS_SMART_CONTRACT(data) ? 'Creator' : 'Owner'}
-                            </dt>
-                            <dd>
-                                <Longtext
-                                    text={data.owner}
-                                    category="unknown"
-                                />
-                            </dd>
+                        <div className={theme.textresults}>
+                            <div>
+                                <div>
+                                    {IS_SMART_CONTRACT(data)
+                                        ? 'Creator'
+                                        : 'Owner'}
+                                </div>
+                                <div>
+                                    <Longtext
+                                        text={data.owner}
+                                        category="unknown"
+                                    />
+                                </div>
+                            </div>
 
                             {!IS_SMART_CONTRACT(data) && (
                                 <>
-                                    <dt>Contract ID</dt>
-                                    <dd>
-                                        {data.contract && (
-                                            <Longtext
-                                                text={data.contract}
-                                                category="objects"
+                                    <div>
+                                        <div>Contract ID</div>
+                                        <div>
+                                            {data.contract && (
+                                                <Longtext
+                                                    text={data.contract}
+                                                    category="objects"
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div>Component Objects</div>
+                                        {!data.components && (
+                                            <div
+                                                className={styles.unconstrained}
                                             />
                                         )}
-                                    </dd>
-
-                                    <dt>Component Objects</dt>
-                                    {!data.components && (
-                                        <dd className={styles.unconstrained} />
-                                    )}
-                                    {data.components &&
-                                        data.components.map(
-                                            (objectID, index) => (
-                                                <dd key={`object-${index}`}>
-                                                    <Longtext
-                                                        text={objectID}
-                                                        category="objects"
-                                                    />
-                                                </dd>
-                                            )
-                                        )}
+                                        {data.components &&
+                                            data.components.map(
+                                                (objectID, index) => (
+                                                    <div
+                                                        key={`object-${index}`}
+                                                    >
+                                                        <Longtext
+                                                            text={objectID}
+                                                            category="objects"
+                                                        />
+                                                    </div>
+                                                )
+                                            )}
+                                    </div>
                                 </>
                             )}
-                        </dl>
+                        </div>
                     )}
-                    <br className="h-10vh" />
-                </dl>
+                </div>
             </div>
         );
     }

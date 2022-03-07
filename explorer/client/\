@@ -1,8 +1,6 @@
 .resultbox {
-    @apply flex flex-wrap w-[100vw];
+    @apply flex flex-wrap w-full;
 }
-
-/* Display Box CSS */
 
 .display-container {
     @apply ml-[5vw];
@@ -11,7 +9,7 @@
 .imagebox {
     @apply border-solid border-stone-300
     rounded-lg p-[1vw] mx-auto mt-[1vh] 
-    w-[88vw] h-[88vw] lg:w-[35vw] lg:h-[35vw] mb-[10vh];
+    w-[88vw] h-[88vw] lg:w-[35rem] lg:h-[35rem] mb-[10vh];
 }
 
 img.imagebox {
@@ -19,15 +17,8 @@ img.imagebox {
 }
 
 .codebox {
-    @apply overflow-hidden 
-    border-solid border-stone-300 rounded-lg mt-[1vh] w-[88vw]
-    w-[88vw] h-[88vw] lg:w-[35vw] lg:h-[35vw] mb-[10vh];
-}
-
-/* Text Box CSS */
-
-div.textbox {
-    @apply lg:w-[50vw] ml-[5vw] mb-[5vh];
+    @apply overflow-hidden resize-x
+    border-solid border-stone-300 rounded-lg mt-[1vh] w-[88vw];
 }
 
 div.mutable {
@@ -43,11 +34,11 @@ div.resultbox > div > div > div > div.unconstrained {
 }
 
 div.resultbox > div > div.propertybox {
-    @apply flex flex-wrap font-mono;
+  @apply flex flex-wrap;
 }
 
 div.resultbox > div > div.propertybox > div.property {
-    @apply w-[10rem] p-[0.5rem] mx-[1vw] my-[1vh] text-center border-solid rounded-xl bg-slate-200;
+    @apply w-[10rem] p-[0.5rem] text-center border-solid m-1 rounded-xl bg-slate-200 mx-auto;
 }
 
 div.property > p {
@@ -60,7 +51,7 @@ div.property > p {
 
 h2.clickableheader {
     @apply hover:bg-slate-200 p-1 cursor-pointer
-    font-semibold text-2xl leading-6 lg:w-[50vw];
+    font-semibold text-2xl leading-6;
 }
 
 h1.title {
