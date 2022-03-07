@@ -23,23 +23,28 @@ function AddressResult() {
 
     if (instanceOfDataType(data)) {
         return (
-            <dl className={theme.textbox}>
-                <dt>Address ID</dt>
-                <dd>
-                    <Longtext
-                        text={data.id}
-                        category="addresses"
-                        isLink={false}
-                    />
-                </dd>
-
-                <dt>Owned Objects</dt>
-                {data.objects.map((objectID, index) => (
-                    <dd key={`object-${index}`}>
-                        <Longtext text={objectID} category="objects" />
-                    </dd>
-                ))}
-            </dl>
+            <div className={theme.textresults}>
+                <div>
+                    <div>Address ID</div>
+                    <div>
+                        <Longtext
+                            text={data.id}
+                            category="addresses"
+                            isLink={false}
+                        />
+                    </div>
+                </div>
+                <div>
+                    <div>Owned Objects</div>
+                    <div>
+                        {data.objects.map((objectID, index) => (
+                            <div key={`object-${index}`}>
+                                <Longtext text={objectID} category="objects" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
         );
     }
     return (
