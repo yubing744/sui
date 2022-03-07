@@ -2,6 +2,10 @@
     @apply flex flex-wrap w-[100vw];
 }
 
+h1.title {
+    @apply font-semibold text-3xl leading-6;
+}
+
 /* Display Box CSS */
 
 .display-container {
@@ -27,7 +31,15 @@ img.imagebox {
 /* Text Box CSS */
 
 div.textbox {
-    @apply lg:w-[50vw] ml-[5vw] mb-[5vh];
+    @apply ml-[5vw] mb-[10vh] w-[90vw];
+}
+
+div.textbox.accommodate {
+    @apply lg:w-[50vw];
+}
+
+div.textbox.noaccommodate {
+    @apply w-[90vw];
 }
 
 div.mutable {
@@ -38,31 +50,35 @@ div.immutable {
     @apply h-[1.5rem] p-2 border-none bg-gray-300;
 }
 
-div.resultbox > div > div > div > div.unconstrained {
+div.textbox > div > div > div.unconstrained {
     @apply h-fit break-normal min-h-[1.5rem];
 }
 
-div.resultbox > div > div.propertybox {
+/* Property Box CSS */
+
+div.propertybox {
     @apply flex flex-wrap font-mono;
 }
 
-div.resultbox > div > div.propertybox > div.property {
+div.propertybox > div {
     @apply w-[10rem] p-[0.5rem] mx-[1vw] my-[1vh] text-center border-solid rounded-xl bg-slate-200;
 }
 
-div.property > p {
+div.propertybox > div > p {
     @apply m-0;
 }
 
-.key {
+div.propertybox > div > p:first-child {
     @apply font-extrabold;
 }
 
+/* Clickable Header CSS */
+
 h2.clickableheader {
     @apply hover:bg-slate-200 p-1 cursor-pointer
-    font-semibold text-2xl leading-6 lg:w-[50vw];
+    font-semibold text-2xl leading-6;
 }
 
-h1.title {
-    @apply font-semibold text-3xl leading-6;
+div.accommodate > h2.clickableheader {
+    @apply lg:w-[50vw];
 }

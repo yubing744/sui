@@ -110,7 +110,13 @@ function ObjectResult() {
         return (
             <div className={styles.resultbox}>
                 {data?.display?.data && <DisplayBox data={data} />}
-                <div className={styles.textbox}>
+                <div
+                    className={`${styles.textbox} ${
+                        data?.display?.data !== undefined
+                            ? styles.accommodate
+                            : styles.noaccommodate
+                    }`}
+                >
                     {data?.description?.title && (
                         <h1 className={styles.title}>
                             {data.description.title}
@@ -190,12 +196,8 @@ function ObjectResult() {
                                     {data.properties &&
                                         Object.entries(data.properties).map(
                                             ([key, value]) => (
-                                                <div
-                                                    className={styles.property}
-                                                >
-                                                    <p className={styles.key}>
-                                                        {key}
-                                                    </p>
+                                                <div>
+                                                    <p>{key}</p>
                                                     <p>{value}</p>
                                                 </div>
                                             )
