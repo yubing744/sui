@@ -1,20 +1,6 @@
 {
     "data": [
-        {
-            "id": "senderAddress",
-            "category": "address",
-            "objects": []
-        },
-        {
-            "id": "receiverAddress",
-            "category": "address",
-            "objects": ["CollectionObject", "standaloneObject"]
-        },
-        {
-            "id": "problemAddress",
-            "category": "address"
-        },
-        {
+       {
             "id": "txCreateSuccess",
             "category": "transaction",
             "sender": "senderAddress",
@@ -57,6 +43,80 @@
         {
             "id": "txProblem",
             "category": "transaction"
+        },
+        {
+            "id": "senderAddress",
+            "category": "object",
+            "objects": [],
+            "version": "6",
+            "readonly": "false",
+            "objType": "0x2::Example::Player",
+            "data": {
+              "contents": {
+                "earth_runes_count": 4,
+                "fire_runes_count": 2,
+                "water_runes_count": 1,
+                "wind_runes_count": 8,
+                "id": {},
+                "player_name": {
+                  "bytes": [
+                    84,
+                    101,
+                    115,
+                    116,
+                    32,
+                    80,
+                    108,
+                    97,
+                    121,
+                    101,
+                    114
+                ]
+                }
+              }
+            }
+        },
+        {
+            "id": "receiverAddress",
+            "category": "object",
+            "objects": [],
+            "version": "5",
+            "readonly": "false",
+            "objType": "0x2::Example::Player",
+            "data": {
+              "contents": {
+                "earth_runes_count": 1,
+                "fire_runes_count": 10,
+                "water_runes_count": 3,
+                "wind_runes_count": 2,
+                "id": {},
+                "player_name": {
+                  "bytes": [
+                    84,
+                    101,
+                    115,
+                    116,
+                    32,
+                    80,
+                    108,
+                    97,
+                    121,
+                    101,
+                    114
+                ]
+                },
+                "standalone_id": {
+                  "bytes": "standaloneObject"
+                },
+                "owned_collections_id": {
+                  "vec": [
+                    {
+                      "bytes": "CollectionObject"
+                    }
+                  ]
+                }
+              }
+            }
         },
         {
             "id": "standaloneObject",
