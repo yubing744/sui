@@ -144,10 +144,10 @@
         {
             "id": "ComponentObject",
             "category": "object",
-            "owner": "SinlgeOwner(k#CollectionObject)",
+            "owner": "SingleOwner(k#CollectionObject)",
             "version": "1",
             "readonly": "true",
-            "type": "0x2::Cosmetic::Plant",
+            "objType": "0x2::Cosmetic::Plant",
             "data": {
                 "contents": {
                     "display": {
@@ -171,7 +171,7 @@
             "owner": "SingleOwner(k#senderAddress)",
             "version": "1",
             "readonly": false,
-            "type": "0x2::SmartContract::SmartContract",
+            "objType": "0x2::SmartContract::SmartContract",
             "data": {
                 "contents": {
                     "display": {

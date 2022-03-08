@@ -14,31 +14,25 @@ type DataType = {
     id: string;
     category: string;
     owner: string;
-    version: number;
-    readonly: boolean;
-    type: string;
-    display?: {
-        category: string;
-        data: string;
+    version: string;
+    readonly: string;
+    objType: string;
+    data: {
+        contents: {
+            [key: string]: any;
+        };
     };
-    description?: {
-        title: string;
-        lore: string;
-    };
-    properties?: {
-        [key: string]: string;
-    };
-    components?: string[];
-    contract?: string;
 };
 
 const IS_SMART_CONTRACT = (data: DataType) =>
-    data.display?.category === 'moveScript';
+    data.data.contents.display?.category === 'moveScript';
 
 function instanceOfDataType(object: any): object is DataType {
     return (
         object !== undefined &&
-        ['id', 'owner', 'version', 'readonly', 'type'].every((x) => x in object)
+        ['id', 'owner', 'version', 'readonly', 'objType'].every(
+            (x) => x in object
+        )
     );
 }
 
@@ -52,7 +46,7 @@ function DisplayBox({ data }: { data: DataType }) {
         [setHasDisplayLoaded]
     );
 
-    if (data.display?.category === 'imageURL') {
+    if (data.data.contents.display?.category === 'imageURL') {
         return (
             <div className={styles['display-container']}>
                 {!hasDisplayLoaded && (
@@ -64,7 +58,7 @@ function DisplayBox({ data }: { data: DataType }) {
                     className={styles.imagebox}
                     style={imageStyle}
                     alt="NFT"
-                    src={data.display.data}
+                    src={data.data.contents.display.data}
                     onLoad={handleImageLoad}
                 />
             </div>
@@ -76,7 +70,7 @@ function DisplayBox({ data }: { data: DataType }) {
             <div className={styles['display-container']}>
                 <AceEditor
                     theme="github"
-                    value={data.display?.data}
+                    value={data.data.contents.display?.data}
                     showGutter={true}
                     readOnly={true}
                     fontSize="0.8rem"
@@ -98,31 +92,25 @@ function ObjectResult() {
 
     const [showDescription, setShowDescription] = useState(true);
     const [showProperties, setShowProperties] = useState(false);
-    const [showConnectedEntities, setShowConnectedEntities] = useState(false);
 
     useEffect(() => {
         setShowDescription(true);
         setShowProperties(false);
-        setShowConnectedEntities(false);
-    }, [data, setShowDescription, setShowProperties, setShowConnectedEntities]);
+    }, [data, setShowDescription, setShowProperties]);
 
     if (instanceOfDataType(data)) {
         return (
             <div className={styles.resultbox}>
-                {data?.display?.data && <DisplayBox data={data} />}
+                {data?.data.contents.display?.data && (
+                    <DisplayBox data={data} />
+                )}
                 <div
                     className={`${styles.textbox} ${
-                        data?.display?.data !== undefined
+                        data?.data.contents.display?.data !== undefined
                             ? styles.accommodate
                             : styles.noaccommodate
                     }`}
                 >
-                    {data?.description?.title && (
-                        <h1 className={styles.title}>
-                            {data.description.title}
-                        </h1>
-                    )}
-
                     <h2
                         className={styles.clickableheader}
                         onClick={() => setShowDescription(!showDescription)}
@@ -131,14 +119,6 @@ function ObjectResult() {
                     </h2>
                     {showDescription && (
                         <div className={theme.textresults}>
-                            {data?.description && (
-                                <div>
-                                    <div>Lore</div>
-                                    <div className={styles.unconstrained}>
-                                        {data.description.lore}
-                                    </div>
-                                </div>
-                            )}
                             <div>
                                 <div>Object ID</div>
                                 <div>
@@ -162,21 +142,26 @@ function ObjectResult() {
                                         data-testid="read-only-text"
                                         className={styles.immutable}
                                     >
-                                        Immutable
+                                        True
                                     </div>
                                 ) : (
                                     <div
                                         data-testid="read-only-text"
                                         className={styles.mutable}
                                     >
-                                        Mutable
+                                        False
                                     </div>
                                 )}
                             </div>
 
                             <div>
                                 <div>Type</div>
-                                <div>{data.type}</div>
+                                <div>{data.objType}</div>
+                            </div>
+
+                            <div>
+                                <div>Owner</div>
+                                <div>{data.owner}</div>
                             </div>
                         </div>
                     )}
@@ -193,82 +178,77 @@ function ObjectResult() {
                             </h2>
                             {showProperties && (
                                 <div className={styles.propertybox}>
-                                    {data.properties &&
-                                        Object.entries(data.properties).map(
-                                            ([key, value]) => (
-                                                <div>
-                                                    <p>{key}</p>
-                                                    <p>{value}</p>
-                                                </div>
-                                            )
+                                    {data.data.contents &&
+                                        Object.entries(data.data.contents).map(
+                                            ([key, value]) => {
+                                                if (
+                                                    [
+                                                        'number',
+                                                        'string',
+                                                    ].includes(typeof value)
+                                                ) {
+                                                    return (
+                                                        <div>
+                                                            <p>
+                                                                {key
+                                                                    .split('_')
+                                                                    .join(' ')}
+                                                            </p>
+                                                            <p>{value}</p>
+                                                        </div>
+                                                    );
+                                                }
+                                                if (value.bytes) {
+                                                    return (
+                                                        <div>
+                                                            <p>
+                                                                {key
+                                                                    .split('_')
+                                                                    .join(' ')}
+                                                            </p>
+                                                            <p>
+                                                                {Array.isArray(
+                                                                    value.bytes
+                                                                )
+                                                                    ? value.bytes.join(
+                                                                          ' '
+                                                                      )
+                                                                    : value.bytes}
+                                                            </p>
+                                                        </div>
+                                                    );
+                                                }
+
+                                                if (value.vec) {
+                                                    return (
+                                                        <div>
+                                                            <p>
+                                                                {key
+                                                                    .split('_')
+                                                                    .join(' ')}
+                                                            </p>
+                                                            <p>
+                                                                {value.vec.map(
+                                                                    (el: {
+                                                                        bytes: string;
+                                                                    }) => (
+                                                                        <p>
+                                                                            {
+                                                                                el.bytes
+                                                                            }
+                                                                        </p>
+                                                                    )
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    );
+                                                }
+                                                return <></>;
+                                            }
                                         )}
                                 </div>
                             )}
                         </>
-                    )}
-
-                    <h2
-                        className={styles.clickableheader}
-                        onClick={() =>
-                            setShowConnectedEntities(!showConnectedEntities)
-                        }
-                    >
-                        Connected Entities {showConnectedEntities ? '-' : '+'}
-                    </h2>
-                    {showConnectedEntities && (
-                        <div className={theme.textresults}>
-                            <div>
-                                <div>
-                                    {IS_SMART_CONTRACT(data)
-                                        ? 'Creator'
-                                        : 'Owner'}
-                                </div>
-                                <div>
-                                    <Longtext
-                                        text={data.owner}
-                                        category="unknown"
-                                    />
-                                </div>
-                            </div>
-
-                            {!IS_SMART_CONTRACT(data) && (
-                                <>
-                                    <div>
-                                        <div>Contract ID</div>
-                                        <div>
-                                            {data.contract && (
-                                                <Longtext
-                                                    text={data.contract}
-                                                    category="objects"
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div>Component Objects</div>
-                                        {!data.components && (
-                                            <div
-                                                className={styles.unconstrained}
-                                            />
-                                        )}
-                                        {data.components &&
-                                            data.components.map(
-                                                (objectID, index) => (
-                                                    <div
-                                                        key={`object-${index}`}
-                                                    >
-                                                        <Longtext
-                                                            text={objectID}
-                                                            category="objects"
-                                                        />
-                                                    </div>
-                                                )
-                                            )}
-                                    </div>
-                                </>
-                            )}
-                        </div>
                     )}
                 </div>
             </div>
