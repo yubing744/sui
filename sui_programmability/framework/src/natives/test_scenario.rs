@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::EventType;
+use core::panic;
 use move_binary_format::errors::PartialVMResult;
 use move_core_types::{account_address::AccountAddress, value::MoveTypeLayout};
 use move_vm_runtime::native_functions::NativeContext;
@@ -10,25 +11,25 @@ use move_vm_types::{
     loaded_data::runtime_types::Type,
     natives::function::{native_gas, NativeResult},
     pop_arg,
-    values::Value,
+    values::{Struct, Value},
 };
 use num_enum::TryFromPrimitive;
 use smallvec::smallvec;
 use std::collections::{BTreeMap, VecDeque};
-use sui_types::base_types::ObjectID;
+use sui_types::{
+    base_types::{ObjectID, SuiAddress},
+    object::Owner,
+};
 
 type Event = (Vec<u8>, u64, Type, MoveTypeLayout, Value);
 
 const WRAPPED_OBJECT_EVENT: u64 = 255;
 
-type SuiAddressBytes = Vec<u8>;
-
 #[derive(Debug)]
 struct OwnedObj {
     value: Value,
     type_: Type,
-    owner: SuiAddressBytes,
-    is_read_only: bool,
+    owner: Owner,
 }
 
 /// Set of all live objects in the current test scenario
@@ -37,6 +38,37 @@ struct OwnedObj {
 // into the module's StructHandle table for structs) to something human-readable like `TypeTag`.
 // TODO: add a native function that prints the log of transfers, deletes, wraps for debugging purposes
 type Inventory = BTreeMap<ObjectID, OwnedObj>;
+
+fn get_id(versioned_id: &Value) -> AccountAddress {
+    // All of the following unwraps are safe by construction because a properly verified
+    // bytecode ensures that the parameter must be of type UniqueID with the correct fields:
+    // ```
+    // VersionedID { id: UniqueID { id: ID { bytes: address } } .. }
+    // ```
+    versioned_id
+        .copy_value()
+        .unwrap()
+        .value_as::<Struct>()
+        .unwrap() // Convert to VersionedID
+        .unpack()
+        .unwrap()
+        .next() // Get id field of VersionedID
+        .unwrap()
+        .value_as::<Struct>() // Convert to UniqueID
+        .unwrap()
+        .unpack()
+        .unwrap()
+        .next()
+        .unwrap() // Get id field of UniqueID
+        .value_as::<Struct>() // Convert to ID
+        .unwrap()
+        .unpack()
+        .unwrap()
+        .next()
+        .unwrap()
+        .value_as::<AccountAddress>()
+        .unwrap()
+}
 
 /// Process the event log to determine the global set of live objects
 fn get_global_inventory(events: &[Event]) -> Inventory {
@@ -53,31 +85,36 @@ fn get_global_inventory(events: &[Event]) -> Inventory {
         match event_type {
             EventType::TransferToAddress
             | EventType::TransferToObject
-            | EventType::TransferToAddressAndFreeze => {
+            | EventType::FreezeObject => {
                 let obj_bytes = val
                     .simple_serialize(layout)
                     .expect("This will always succeed for a well-structured event log");
                 let obj_id = ObjectID::try_from(&obj_bytes[0..ObjectID::LENGTH])
                     .expect("This will always succeed on an object from a system transfer event");
-                let is_read_only = event_type == EventType::TransferToAddressAndFreeze;
+                let owner = match event_type {
+                    EventType::FreezeObject => Owner::SharedImmutable,
+                    EventType::TransferToAddress => {
+                        Owner::AddressOwner(SuiAddress::try_from(recipient.clone()).unwrap())
+                    }
+                    EventType::TransferToObject => {
+                        Owner::ObjectOwner(SuiAddress::try_from(recipient.clone()).unwrap())
+                    }
+                    _ => panic!("Unrecognized event_type"),
+                };
                 // note; may overwrite older values of the object, which is intended
                 inventory.insert(
                     obj_id,
                     OwnedObj {
                         value: Value::copy_value(val).unwrap(),
                         type_: type_.clone(),
-                        owner: recipient.clone(),
-                        is_read_only,
+                        owner,
                     },
                 );
             }
             EventType::DeleteObjectID => {
-                let id_bytes = val
-                    .simple_serialize(layout)
-                    .expect("This will always succeed for a well-structured event log");
-                let obj_id = ObjectID::try_from(id_bytes.as_slice()).expect("This will always succeed for a well-formed from a system delete object ID event");
+                let obj_id = get_id(val);
                 // note: obj_id may or may not be present in `inventory`--a useer can create an ID and delete it without associating it with a transferred object
-                inventory.remove(&obj_id);
+                inventory.remove(&obj_id.into());
             }
             EventType::User => (),
         }
@@ -93,10 +130,16 @@ fn get_inventory_for(
     events: &[Event],
 ) -> Vec<Value> {
     let inventory = get_global_inventory(&events[..tx_end_index]);
+    let sui_addr = SuiAddress::try_from(addr.to_vec()).unwrap();
     inventory
         .into_iter()
         .filter_map(|(_, obj)| {
-            if (obj.owner == addr.to_vec() || obj.is_read_only) && &obj.type_ == type_ {
+            // TODO: We should also be able to include objects indirectly owned by the
+            // requested address through owning other objects.
+            // https://github.com/MystenLabs/sui/issues/673
+            if (obj.owner == Owner::AddressOwner(sui_addr) || obj.owner.is_shared())
+                && &obj.type_ == type_
+            {
                 Some(obj.value)
             } else {
                 None
@@ -120,13 +163,11 @@ pub fn deleted_object_ids(
         .events()
         .iter()
         .skip(tx_begin_idx)
-        .filter_map(|(_, event_type_byte, _, layout, val)| {
+        .filter_map(|(_, event_type_byte, _, _, val)| {
             if *event_type_byte == EventType::DeleteObjectID as u64 {
                 // TODO: for some reason, this creates internal type errors in the VM. Create a fresh value with the object ID instead
                 //Some(Value::copy_value(val).unwrap())
-                let id_bytes = val
-                    .simple_serialize(layout)
-                    .expect("This will always succeed for a well-structured event log");
+                let id_bytes = get_id(val).to_vec();
                 Some(Value::vector_u8(id_bytes))
             } else {
                 None
