@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
-import mockTransactionData from '../../utils/mock_data.json';
+import { findDataFromID } from '../../utils/utility_functions';
 import styles from './TransactionResult.module.css';
 
 type DataType = {
@@ -27,8 +27,7 @@ function TransactionResult() {
     const { state } = useLocation();
     const { id: txID } = useParams();
 
-    const data =
-        state || mockTransactionData.data.find(({ id }) => id === txID);
+    const data = findDataFromID(txID, state);
 
     if (instanceOfDataType(data)) {
         let action: string;

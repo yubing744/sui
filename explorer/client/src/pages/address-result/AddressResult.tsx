@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
-import mockTransactionData from '../../utils/mock_data.json';
+import { findDataFromID } from '../../utils/utility_functions';
 
 type DataType = {
     id: string;
@@ -18,8 +18,7 @@ function AddressResult() {
     const { state } = useLocation();
     const { id: addressID } = useParams();
 
-    const data =
-        state || mockTransactionData.data.find(({ id }) => id === addressID);
+    const data = findDataFromID(addressID, state);
 
     if (instanceOfDataType(data)) {
         return (

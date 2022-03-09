@@ -1,5 +1,8 @@
 import mockTransactionData from './mock_data.json';
 
+const findDataFromID = (targetID: string | undefined, state: object | unknown) => 
+        state || mockTransactionData.data.find(({ id }) => id === targetID);
+
 const navigateWithUnknown = (input: string, navigate: Function) => {
     const data = mockTransactionData.data.find(({ id }) => id === input);
 
@@ -16,4 +19,4 @@ const navigateWithUnknown = (input: string, navigate: Function) => {
     }
 };
 
-export { navigateWithUnknown };
+export { findDataFromID, navigateWithUnknown };
