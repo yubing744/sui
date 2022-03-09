@@ -111,8 +111,8 @@ function ObjectResult() {
 
     useEffect(() => {
         setShowDescription(true);
-        setShowProperties(false);
-        setShowConnectedEntities(false);
+        setShowProperties(true);
+        setShowConnectedEntities(true);
     }, [data, setShowDescription, setShowProperties, setShowConnectedEntities]);
 
     if (instanceOfDataType(data)) {

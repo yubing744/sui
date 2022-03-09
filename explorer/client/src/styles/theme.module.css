@@ -1,18 +1,18 @@
 div.textresults > div {
-    @apply mb-[5vh] sm:table ml-[5vw];
+    @apply mb-[2vh] sm:table ml-[5vw];
 }
 
 div.textresults > div:first-child {
-    @apply mt-[5vh];
+    @apply mt-[2vh];
 }
 
 div.textresults > div:last-child {
-    @apply mb-[10vh];
+    @apply mb-[2vh];
 }
 
 div.textresults > div > div:first-child {
     @apply font-mono tracking-tight font-semibold block
-    sm:w-[15vw] sm:table-cell sm:text-right sm:pr-[2vw];
+    sm:w-[10vw] sm:table-cell sm:pr-[2vw];
 }
 
 div.textresults > div > div:nth-child(2) {
