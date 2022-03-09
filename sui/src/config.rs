@@ -226,8 +226,8 @@ fn default_move_framework_lib() -> PathBuf {
 }
 
 const DEFAULT_NUMBER_OF_AUTHORITIES: usize = 4;
-const DEFAULT_NUMBER_OF_ACCOUNT: usize = 1;
-const DEFAULT_NUMBER_OF_OBJECT_PER_ACCOUNT: usize = 750;
+const DEFAULT_NUMBER_OF_ACCOUNT: usize = 5;
+const DEFAULT_NUMBER_OF_OBJECT_PER_ACCOUNT: usize = 5;
 
 impl GenesisConfig {
     pub fn default_genesis(path: &Path) -> Result<Self, anyhow::Error> {

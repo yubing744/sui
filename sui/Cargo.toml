@@ -80,3 +80,7 @@ path = "src/sui-move.rs"
 [[bin]]
 name = "rest_server"
 path = "src/rest_server.rs"
+
+[[bin]]
+name = "rest_client"
+path = "src/rest_client.rs"
