@@ -92,11 +92,29 @@ function ObjectResult() {
 
     const [showDescription, setShowDescription] = useState(true);
     const [showProperties, setShowProperties] = useState(false);
+    const [showConnectedEntities, setShowConnectedEntities] = useState(false);
+
+    const prepLabel = (label: string) => label.split('_').join(' ');
+    const checkIsPropertyType = (value: any) =>
+        ['number', 'string'].includes(typeof value);
+
+    const checkIsIDType = (key: string, value: any) =>
+        ( /owned/.test(key) || /_id/.test(key) && value?.bytes) || value?.vec;
+    const checkSingleID = (value: any) => value?.bytes;
+    const checkVecIDs = (value: any) => value?.vec;
+
+    const extractOwnerData = (singleownerstring: string) => {
+        const re = /SingleOwner\(k#(.*)\)/;
+        const result = re.exec(singleownerstring);
+
+        return result ? result[1] : '';
+    };
 
     useEffect(() => {
         setShowDescription(true);
         setShowProperties(false);
-    }, [data, setShowDescription, setShowProperties]);
+        setShowConnectedEntities(false);
+    }, [data, setShowDescription, setShowProperties, setShowConnectedEntities]);
 
     if (instanceOfDataType(data)) {
         return (
@@ -158,11 +176,6 @@ function ObjectResult() {
                                 <div>Type</div>
                                 <div>{data.objType}</div>
                             </div>
-
-                            <div>
-                                <div>Owner</div>
-                                <div>{data.owner}</div>
-                            </div>
                         </div>
                     )}
 
@@ -182,64 +195,14 @@ function ObjectResult() {
                                         Object.entries(data.data.contents).map(
                                             ([key, value]) => {
                                                 if (
-                                                    [
-                                                        'number',
-                                                        'string',
-                                                    ].includes(typeof value)
+                                                    checkIsPropertyType(value)
                                                 ) {
                                                     return (
                                                         <div>
                                                             <p>
-                                                                {key
-                                                                    .split('_')
-                                                                    .join(' ')}
+                                                                {prepLabel(key)}
                                                             </p>
                                                             <p>{value}</p>
-                                                        </div>
-                                                    );
-                                                }
-                                                if (value.bytes) {
-                                                    return (
-                                                        <div>
-                                                            <p>
-                                                                {key
-                                                                    .split('_')
-                                                                    .join(' ')}
-                                                            </p>
-                                                            <p>
-                                                                {Array.isArray(
-                                                                    value.bytes
-                                                                )
-                                                                    ? value.bytes.join(
-                                                                          ' '
-                                                                      )
-                                                                    : value.bytes}
-                                                            </p>
-                                                        </div>
-                                                    );
-                                                }
-
-                                                if (value.vec) {
-                                                    return (
-                                                        <div>
-                                                            <p>
-                                                                {key
-                                                                    .split('_')
-                                                                    .join(' ')}
-                                                            </p>
-                                                            <p>
-                                                                {value.vec.map(
-                                                                    (el: {
-                                                                        bytes: string;
-                                                                    }) => (
-                                                                        <p>
-                                                                            {
-                                                                                el.bytes
-                                                                            }
-                                                                        </p>
-                                                                    )
-                                                                )}
-                                                            </p>
                                                         </div>
                                                     );
                                                 }
@@ -249,6 +212,59 @@ function ObjectResult() {
                                 </div>
                             )}
                         </>
+                    )}
+
+                    <h2
+                        className={styles.clickableheader}
+                        onClick={() =>
+                            setShowConnectedEntities(!showConnectedEntities)
+                        }
+                    >
+                        Connected Entities {showConnectedEntities ? '-' : '+'}
+                    </h2>
+                    {showConnectedEntities && (
+                        <div className={theme.textresults}>
+                            <div>
+                                <div>Owner</div>
+                                <Longtext
+                                    text={extractOwnerData(data.owner)}
+                                    category="objects"
+                                    isLink={true}
+                                />
+                            </div>
+                            {data.data.contents &&
+                                Object.entries(data.data.contents)
+                                    .filter(([key, value]) =>
+                                        checkIsIDType(key, value)
+                                    )
+                                    .map(([key, value]) => (
+                                        <div>
+                                            <div>{prepLabel(key)}</div>
+                                            {checkSingleID(value) && (
+                                                <Longtext
+                                                    text={value.bytes}
+                                                    category="unknown"
+                                                />
+                                            )}
+                                            {checkVecIDs(value) && (
+                                                <div>
+                                                    {value?.vec.map(
+                                                        (value2: {
+                                                            bytes: string;
+                                                        }) => (
+                                                            <Longtext
+                                                                text={
+                                                                    value2.bytes
+                                                                }
+                                                                category="unknown"
+                                                            />
+                                                        )
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                        </div>
                     )}
                 </div>
             </div>

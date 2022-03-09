@@ -5,7 +5,7 @@
             "category": "transaction",
             "sender": "senderAddress",
             "status": "success",
-            "created": ["CollectionObject", "ComponentObject", "DeletedObject"],
+            "created": ["playerOne", "playerTwo", "CollectionObject", "ComponentObject", "DeletedObject"],
             "recipients": []
         },
         {
@@ -20,7 +20,7 @@
             "category": "transaction",
             "sender": "senderAddress",
             "status": "pending",
-            "mutated": ["CollectionObject", "ComponentObject"],
+            "mutated": ["playerOne", "playerTwo", "CollectionObject", "ComponentObject", "DeletedObject"],
             "recipients": ["receiverAddress"]
         },
         {
@@ -28,7 +28,7 @@
             "category": "transaction",
             "sender": "senderAddress",
             "status": "success",
-            "mutated": ["CollectionObject", "ComponentObject"],
+            "mutated": ["playerOne", "playerTwo", "CollectionObject", "ComponentObject", "DeletedObject"],
             "recipients": ["receiverAddress"]
         },
 
@@ -45,8 +45,8 @@
             "category": "transaction"
         },
         {
-            "id": "senderAddress",
-            "owner": "SingleOwner(k#09818aac3edf9cf9b006b70c36e7241768b26386)",
+            "id": "playerOne",
+            "owner": "SingleOwner(k#receiverAddress)",
             "category": "object",
             "version": "6",
             "readonly": "false",
@@ -69,8 +69,8 @@
             }
         },
         {
-            "id": "receiverAddress",
-            "owner": "SingleOwner(k#09818aac3edf9cf9b006b70c36e7241768b26386)",
+            "id": "playerTwo",
+            "owner": "SingleOwner(k#receiverAddress)",
             "category": "object",
             "version": "5",
             "readonly": "false",
@@ -103,7 +103,7 @@
         {
             "id": "standaloneObject",
             "category": "object",
-            "owner": "SingleOwner(k#receiverAddress)",
+            "owner": "SingleOwner(k#playerTwo)",
             "version": "87",
             "readonly": "true",
             "objType": "0x2::Coin::Coin<0x2::USD::USD>",
@@ -121,7 +121,7 @@
         {
             "id": "CollectionObject",
             "category": "object",
-            "owner": "SingleOwner(k#receiverAddress)",
+            "owner": "SingleOwner(k#playerTwo)",
             "version": "2",
             "readonly": "false",
             "objType": "0x2::MystenUniverse::Collection",
@@ -137,7 +137,7 @@
                     "id": {},
                     "level": 0,
                     "lore": "Customizable with Decoration Cosmetics",
-                    "contract": "smartContract"
+                    "contract_id": {"bytes": "smartContract"}
                 }
             }
         },
@@ -161,7 +161,7 @@
                     "Temperature": "Hot",
                     "Light": "Medium",
                     "Flowering Period": "Spring to early Summer",
-                    "contract": "smartContract"
+                    "contract_id": {"bytes": "smartContract"}
                 }
             }
         },
