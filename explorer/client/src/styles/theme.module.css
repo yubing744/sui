@@ -1,9 +1,10 @@
 div.textresults > div {
-    @apply mb-[2vh] sm:table ml-[5vw];
+    @apply py-[1vh] sm:table ml-[5vw] 
+  border-0 border-b border-solid border-gray-300 w-[90%];
 }
 
 div.textresults > div:first-child {
-    @apply mt-[2vh];
+    @apply mt-[1vh];
 }
 
 div.textresults > div:last-child {
@@ -16,7 +17,7 @@ div.textresults > div > div:first-child {
 }
 
 div.textresults > div > div:nth-child(2) {
-    @apply font-mono tracking-tight text-gray-900 break-all rounded-md block sm:table-cell;
+    @apply font-mono tracking-tight text-gray-900 break-all rounded-l-md block sm:table-cell;
 }
 
 div.textresults > div > div:nth-child(2) > div {

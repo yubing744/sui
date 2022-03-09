@@ -35,7 +35,7 @@ div.textbox {
 }
 
 div.textbox.accommodate {
-    @apply lg:w-[50vw];
+    @apply lg:w-[40vw];
 }
 
 div.textbox.noaccommodate {
@@ -57,7 +57,7 @@ div.textbox > div > div > div.unconstrained {
 /* Property Box CSS */
 
 div.propertybox {
-    @apply flex flex-wrap font-mono;
+    @apply flex flex-wrap font-mono lg:w-[50vw];
 }
 
 div.propertybox > div {
@@ -76,7 +76,7 @@ div.propertybox > div > p:first-child {
 
 h2.clickableheader {
     @apply hover:bg-slate-200 p-1 cursor-pointer
-    font-semibold text-2xl leading-6;
+    font-semibold text-2xl leading-6 mb-0;
 }
 
 div.accommodate > h2.clickableheader {
