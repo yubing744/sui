@@ -22,7 +22,7 @@ function expectTransactionStatus(result: 'fail' | 'success' | 'pending') {
     expect(screen.getByTestId('transaction-status')).toHaveTextContent(result);
 }
 
-function expectReadOnlyStatus(result: 'Mutable' | 'Immutable') {
+function expectReadOnlyStatus(result: 'True' | 'False') {
     expect(screen.getByTestId('read-only-text')).toHaveTextContent(result);
 }
 
@@ -37,8 +37,8 @@ const problemObjectID = 'ProblemObject';
 
 const noDataID = 'nonsenseQuery';
 
-const immutableObject = 'ComponentObject';
-const mutableObject = 'CollectionObject';
+const readOnlyObject = 'ComponentObject';
+const notReadOnlyObject = 'CollectionObject';
 
 const addressID = 'receiverAddress';
 
@@ -115,16 +115,16 @@ describe('End-to-end Tests', () => {
             expect(screen.getByText('Object ID')).toBeInTheDocument();
         });
 
-        it('when object is mutable', () => {
+        it('when object is read only', () => {
             render(<App />, { wrapper: MemoryRouter });
-            searchText(mutableObject);
-            expectReadOnlyStatus('Mutable');
+            searchText(readOnlyObject);
+            expectReadOnlyStatus('True');
         });
 
-        it('when object is immutable', () => {
+        it('when object is not read only', () => {
             render(<App />, { wrapper: MemoryRouter });
-            searchText(immutableObject);
-            expectReadOnlyStatus('Immutable');
+            searchText(notReadOnlyObject);
+            expectReadOnlyStatus('False');
         });
 
         it('when object data has missing info', () => {

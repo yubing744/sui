@@ -99,7 +99,7 @@ function ObjectResult() {
         ['number', 'string'].includes(typeof value);
 
     const checkIsIDType = (key: string, value: any) =>
-        ( /owned/.test(key) || /_id/.test(key) && value?.bytes) || value?.vec;
+        /owned/.test(key) || (/_id/.test(key) && value?.bytes) || value?.vec;
     const checkSingleID = (value: any) => value?.bytes;
     const checkVecIDs = (value: any) => value?.vec;
 
@@ -155,7 +155,7 @@ function ObjectResult() {
 
                             <div>
                                 <div>Read Only?</div>
-                                {data.readonly ? (
+                                {data.readonly === 'true' ? (
                                     <div
                                         data-testid="read-only-text"
                                         className={styles.immutable}

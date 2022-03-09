@@ -5,7 +5,13 @@
             "category": "transaction",
             "sender": "senderAddress",
             "status": "success",
-            "created": ["playerOne", "playerTwo", "CollectionObject", "ComponentObject", "DeletedObject"],
+            "created": [
+                "playerOne",
+                "playerTwo",
+                "CollectionObject",
+                "ComponentObject",
+                "DeletedObject"
+            ],
             "recipients": []
         },
         {
@@ -20,7 +26,7 @@
             "category": "transaction",
             "sender": "senderAddress",
             "status": "pending",
-            "mutated": ["playerOne", "playerTwo", "CollectionObject", "ComponentObject", "DeletedObject"],
+            "mutated": ["playerOne", "playerTwo"],
             "recipients": ["receiverAddress"]
         },
         {
@@ -28,7 +34,7 @@
             "category": "transaction",
             "sender": "senderAddress",
             "status": "success",
-            "mutated": ["playerOne", "playerTwo", "CollectionObject", "ComponentObject", "DeletedObject"],
+            "mutated": ["playerOne", "playerTwo"],
             "recipients": ["receiverAddress"]
         },
 
@@ -43,6 +49,27 @@
         {
             "id": "txProblem",
             "category": "transaction"
+        },
+        {
+            "id": "senderAddress",
+            "category": "address",
+            "objects": []
+        },
+        {
+            "id": "receiverAddress",
+            "category": "address",
+            "objects": [
+                {
+                    "objectId": "playerOne"
+                },
+                {
+                    "objectId": "playerTwo"
+                }
+            ]
+        },
+        {
+            "id": "problemAddress",
+            "category": "address"
         },
         {
             "id": "playerOne",
@@ -137,7 +164,7 @@
                     "id": {},
                     "level": 0,
                     "lore": "Customizable with Decoration Cosmetics",
-                    "contract_id": {"bytes": "smartContract"}
+                    "contract_id": { "bytes": "smartContract" }
                 }
             }
         },
@@ -161,7 +188,7 @@
                     "Temperature": "Hot",
                     "Light": "Medium",
                     "Flowering Period": "Spring to early Summer",
-                    "contract_id": {"bytes": "smartContract"}
+                    "contract_id": { "bytes": "smartContract" }
                 }
             }
         },

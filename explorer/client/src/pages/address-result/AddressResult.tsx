@@ -7,7 +7,7 @@ import mockTransactionData from '../../utils/mock_data.json';
 
 type DataType = {
     id: string;
-    objects: string[];
+    objects: { objectId: string }[];
 };
 
 function instanceOfDataType(object: any): object is DataType {
@@ -28,7 +28,7 @@ function AddressResult() {
                     <div>Address ID</div>
                     <div>
                         <Longtext
-                            text={data.id}
+                            text={data?.id}
                             category="addresses"
                             isLink={false}
                         />
@@ -39,7 +39,10 @@ function AddressResult() {
                     <div>
                         {data.objects.map((objectID, index) => (
                             <div key={`object-${index}`}>
-                                <Longtext text={objectID} category="objects" />
+                                <Longtext
+                                    text={objectID.objectId}
+                                    category="objects"
+                                />
                             </div>
                         ))}
                     </div>
