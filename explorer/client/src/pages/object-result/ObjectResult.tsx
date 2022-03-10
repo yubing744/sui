@@ -181,8 +181,8 @@ function ObjectResult() {
                                     <div>
                                         <Longtext
                                             text={data.ethAddress}
-                                            category="addresses"
-                                            isLink={false}
+                                            category="ethAddress"
+                                            isLink={true}
                                         />
                                     </div>
                                 </div>

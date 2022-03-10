@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { ReactComponent as ContentCopyIcon } from '../../assets/content_copy_black_18dp.svg';
 import { navigateWithUnknown } from '../../utils/utility_functions';
+import ExternalLink from '../external-link/ExternalLink';
 import styles from './Longtext.module.css';
 
 function Longtext({
@@ -11,7 +12,12 @@ function Longtext({
     isLink = true,
 }: {
     text: string;
-    category: 'objects' | 'transactions' | 'addresses' | 'unknown';
+    category:
+        | 'objects'
+        | 'transactions'
+        | 'addresses'
+        | 'ethAddress'
+        | 'unknown';
     isLink?: boolean;
 }) {
     const [isCopyIcon, setCopyIcon] = useState(true);
@@ -46,6 +52,14 @@ function Longtext({
                 >
                     {text}
                 </span>
+            );
+        } else if (category === 'ethAddress') {
+            textComponent = (
+                <ExternalLink
+                    href={`https://etherscan.io/address/${text}`}
+                    label={text}
+                    className={styles.longtext}
+                />
             );
         } else {
             textComponent = (
