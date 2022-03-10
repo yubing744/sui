@@ -12,7 +12,7 @@ div.textresults > div:last-child {
 }
 
 div.textresults > div > div:first-child {
-    @apply font-mono tracking-tight font-semibold block
+    @apply font-sans tracking-tight font-semibold block
     sm:w-[10vw] sm:table-cell sm:pr-[2vw];
 }
 

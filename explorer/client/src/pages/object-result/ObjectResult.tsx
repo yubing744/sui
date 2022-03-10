@@ -189,23 +189,16 @@ function ObjectResult() {
                             {showProperties && (
                                 <div className={styles.propertybox}>
                                     {data.data.contents &&
-                                        Object.entries(data.data.contents).map(
-                                            ([key, value]) => {
-                                                if (
-                                                    checkIsPropertyType(value)
-                                                ) {
-                                                    return (
-                                                        <div>
-                                                            <p>
-                                                                {prepLabel(key)}
-                                                            </p>
-                                                            <p>{value}</p>
-                                                        </div>
-                                                    );
-                                                }
-                                                return <></>;
-                                            }
-                                        )}
+                                        Object.entries(data.data.contents)
+                                            .filter(([_, value]) =>
+                                                checkIsPropertyType(value)
+                                            )
+                                            .map(([key, value], index) => (
+                                                <div key={`property-${index}`}>
+                                                    <p>{prepLabel(key)}</p>
+                                                    <p>{value}</p>
+                                                </div>
+                                            ))}
                                 </div>
                             )}
                         </>
@@ -239,8 +232,10 @@ function ObjectResult() {
                                             .filter(([key, value]) =>
                                                 checkIsIDType(key, value)
                                             )
-                                            .map(([key, value]) => (
-                                                <div>
+                                            .map(([key, value], index1) => (
+                                                <div
+                                                    key={`ConnectedEntity-${index1}`}
+                                                >
                                                     <div>{prepLabel(key)}</div>
                                                     {checkSingleID(value) && (
                                                         <Longtext
@@ -251,14 +246,18 @@ function ObjectResult() {
                                                     {checkVecIDs(value) && (
                                                         <div>
                                                             {value?.vec.map(
-                                                                (value2: {
-                                                                    bytes: string;
-                                                                }) => (
+                                                                (
+                                                                    value2: {
+                                                                        bytes: string;
+                                                                    },
+                                                                    index2: number
+                                                                ) => (
                                                                     <Longtext
                                                                         text={
                                                                             value2.bytes
                                                                         }
                                                                         category="unknown"
+                                                                        key={`ConnectedEntity-${index1}-${index2}`}
                                                                     />
                                                                 )
                                                             )}
