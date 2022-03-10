@@ -17,6 +17,7 @@ type DataType = {
     version: string;
     readonly: string;
     objType: string;
+    name?: string;
     ethAddress?: string;
     ethTokenId?: string;
     data: {
@@ -128,6 +129,7 @@ function ObjectResult() {
                             : styles.noaccommodate
                     }`}
                 >
+                    {data.name && <h1>{data.name}</h1>}
                     <h2
                         className={styles.clickableheader}
                         onClick={() => setShowDescription(!showDescription)}
