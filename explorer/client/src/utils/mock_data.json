@@ -207,7 +207,6 @@
             "category": "object",
             "owner": "SingleOwner(k#0xa5e6dbcf33730ace6ec8b400ff4788c1f150ff7e)",
             "version": "1",
-            "readonly": "true",
             "objType": "0x2::SuiDrop::NFT",
             "name": "Bored Ape Yacht Club #8937",
             "ethAddress": "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",

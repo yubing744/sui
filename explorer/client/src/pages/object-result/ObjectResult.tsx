@@ -15,7 +15,7 @@ type DataType = {
     category: string;
     owner: string;
     version: string;
-    readonly: string;
+    readonly?: string;
     objType: string;
     name?: string;
     ethAddress?: string;
@@ -33,7 +33,7 @@ const IS_SMART_CONTRACT = (data: DataType) =>
 function instanceOfDataType(object: any): object is DataType {
     return (
         object !== undefined &&
-        ['id', 'version', 'readonly', 'objType'].every((x) => x in object)
+        ['id', 'version', 'objType'].every((x) => x in object)
     );
 }
 
@@ -154,24 +154,26 @@ function ObjectResult() {
                                 <div>{data.version}</div>
                             </div>
 
-                            <div>
-                                <div>Read Only?</div>
-                                {data.readonly === 'true' ? (
-                                    <div
-                                        data-testid="read-only-text"
-                                        className={styles.immutable}
-                                    >
-                                        True
-                                    </div>
-                                ) : (
-                                    <div
-                                        data-testid="read-only-text"
-                                        className={styles.mutable}
-                                    >
-                                        False
-                                    </div>
-                                )}
-                            </div>
+                            {data.readonly && (
+                                <div>
+                                    <div>Read Only?</div>
+                                    {data.readonly === 'true' ? (
+                                        <div
+                                            data-testid="read-only-text"
+                                            className={styles.immutable}
+                                        >
+                                            True
+                                        </div>
+                                    ) : (
+                                        <div
+                                            data-testid="read-only-text"
+                                            className={styles.mutable}
+                                        >
+                                            False
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             <div>
                                 <div>Type</div>
