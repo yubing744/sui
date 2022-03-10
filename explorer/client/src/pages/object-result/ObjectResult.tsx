@@ -17,6 +17,8 @@ type DataType = {
     version: string;
     readonly: string;
     objType: string;
+    ethAddress?: string;
+    ethTokenId?: string;
     data: {
         contents: {
             [key: string]: any;
@@ -173,6 +175,30 @@ function ObjectResult() {
                                 <div>Type</div>
                                 <div>{data.objType}</div>
                             </div>
+                            {data.ethAddress && (
+                                <div>
+                                    <div>Ethereum Contract Address</div>
+                                    <div>
+                                        <Longtext
+                                            text={data.ethAddress}
+                                            category="addresses"
+                                            isLink={false}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            {data.ethTokenId && (
+                                <div>
+                                    <div>Ethereum Token ID</div>
+                                    <div>
+                                        <Longtext
+                                            text={data.ethTokenId}
+                                            category="addresses"
+                                            isLink={false}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
