@@ -193,6 +193,28 @@
             }
         },
         {
+            "id": "0xa5e6dbcf33730ace6ec8b400ff4788c1f150ff7e",
+            "category": "object",
+            "version": "1",
+            "readonly": "true",
+            "objType": "0x2::SuiDrop::Ethereum",
+            "data": {
+                "contents": {
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://lh3.googleusercontent.com/xcPvABPQX6sG4Wwg1FsD-ztMUZwp6NeZQLTWX1PfiWvti9cFfDXw5gxvBhg6S4B5Q4CFiZV4nWGRQnzfL0YJpL_yWVgHVZ_DOFSM=w600"
+                    },
+                    "background": "Orange",
+                    "clothes": "Tanktop",
+                    "eyes": "Holographic",
+                    "fur": "Dark Brown",
+                    "hat": "Cowboy Hat",
+                    "mouth": "Bored Unshaven Bubblegum"
+                }
+            }
+        },
+
+        {
             "id": "smartContract",
             "category": "object",
             "owner": "SingleOwner(k#senderAddress)",

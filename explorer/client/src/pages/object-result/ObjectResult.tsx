@@ -30,9 +30,7 @@ const IS_SMART_CONTRACT = (data: DataType) =>
 function instanceOfDataType(object: any): object is DataType {
     return (
         object !== undefined &&
-        ['id', 'owner', 'version', 'readonly', 'objType'].every(
-            (x) => x in object
-        )
+        ['id', 'version', 'readonly', 'objType'].every((x) => x in object)
     );
 }
 
@@ -213,57 +211,64 @@ function ObjectResult() {
                         </>
                     )}
 
-                    <h2
-                        className={styles.clickableheader}
-                        onClick={() =>
-                            setShowConnectedEntities(!showConnectedEntities)
-                        }
-                    >
-                        Connected Entities {showConnectedEntities ? '-' : '+'}
-                    </h2>
-                    {showConnectedEntities && (
-                        <div className={theme.textresults}>
-                            <div>
-                                <div>Owner</div>
-                                <Longtext
-                                    text={extractOwnerData(data.owner)}
-                                    category="objects"
-                                    isLink={true}
-                                />
-                            </div>
-                            {data.data.contents &&
-                                Object.entries(data.data.contents)
-                                    .filter(([key, value]) =>
-                                        checkIsIDType(key, value)
+                    {data.owner && (
+                        <>
+                            <h2
+                                className={styles.clickableheader}
+                                onClick={() =>
+                                    setShowConnectedEntities(
+                                        !showConnectedEntities
                                     )
-                                    .map(([key, value]) => (
-                                        <div>
-                                            <div>{prepLabel(key)}</div>
-                                            {checkSingleID(value) && (
-                                                <Longtext
-                                                    text={value.bytes}
-                                                    category="unknown"
-                                                />
-                                            )}
-                                            {checkVecIDs(value) && (
+                                }
+                            >
+                                Connected Entities{' '}
+                                {showConnectedEntities ? '-' : '+'}
+                            </h2>
+                            {showConnectedEntities && (
+                                <div className={theme.textresults}>
+                                    <div>
+                                        <div>Owner</div>
+                                        <Longtext
+                                            text={extractOwnerData(data.owner)}
+                                            category="objects"
+                                            isLink={true}
+                                        />
+                                    </div>
+                                    {data.data.contents &&
+                                        Object.entries(data.data.contents)
+                                            .filter(([key, value]) =>
+                                                checkIsIDType(key, value)
+                                            )
+                                            .map(([key, value]) => (
                                                 <div>
-                                                    {value?.vec.map(
-                                                        (value2: {
-                                                            bytes: string;
-                                                        }) => (
-                                                            <Longtext
-                                                                text={
-                                                                    value2.bytes
-                                                                }
-                                                                category="unknown"
-                                                            />
-                                                        )
+                                                    <div>{prepLabel(key)}</div>
+                                                    {checkSingleID(value) && (
+                                                        <Longtext
+                                                            text={value.bytes}
+                                                            category="unknown"
+                                                        />
+                                                    )}
+                                                    {checkVecIDs(value) && (
+                                                        <div>
+                                                            {value?.vec.map(
+                                                                (value2: {
+                                                                    bytes: string;
+                                                                }) => (
+                                                                    <Longtext
+                                                                        text={
+                                                                            value2.bytes
+                                                                        }
+                                                                        category="unknown"
+                                                                    />
+                                                                )
+                                                            )}
+                                                        </div>
                                                     )}
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))}
-                        </div>
+                                            ))}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
