@@ -68,6 +68,16 @@
             ]
         },
         {
+            "id": "0xa5e6dbcf33730ace6ec8b400ff4788c1f150ff7e",
+            "category": "address",
+            "objects": [
+                {
+                    "objectId": "7bc832ec31709638cd8d9323e90edf332gff4389"
+                }
+            ]
+        },
+
+        {
             "id": "problemAddress",
             "category": "address"
         },
@@ -193,8 +203,9 @@
             }
         },
         {
-            "id": "0xa5e6dbcf33730ace6ec8b400ff4788c1f150ff7e",
+            "id": "7bc832ec31709638cd8d9323e90edf332gff4389",
             "category": "object",
+            "owner": "SingleOwner(k#0xa5e6dbcf33730ace6ec8b400ff4788c1f150ff7e)",
             "version": "1",
             "readonly": "true",
             "objType": "0x2::SuiDrop::Ethereum",
@@ -204,6 +215,7 @@
                         "category": "imageURL",
                         "data": "https://lh3.googleusercontent.com/xcPvABPQX6sG4Wwg1FsD-ztMUZwp6NeZQLTWX1PfiWvti9cFfDXw5gxvBhg6S4B5Q4CFiZV4nWGRQnzfL0YJpL_yWVgHVZ_DOFSM=w600"
                     },
+                    "token id": 8937,
                     "background": "Orange",
                     "clothes": "Tanktop",
                     "eyes": "Holographic",
