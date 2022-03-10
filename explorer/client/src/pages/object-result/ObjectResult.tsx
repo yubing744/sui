@@ -223,7 +223,7 @@ function ObjectResult() {
                                         <div>Owner</div>
                                         <Longtext
                                             text={extractOwnerData(data.owner)}
-                                            category="objects"
+                                            category="unknown"
                                             isLink={true}
                                         />
                                     </div>
