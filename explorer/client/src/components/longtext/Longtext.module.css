@@ -7,5 +7,5 @@
 }
 
 .longtext {
-    @apply no-underline text-sky-600 hover:text-sky-900 cursor-pointer;
+    @apply no-underline text-sky-600 hover:text-sky-900 cursor-pointer break-all;
 }
