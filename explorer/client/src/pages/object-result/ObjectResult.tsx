@@ -110,6 +110,11 @@ function ObjectResult() {
         return result ? result[1] : '';
     };
 
+    const stdLibRe = /0x2::/;
+
+    const prepObjTypeValue = (typeString: string) =>
+        typeString.replace(stdLibRe, '');
+
     useEffect(() => {
         setShowDescription(true);
         setShowProperties(true);
@@ -185,7 +190,7 @@ function ObjectResult() {
 
                             <div>
                                 <div>Type</div>
-                                <div>{data.objType}</div>
+                                <div>{prepObjTypeValue(data.objType)}</div>
                             </div>
                             {data.ethAddress && (
                                 <div>
