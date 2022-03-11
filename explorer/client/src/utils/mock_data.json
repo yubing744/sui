@@ -76,6 +76,27 @@
                 }
             ]
         },
+        {
+            "id": "0xb6f7ecdg44841bdf7fd9c511gg5899d2g261gg8f",
+            "category": "address",
+            "objects": [
+                {
+                    "objectId": "8cd943fd42810749de9e0434f01feg443hgg54v1"
+                },
+                {
+                    "objectId": "8cd943fd42810749de9e0434f01feg443hgg54v2"
+                },
+                {
+                    "objectId": "9de054ge53921850ef0f1545g12gfh554ihh65v1"
+                },
+                {
+                    "objectId": "9de054ge53921850ef0f1545g12gfh554ihh65v2"
+                },
+                {
+                    "objectId": "0ef165hf64032961fg1g2656h23hgi665jii7690"
+                }
+            ]
+        },
 
         {
             "id": "problemAddress",
@@ -137,6 +158,187 @@
                 }
             }
         },
+        {
+            "id": "8cd943fd42810749de9e0434f01feg443hgg54v1",
+            "owner": "SingleOwner(k#0xb6f7ecdg44841bdf7fd9c511gg5899d2g261gg8f)",
+            "category": "object",
+            "version": "1",
+            "readonly": "false",
+            "objType": "0x2::Geniteam::Monster",
+            "data": {
+                "contents": {
+                    "id": {},
+                    "monster_name": "Brown Dog",
+                    "animal": "dog",
+                    "fur": "brown",
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://geniteam-video-images.s3.amazonaws.com/131074_0_Brown_Dog.png"
+                    }
+                }
+            }
+        },
+        {
+            "id": "8cd943fd42810749de9e0434f01feg443hgg54v2",
+            "owner": "SingleOwner(k#0xb6f7ecdg44841bdf7fd9c511gg5899d2g261gg8f)",
+            "category": "object",
+            "version": "2",
+            "readonly": "false",
+            "objType": "0x2::Geniteam::Monster",
+            "data": {
+                "contents": {
+                    "water_runes_count": 1,
+                    "applied_monster_cosmetic_0_id": {
+                        "vec": [
+                            {
+                                "bytes": "waterrune2810749de9e0434f01feg443hgg54v2"
+                            }
+                        ]
+                    },
+                    "id": {},
+                    "monster_name": "Brown Water Dog",
+                    "animal": "dog",
+                    "fur": "brown",
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://geniteam-video-images.s3.amazonaws.com/131842_0_Evolved_Water_Dog_Brown.png"
+                    }
+                }
+            }
+        },
+        {
+            "id": "waterrune2810749de9e0434f01feg443hgg54v2",
+            "owner": "SingleOwner(k#8cd943fd42810749de9e0434f01feg443hgg54v2)",
+            "category": "object",
+            "version": "1",
+            "readonly": "true",
+            "objType": "0x2::Geniteam::MonsterCosmetic",
+            "data": {
+                "contents": {
+                    "id": {},
+                    "monster_cosmetic_name": "Water Rune",
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://geniteam-video-images.s3.amazonaws.com/1125899906842624_Rune_Water.png"
+                    }
+                }
+            }
+        },
+
+        {
+            "id": "9de054ge53921850ef0f1545g12gfh554ihh65v1",
+            "owner": "SingleOwner(k#0xb6f7ecdg44841bdf7fd9c511gg5899d2g261gg8f)",
+            "category": "object",
+            "version": "1",
+            "readonly": "false",
+            "objType": "0x2::Geniteam::Monster",
+            "data": {
+                "contents": {
+                    "id": {},
+                    "monster_name": "White Cat",
+                    "animal": "cat",
+                    "fur": "white",
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://geniteam-video-images.s3.amazonaws.com/65537_0_White_Cat.png"
+                    }
+                }
+            }
+        },
+        {
+            "id": "9de054ge53921850ef0f1545g12gfh554ihh65v2",
+            "owner": "SingleOwner(k#0xb6f7ecdg44841bdf7fd9c511gg5899d2g261gg8f)",
+            "category": "object",
+            "version": "2",
+            "readonly": "false",
+            "objType": "0x2::Geniteam::Monster",
+            "data": {
+                "contents": {
+                    "id": {},
+                    "monster_name": "White Cat with Glasses",
+                    "applied_monster_cosmetic_0_id": {
+                        "vec": [
+                            {
+                                "bytes": "glassese53921850ef0f1545g12gfh554ihh65v2"
+                            }
+                        ]
+                    },
+                    "animal": "cat",
+                    "fur": "white",
+                    "applied_monster_cosmetic": "glasses",
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://geniteam-video-images.s3.amazonaws.com/4295032833_2_White_Cat_Goggles1.png"
+                    }
+                }
+            }
+        },
+        {
+            "id": "glassese53921850ef0f1545g12gfh554ihh65v2",
+            "owner": "SingleOwner(k#9de054ge53921850ef0f1545g12gfh554ihh65v2)",
+            "category": "object",
+            "version": "1",
+            "readonly": "true",
+            "objType": "0x2::Geniteam::MonsterCosmetic",
+            "data": {
+                "contents": {
+                    "id": {},
+                    "monster_cosmetic_name": "Glasses",
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://geniteam-video-images.s3.amazonaws.com/4294967296_Goggles1.png"
+                    }
+                }
+            }
+        },
+
+        {
+            "id": "0ef165hf64032961fg1g2656h23hgi665jii7690",
+            "owner": "SingleOwner(k#0xb6f7ecdg44841bdf7fd9c511gg5899d2g261gg8f)",
+            "category": "object",
+            "version": "2",
+            "readonly": "false",
+            "objType": "0x2::Geniteam::Monster",
+            "data": {
+                "contents": {
+                    "id": {},
+                    "monster_name": "White Fire Cat",
+                    "applied_monster_cosmetic_0_id": {
+                        "vec": [
+                            {
+                                "bytes": "firerune64032961fg1g2656h23hgi665jii7690"
+                            }
+                        ]
+                    },
+                    "fire_runes_count": 1,
+                    "animal": "cat",
+                    "fur": "white",
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://geniteam-video-images.s3.amazonaws.com/66049_0_Evolved_Fire_Cat_White.png"
+                    }
+                }
+            }
+        },
+        {
+            "id": "firerune64032961fg1g2656h23hgi665jii7690",
+            "owner": "SingleOwner(k#0ef165hf64032961fg1g2656h23hgi665jii7690)",
+            "category": "object",
+            "version": "1",
+            "readonly": "true",
+            "objType": "0x2::Geniteam::MonsterCosmetic",
+            "data": {
+                "contents": {
+                    "id": {},
+                    "monster_cosmetic_name": "Fire Rune",
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://geniteam-video-images.s3.amazonaws.com/562949953421312_Rune_Fire.png"
+                    }
+                }
+            }
+        },
+
         {
             "id": "standaloneObject",
             "category": "object",
