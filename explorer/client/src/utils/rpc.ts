@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 
 class SuiRpcClient {
     public host: string;
@@ -16,12 +18,23 @@ class SuiRpcClient {
 
         switch (response.status) {
             case 200: {
-                return response.body?.getReader().read();
+                const buf = await response.body?.getReader().read();
+                if(buf?.value) {
+                    const parsedData = u8ArrToObject(buf);
+                    console.log(parsedData)
+                    return parsedData;
+                }
             }
             default:
-                console.warn(response);
+                console.warn(response); return null;
         }
     }
+}
+
+const textDecoder = new TextDecoder();
+export function u8ArrToObject(buffer: Uint8Array): object | null {
+    let asStr = textDecoder.decode(buffer);
+    return asStr ? JSON.parse(asStr) : null;
 }
 
 
@@ -37,10 +50,10 @@ export interface ObjectInfoResponse<T> {
     id: string;
     readonly: BoolString;
     objType: string;
-    data: Data<T>;
+    data: SuiObject<T>;
 }
 
-export interface Data<T> {
+export interface SuiObject<T> {
     contents: T;
     owner: OwnerField;
     tx_digest: number[];
