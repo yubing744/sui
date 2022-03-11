@@ -134,7 +134,7 @@ function ObjectResult() {
                         className={styles.clickableheader}
                         onClick={() => setShowDescription(!showDescription)}
                     >
-                        Description {showDescription ? '-' : '+'}
+                        Description {showDescription ? '' : '+'}
                     </h2>
                     {showDescription && (
                         <div className={theme.textresults}>
@@ -214,7 +214,7 @@ function ObjectResult() {
                                     setShowProperties(!showProperties)
                                 }
                             >
-                                Properties {showProperties ? '-' : '+'}
+                                Properties {showProperties ? '' : '+'}
                             </h2>
                             {showProperties && (
                                 <div className={styles.propertybox}>
@@ -245,7 +245,7 @@ function ObjectResult() {
                                 }
                             >
                                 Connected Entities{' '}
-                                {showConnectedEntities ? '-' : '+'}
+                                {showConnectedEntities ? '' : '+'}
                             </h2>
                             {showConnectedEntities && (
                                 <div className={theme.textresults}>
