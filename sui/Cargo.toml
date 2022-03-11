@@ -1,33 +1,36 @@
 [package]
 name = "sui"
 version = "0.1.0"
-authors = ["Libra <oncall+libra@xmail.facebook.com>"]
+authors = ["Mysten Labs <build@mystenlabs.com>"]
 license = "Apache-2.0"
 publish = false
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.53"
+anyhow = "1.0.55"
 bytes = "1.1.0"
-futures = "0.3.19"
+futures = "0.3.21"
 serde = { version = "1.0.136", features = ["derive"] }
-serde_json = "1.0.78"
+serde_json = "1.0.79"
 structopt = "0.3.26"
 tempfile = "3.3.0"
-tokio = { version = "1.16.1", features = ["full"] }
+tokio = { version = "1.17.0", features = ["full"] }
 rand = "0.8.4"
 toml = "0.5.8"
-strum = "0.23.0"
-strum_macros = "0.23.1"
+strum = "0.24.0"
+strum_macros = "0.24.0"
 num_cpus = "1.13.1"
 base64 = "0.13.0"
 ed25519-dalek = { version = "1.0.1", features = ["batch", "serde"] }
-rocksdb = "0.17.0"
+rocksdb = "0.18.0"
 hex = "0.4.3"
 async-trait = "0.1.52"
-serde_with = "1.11.0"
-tracing = { version = "0.1", features = ["log"] }
-tracing-subscriber = { version = "0.3", features = ["time", "env-filter"] }
+serde_with = { version = "1.12.0", features = ["hex"] }
+tracing = { version = "0.1.31", features = ["log"] }
+tracing-subscriber = { version = "0.3.9", features = ["time", "registry", "env-filter"] }
+tracing-bunyan-formatter = "0.3"
+serde-value = "0.7.0"
+log = "0.4.14"
 
 bcs = "0.1.3"
 sui_core = { path = "../sui_core" }
@@ -41,9 +44,19 @@ rustyline-derive = "0.6.0"
 colored = "2.0.0"
 unescape = "0.1.0"
 
-move-package = { git = "https://github.com/diem/move", rev = "7683d09732dd930c581583bf5fde97fb7ac02ff7" }
-move-core-types = { git = "https://github.com/diem/move", rev = "7683d09732dd930c581583bf5fde97fb7ac02ff7", features = ["address20"] }
-move-bytecode-verifier = { git = "https://github.com/diem/move", rev = "7683d09732dd930c581583bf5fde97fb7ac02ff7" }
+# Deps for rest server
+dropshot = "0.6.0"
+http = "0.2.6"
+hyper = "0.14.17"
+schemars = "0.8.8"
+
+move-package = { git = "https://github.com/diem/move", rev = "584bfc8c5f8e582223581975106ffa2545677e2a" }
+move-core-types = { git = "https://github.com/diem/move", rev = "584bfc8c5f8e582223581975106ffa2545677e2a", features = ["address20"] }
+move-bytecode-verifier = { git = "https://github.com/diem/move", rev = "584bfc8c5f8e582223581975106ffa2545677e2a" }
+move-binary-format = { git = "https://github.com/diem/move", rev = "584bfc8c5f8e582223581975106ffa2545677e2a" }
+move-bytecode-utils = { git = "https://github.com/diem/move", rev = "584bfc8c5f8e582223581975106ffa2545677e2a" }
+
+once_cell = "1.9.0"
 
 [dev-dependencies]
 tracing-test = "0.2.1"
@@ -63,3 +76,7 @@ path = "src/sui.rs"
 [[bin]]
 name = "sui-move"
 path = "src/sui-move.rs"
+
+[[bin]]
+name = "rest_server"
+path = "src/rest_server.rs"

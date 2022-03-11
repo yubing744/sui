@@ -4,9 +4,9 @@ module.exports = {
     content: ['./src/**/*.{js,jsx,ts,tsx}'],
     theme: {
         fontFamily: {
-            sans: ['Inter', ...defaultTheme.fontFamily.sans],
-            advanced: ['Inter', 'cursive'],
-            mono: ['Space Mono', ...defaultTheme.fontFamily.mono],
+            sans: ['Zen Kurenaido', ...defaultTheme.fontFamily.sans],
+            advanced: ['Zen Dots', 'cursive'],
+            mono: ['Ubuntu Mono', ...defaultTheme.fontFamily.mono],
         },
     },
     plugins: [],

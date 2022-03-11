@@ -1,4 +1,4 @@
-// Copyright (c) Mysten Labs
+// Copyright (c) 2022, Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
 use move_binary_format::CompiledModule;
@@ -6,58 +6,67 @@ use move_core_types::{account_address::AccountAddress, ident_str};
 use move_package::BuildConfig;
 use num_enum::TryFromPrimitive;
 use std::collections::HashSet;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use sui_types::error::{SuiError, SuiResult};
 use sui_verifier::verifier as sui_bytecode_verifier;
+
+#[cfg(test)]
+use std::path::PathBuf;
 
 pub mod natives;
 
 // Move unit tests will halt after executing this many steps. This is a protection to avoid divergence
 const MAX_UNIT_TEST_INSTRUCTIONS: u64 = 100_000;
 
-#[derive(TryFromPrimitive)]
+pub const DEFAULT_FRAMEWORK_PATH: &str = env!("CARGO_MANIFEST_DIR");
+
+#[derive(TryFromPrimitive, PartialEq, Eq)]
 #[repr(u8)]
 pub enum EventType {
     /// System event: transfer between addresses
     TransferToAddress,
-    /// System event: freeze, then transfer between addresses
-    TransferToAddressAndFreeze,
     /// System event: transfer object to another object
     TransferToObject,
+    /// System event: freeze object
+    FreezeObject,
+    /// System event: turn an object into a shared mutable object
+    ShareObject,
     /// System event: an object ID is deleted. This does not necessarily
     /// mean an object is being deleted. However whenever an object is being
     /// deleted, the object ID must be deleted and this event will be
     /// emitted.
     DeleteObjectID,
+    /// System event: a child object is deleted along with a child ref.
+    DeleteChildObject,
     /// User-defined event
     User,
 }
 
-pub fn get_sui_framework_modules() -> Vec<CompiledModule> {
-    let modules = build_framework(".");
-    // TODO: Consider not unwrap.
-    verify_modules(&modules).unwrap();
-    modules
+pub fn get_sui_framework_modules(lib_dir: &Path) -> SuiResult<Vec<CompiledModule>> {
+    let modules = build_framework(lib_dir)?;
+    verify_modules(&modules)?;
+    Ok(modules)
 }
 
-pub fn get_move_stdlib_modules() -> Vec<CompiledModule> {
+pub fn get_move_stdlib_modules(lib_dir: &Path) -> SuiResult<Vec<CompiledModule>> {
     let denylist = vec![
         ident_str!("Capability").to_owned(),
         ident_str!("Event").to_owned(),
         ident_str!("GUID").to_owned(),
+        #[cfg(not(test))]
+        ident_str!("Debug").to_owned(),
     ];
-    let modules: Vec<CompiledModule> = build_framework("deps/move-stdlib")
+    let modules: Vec<CompiledModule> = build_framework(lib_dir)?
         .into_iter()
         .filter(|m| !denylist.contains(&m.self_id().name().to_owned()))
         .collect();
-    // TODO: Consider not unwrap.
-    verify_modules(&modules).unwrap();
-    modules
+    verify_modules(&modules)?;
+    Ok(modules)
 }
 
 /// Given a `path` and a `build_config`, build the package in that path and return the compiled modules as Vec<Vec<u8>>.
 /// This is useful for when publishing
-/// If we are building the FastX framework, `is_framework` will be true;
+/// If we are building the Sui framework, `is_framework` will be true;
 /// Otherwise `is_framework` should be false (e.g. calling from client).
 pub fn build_move_package_to_bytes(path: &Path) -> Result<Vec<Vec<u8>>, SuiError> {
     build_move_package(
@@ -79,7 +88,7 @@ pub fn build_move_package_to_bytes(path: &Path) -> Result<Vec<Vec<u8>>, SuiError
 }
 
 /// Given a `path` and a `build_config`, build the package in that path.
-/// If we are building the FastX framework, `is_framework` will be true;
+/// If we are building the Sui framework, `is_framework` will be true;
 /// Otherwise `is_framework` should be false (e.g. calling from client).
 pub fn build_move_package(
     path: &Path,
@@ -124,7 +133,7 @@ pub fn build_move_package(
                         && m.self_id().address() == &AccountAddress::ZERO
                 })
             {
-                return Err(SuiError::ModulePublishFailure { error: format!("Denpendent modules must have been published on-chain with non-0 addresses, unlike module {:?}", m.self_id()) });
+                return Err(SuiError::ModulePublishFailure { error: format!("Dependent modules must have been published on-chain with non-0 addresses, unlike module {:?}", m.self_id()) });
             }
             Ok(package
                 .transitive_compiled_modules()
@@ -157,18 +166,15 @@ fn verify_modules(modules: &[CompiledModule]) -> SuiResult {
         sui_bytecode_verifier::verify_module(m)?;
     }
     Ok(())
-    // TODO(https://github.com/MystenLabs/fastnft/issues/69): Run Move linker
+    // TODO(https://github.com/MystenLabs/sui/issues/69): Run Move linker
 }
 
-fn build_framework(sub_dir: &str) -> Vec<CompiledModule> {
-    let mut framework_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    framework_dir.push(sub_dir);
+fn build_framework(framework_dir: &Path) -> SuiResult<Vec<CompiledModule>> {
     let build_config = BuildConfig {
         dev_mode: false,
         ..Default::default()
     };
-    // TODO: Consider not unwrap.
-    build_move_package(&framework_dir, build_config, true).unwrap()
+    build_move_package(framework_dir, build_config, true)
 }
 
 pub fn run_move_unit_tests(path: &Path) -> SuiResult {
@@ -180,7 +186,10 @@ pub fn run_move_unit_tests(path: &Path) -> SuiResult {
     let result = cli::run_move_unit_tests(
         path,
         BuildConfig::default(),
-        UnitTestingConfig::default_with_bound(Some(MAX_UNIT_TEST_INSTRUCTIONS)),
+        UnitTestingConfig {
+            report_stacktrace_on_abort: true,
+            ..UnitTestingConfig::default_with_bound(Some(MAX_UNIT_TEST_INSTRUCTIONS))
+        },
         natives::all_natives(MOVE_STDLIB_ADDRESS, SUI_FRAMEWORK_ADDRESS),
         /* compute_coverage */ false,
     )
@@ -198,13 +207,18 @@ pub fn run_move_unit_tests(path: &Path) -> SuiResult {
 
 #[test]
 fn run_framework_move_unit_tests() {
-    get_sui_framework_modules();
+    get_sui_framework_modules(&PathBuf::from(DEFAULT_FRAMEWORK_PATH)).unwrap();
     run_move_unit_tests(Path::new(env!("CARGO_MANIFEST_DIR"))).unwrap();
 }
 
 #[test]
 fn run_examples_move_unit_tests() {
-    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../examples");
-    build_and_verify_user_package(&path, true).unwrap();
-    run_move_unit_tests(&path).unwrap();
+    let examples = vec!["basics", "defi", "fungible_tokens", "games", "nfts"];
+    for example in examples {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../examples")
+            .join(example);
+        build_and_verify_user_package(&path, true).unwrap();
+        run_move_unit_tests(&path).unwrap();
+    }
 }

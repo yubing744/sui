@@ -1,4 +1,5 @@
-// Copyright (c) Facebook, Inc. and its affiliates.
+// Copyright (c) 2021, Facebook, Inc. and its affiliates
+// Copyright (c) 2022, Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
 use move_binary_format::file_format::*;
@@ -17,6 +18,11 @@ pub struct StructInfo {
 
 pub struct FuncInfo {
     pub handle: FunctionHandleIndex,
+    pub def: FunctionDefinitionIndex,
+}
+
+pub struct GenericFuncInfo {
+    pub handle: FunctionInstantiationIndex,
     pub def: FunctionDefinitionIndex,
 }
 
@@ -49,13 +55,13 @@ impl ModuleBuilder {
         }
     }
 
-    /// Creates the "ID" module in framework address, along with the "ID" struct.
+    /// Creates the "ID" module in framework address, along with the "VersionedID" struct.
     /// Both the module and the ID struct information are returned.
     pub fn default() -> (Self, StructInfo) {
         let mut module = Self::new(SUI_FRAMEWORK_ADDRESS, "ID");
         let id = module.add_struct(
             module.get_self_index(),
-            "ID",
+            "VersionedID",
             AbilitySet::EMPTY | Ability::Store | Ability::Drop,
             vec![],
         );
@@ -70,30 +76,30 @@ impl ModuleBuilder {
         self.module.self_module_handle_idx
     }
 
-    pub fn add_function(
+    pub fn add_function_verbose(
         &mut self,
         module_idx: ModuleHandleIndex,
         name: &str,
         parameters: Vec<SignatureToken>,
         ret: Vec<SignatureToken>,
+        type_parameters: Vec<AbilitySet>,
+        visibility: Visibility,
+        code_unit: CodeUnit,
     ) -> FuncInfo {
         let new_handle = FunctionHandle {
             module: module_idx,
             name: self.add_identifier(name),
             parameters: self.add_signature(parameters),
             return_: self.add_signature(ret),
-            type_parameters: vec![],
+            type_parameters,
         };
         let handle_idx = FunctionHandleIndex(self.module.function_handles.len() as u16);
         self.module.function_handles.push(new_handle);
         let new_def = FunctionDefinition {
             function: handle_idx,
-            visibility: Visibility::Public,
+            visibility,
             acquires_global_resources: vec![],
-            code: Some(CodeUnit {
-                locals: SignatureIndex(0),
-                code: vec![Bytecode::Ret],
-            }),
+            code: Some(code_unit),
         };
         self.module.function_defs.push(new_def);
         FuncInfo {
@@ -102,18 +108,64 @@ impl ModuleBuilder {
         }
     }
 
-    pub fn add_struct(
+    pub fn add_function(
+        &mut self,
+        module_idx: ModuleHandleIndex,
+        name: &str,
+        parameters: Vec<SignatureToken>,
+        ret: Vec<SignatureToken>,
+    ) -> FuncInfo {
+        self.add_function_verbose(
+            module_idx,
+            name,
+            parameters,
+            ret,
+            vec![],
+            Visibility::Public,
+            CodeUnit {
+                locals: SignatureIndex(0),
+                code: vec![Bytecode::Ret],
+            },
+        )
+    }
+
+    pub fn add_generic_function(
+        &mut self,
+        module_idx: ModuleHandleIndex,
+        name: &str,
+        type_parameters: Vec<SignatureToken>,
+        parameters: Vec<SignatureToken>,
+        ret: Vec<SignatureToken>,
+    ) -> GenericFuncInfo {
+        let func_info = self.add_function(module_idx, name, parameters, ret);
+        let sig = self.add_signature(type_parameters);
+        let handle_idx =
+            FunctionInstantiationIndex(self.module.function_instantiations.len() as u16);
+        self.module
+            .function_instantiations
+            .push(FunctionInstantiation {
+                handle: func_info.handle,
+                type_parameters: sig,
+            });
+        GenericFuncInfo {
+            handle: handle_idx,
+            def: func_info.def,
+        }
+    }
+
+    pub fn add_struct_verbose(
         &mut self,
         module_index: ModuleHandleIndex,
         name: &str,
         abilities: AbilitySet,
         fields: Vec<(&str, SignatureToken)>,
+        type_parameters: Vec<StructTypeParameter>,
     ) -> StructInfo {
         let new_handle = StructHandle {
             module: module_index,
             name: self.add_identifier(name),
             abilities,
-            type_parameters: vec![],
+            type_parameters,
         };
         let handle_idx = StructHandleIndex(self.module.struct_handles.len() as u16);
         self.module.struct_handles.push(new_handle);
@@ -139,6 +191,16 @@ impl ModuleBuilder {
             def: def_idx,
             fields: field_handles,
         }
+    }
+
+    pub fn add_struct(
+        &mut self,
+        module_index: ModuleHandleIndex,
+        name: &str,
+        abilities: AbilitySet,
+        fields: Vec<(&str, SignatureToken)>,
+    ) -> StructInfo {
+        self.add_struct_verbose(module_index, name, abilities, fields, vec![])
     }
 
     pub fn add_module(&mut self, address: AccountAddress, name: &str) -> ModuleHandleIndex {

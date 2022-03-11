@@ -1,32 +1,30 @@
-// Copyright (c) Mysten Labs
+// Copyright (c) 2022, Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::coin::Coin;
+use crate::crypto::{sha3_hash, BcsSignable};
+use crate::error::{SuiError, SuiResult};
+use crate::move_package::MovePackage;
+use crate::{
+    base_types::{
+        ObjectDigest, ObjectID, ObjectRef, SequenceNumber, SuiAddress, TransactionDigest,
+    },
+    gas_coin::GasCoin,
+};
 use move_binary_format::binary_views::BinaryIndexedView;
+use move_binary_format::CompiledModule;
 use move_bytecode_utils::layout::TypeLayoutBuilder;
 use move_bytecode_utils::module_cache::GetModule;
+use move_core_types::language_storage::StructTag;
 use move_core_types::language_storage::TypeTag;
 use move_core_types::value::{MoveStruct, MoveStructLayout, MoveTypeLayout};
 use move_disassembler::disassembler::Disassembler;
 use move_ir_types::location::Spanned;
 use serde::{Deserialize, Serialize};
-use serde_bytes::ByteBuf;
 use serde_json::{json, Value};
 use serde_with::{serde_as, Bytes};
-use std::collections::BTreeMap;
 use std::convert::{TryFrom, TryInto};
 use std::fmt::{Debug, Display, Formatter};
-
-use move_binary_format::CompiledModule;
-use move_core_types::{account_address::AccountAddress, language_storage::StructTag};
-
-use crate::error::SuiError;
-use crate::{
-    base_types::{
-        sha3_hash, BcsSignable, ObjectDigest, ObjectID, ObjectRef, SequenceNumber, SuiAddress,
-        TransactionDigest,
-    },
-    gas_coin::GasCoin,
-};
 
 pub const GAS_VALUE_FOR_TESTING: u64 = 100000_u64;
 pub const OBJECT_START_VERSION: SequenceNumber = SequenceNumber::from_u64(1);
@@ -37,13 +35,12 @@ pub struct MoveObject {
     pub type_: StructTag,
     #[serde_as(as = "Bytes")]
     contents: Vec<u8>,
-    read_only: bool,
 }
 
 /// Byte encoding of a 64 byte unsigned integer in BCS
 type BcsU64 = [u8; 8];
 /// Index marking the end of the object's ID + the beginning of its version
-const ID_END_INDEX: usize = AccountAddress::LENGTH;
+const ID_END_INDEX: usize = ObjectID::LENGTH;
 /// Index marking the end of the object's version + the beginning of type-specific data
 const VERSION_END_INDEX: usize = ID_END_INDEX + 8;
 
@@ -59,15 +56,11 @@ pub struct ObjectFormatOptions {
 
 impl MoveObject {
     pub fn new(type_: StructTag, contents: Vec<u8>) -> Self {
-        Self {
-            type_,
-            contents,
-            read_only: false,
-        }
+        Self { type_, contents }
     }
 
     pub fn id(&self) -> ObjectID {
-        AccountAddress::try_from(&self.contents[0..ID_END_INDEX]).unwrap()
+        ObjectID::try_from(&self.contents[0..ID_END_INDEX]).unwrap()
     }
 
     pub fn version(&self) -> SequenceNumber {
@@ -130,14 +123,6 @@ impl MoveObject {
         self.contents
     }
 
-    pub fn is_read_only(&self) -> bool {
-        self.read_only
-    }
-
-    pub fn freeze(&mut self) {
-        self.read_only = true;
-    }
-
     /// Get a `MoveStructLayout` for `self`.
     /// The `resolver` value must contain the module that declares `self.type_` and the (transitive)
     /// dependencies of `self.type_` in order for this to succeed. Failure will result in an `ObjectSerializationError`
@@ -169,10 +154,6 @@ impl MoveObject {
     }
 }
 
-// TODO: Make MovePackage a NewType so that we can implement functions on it.
-// serde_bytes::ByteBuf is an analog of Vec<u8> with built-in fast serialization.
-pub type MovePackage = BTreeMap<String, ByteBuf>;
-
 #[derive(Eq, PartialEq, Debug, Clone, Deserialize, Serialize, Hash)]
 #[allow(clippy::large_enum_variant)]
 pub enum Data {
@@ -180,7 +161,7 @@ pub enum Data {
     Move(MoveObject),
     /// Map from each module name to raw serialized Move module bytes
     Package(MovePackage),
-    // ... FastX "native" types go here
+    // ... Sui "native" types go here
 }
 
 impl Data {
@@ -243,7 +224,7 @@ impl Data {
             },
             Package(p) => {
                 let mut disassembled = serde_json::Map::new();
-                for (name, bytecode) in p {
+                for (name, bytecode) in p.serialized_module_map() {
                     let module = CompiledModule::deserialize(bytecode)
                         .expect("Adapter publish flow ensures that this bytecode deserializes");
                     let view = BinaryIndexedView::Module(&module);
@@ -260,13 +241,68 @@ impl Data {
     }
 }
 
+#[derive(Eq, PartialEq, Debug, Clone, Copy, Deserialize, Serialize, Hash)]
+pub enum Owner {
+    /// Object is exclusively owned by a single address, and is mutable.
+    AddressOwner(SuiAddress),
+    /// Object is exclusively owned by a single object, and is mutable.
+    /// The object ID is converted to SuiAddress as SuiAddress is universal.
+    ObjectOwner(SuiAddress),
+    /// Object is shared, can be used by any address, and is mutable.
+    SharedMutable,
+    /// Object is immutable, and hence ownership doesn't matter.
+    SharedImmutable,
+}
+
+impl Owner {
+    pub fn get_owner_address(&self) -> SuiResult<SuiAddress> {
+        match self {
+            Self::AddressOwner(address) | Self::ObjectOwner(address) => Ok(*address),
+            Self::SharedMutable | Self::SharedImmutable => Err(SuiError::UnexpectedOwnerType),
+        }
+    }
+
+    pub fn is_read_only(&self) -> bool {
+        match self {
+            Owner::AddressOwner(_) | Owner::ObjectOwner(_) | Owner::SharedMutable => false,
+            Owner::SharedImmutable => true,
+        }
+    }
+
+    pub fn is_shared(&self) -> bool {
+        match self {
+            Owner::AddressOwner(_) | Owner::ObjectOwner(_) => false,
+            Owner::SharedMutable | Owner::SharedImmutable => true,
+        }
+    }
+}
+
+impl std::cmp::PartialEq<SuiAddress> for Owner {
+    fn eq(&self, other: &SuiAddress) -> bool {
+        match self {
+            Self::AddressOwner(address) => address == other,
+            Self::ObjectOwner(_) | Self::SharedMutable | Self::SharedImmutable => false,
+        }
+    }
+}
+
+impl std::cmp::PartialEq<ObjectID> for Owner {
+    fn eq(&self, other: &ObjectID) -> bool {
+        let other_id: SuiAddress = (*other).into();
+        match self {
+            Self::ObjectOwner(id) => id == &other_id,
+            Self::AddressOwner(_) | Self::SharedMutable | Self::SharedImmutable => false,
+        }
+    }
+}
+
 #[derive(Eq, PartialEq, Debug, Clone, Deserialize, Serialize, Hash)]
 pub struct Object {
     /// The meat of the object
     pub data: Data,
-    /// The owner address that unlocks this object (eg. hashes of public key, or object id)
-    pub owner: SuiAddress,
-    /// The digest of the order that created or last mutated this object
+    /// The owner that unlocks this object
+    pub owner: Owner,
+    /// The digest of the transaction that created or last mutated this object
     pub previous_transaction: TransactionDigest,
 }
 
@@ -274,11 +310,7 @@ impl BcsSignable for Object {}
 
 impl Object {
     /// Create a new Move object
-    pub fn new_move(
-        o: MoveObject,
-        owner: SuiAddress,
-        previous_transaction: TransactionDigest,
-    ) -> Self {
+    pub fn new_move(o: MoveObject, owner: Owner, previous_transaction: TransactionDigest) -> Self {
         Object {
             data: Data::Move(o),
             owner,
@@ -288,29 +320,31 @@ impl Object {
 
     pub fn new_package(
         modules: Vec<CompiledModule>,
-        owner: SuiAddress,
         previous_transaction: TransactionDigest,
     ) -> Self {
-        let serialized: MovePackage = modules
-            .into_iter()
-            .map(|module| {
-                let mut bytes = Vec::new();
-                module.serialize(&mut bytes).unwrap();
-                (module.self_id().name().to_string(), ByteBuf::from(bytes))
-            })
-            .collect();
         Object {
-            data: Data::Package(serialized),
-            owner,
+            data: Data::Package(MovePackage::from(&modules)),
+            owner: Owner::SharedImmutable,
             previous_transaction,
         }
     }
 
     pub fn is_read_only(&self) -> bool {
-        match &self.data {
-            Data::Move(m) => m.is_read_only(),
-            Data::Package(_) => true,
-        }
+        self.owner.is_read_only()
+    }
+
+    pub fn is_shared(&self) -> bool {
+        self.owner.is_shared()
+    }
+
+    pub fn get_single_owner(&self) -> Option<SuiAddress> {
+        self.owner.get_owner_address().ok()
+    }
+
+    // It's a common pattern to retrieve both the owner and object ID
+    // together, if it's owned by a singler owner.
+    pub fn get_single_owner_and_id(&self) -> Option<(SuiAddress, ObjectID)> {
+        self.get_single_owner().map(|owner| (owner, self.id()))
     }
 
     /// Return true if this object is a Move package, false if it is a Move value
@@ -327,14 +361,7 @@ impl Object {
 
         match &self.data {
             Move(v) => v.id(),
-            Package(m) => {
-                // All modules in the same package must have the same address.
-                // TODO: Use byte trick to get ID directly without deserialization.
-                *CompiledModule::deserialize(m.values().next().unwrap())
-                    .unwrap()
-                    .self_id()
-                    .address()
-            }
+            Package(m) => m.id(),
         }
     }
 
@@ -356,21 +383,13 @@ impl Object {
     }
 
     /// Change the owner of `self` to `new_owner`
-    pub fn transfer(&mut self, new_owner: SuiAddress) {
-        // TODO: these should be raised SuiError's instead of panic's
-        assert!(!self.is_read_only(), "Cannot transfer an immutable object");
-        match &mut self.data {
-            Data::Move(m) => {
-                assert!(
-                    m.type_ == GasCoin::type_(),
-                    "Invalid transfer: only transfer of GasCoin is supported"
-                );
-
-                self.owner = new_owner;
-                m.increment_version();
-            }
-            Data::Package(_) => panic!("Cannot transfer a module object"),
-        }
+    pub fn transfer(&mut self, new_owner: SuiAddress) -> SuiResult {
+        self.is_transfer_elegible()?;
+        // unwrap safe as the above check guarantees it.
+        self.owner = Owner::AddressOwner(new_owner);
+        let data = self.data.try_as_move_mut().unwrap();
+        data.increment_version();
+        Ok(())
     }
 
     pub fn with_id_owner_gas_for_testing(
@@ -382,10 +401,9 @@ impl Object {
         let data = Data::Move(MoveObject {
             type_: GasCoin::type_(),
             contents: GasCoin::new(id, version, gas).to_bcs_bytes(),
-            read_only: false,
         });
         Self {
-            owner,
+            owner: Owner::AddressOwner(owner),
             data,
             previous_transaction: TransactionDigest::genesis(),
         }
@@ -408,10 +426,9 @@ impl Object {
         let data = Data::Move(MoveObject {
             type_: GasCoin::type_(),
             contents: bcs::to_bytes(&obj).unwrap(),
-            read_only: false,
         });
         Self {
-            owner,
+            owner: Owner::AddressOwner(owner),
             data,
             previous_transaction: TransactionDigest::genesis(),
         }
@@ -442,9 +459,38 @@ impl Object {
             .map_err(|_e| SuiError::ObjectSerializationError)?;
         Ok(json!({ "contents": contents, "owner": owner, "tx_digest": previous_transaction }))
     }
+
+    /// Treat the object type as a Move struct with one type parameter,
+    /// like this: `S<T>`.
+    /// Returns the inner parameter type `T`.
+    pub fn get_move_template_type(&self) -> SuiResult<TypeTag> {
+        let move_struct = self.data.type_().ok_or(SuiError::TypeError {
+            error: "Object must be a Move object".to_owned(),
+        })?;
+        fp_ensure!(
+            move_struct.type_params.len() == 1,
+            SuiError::TypeError {
+                error: "Move object struct must have one type parameter".to_owned()
+            }
+        );
+        // Index access safe due to checks above.
+        let type_tag = move_struct.type_params[0].clone();
+        Ok(type_tag)
+    }
+
+    pub fn is_transfer_elegible(&self) -> SuiResult {
+        fp_ensure!(!self.is_shared(), SuiError::TransferSharedError);
+        let is_coin = match &self.data {
+            Data::Move(m) => bcs::from_bytes::<Coin>(&m.contents).is_ok(),
+            Data::Package(_) => false,
+        };
+        fp_ensure!(is_coin, SuiError::TransferNonCoinError);
+        Ok(())
+    }
 }
 
 #[allow(clippy::large_enum_variant)]
+#[derive(Serialize)]
 pub enum ObjectRead {
     NotExists(ObjectID),
     Exists(ObjectRef, Object, Option<MoveStructLayout>),
@@ -458,6 +504,16 @@ impl ObjectRead {
         match &self {
             Self::Deleted(oref) => Err(SuiError::ObjectDeleted { object_ref: *oref }),
             Self::NotExists(id) => Err(SuiError::ObjectNotFound { object_id: *id }),
+            Self::Exists(_, o, _) => Ok(o),
+        }
+    }
+
+    /// Returns the object value if there is any, otherwise an Err if
+    /// the object does not exist or is deleted.
+    pub fn into_object(self) -> Result<Object, SuiError> {
+        match self {
+            Self::Deleted(oref) => Err(SuiError::ObjectDeleted { object_ref: oref }),
+            Self::NotExists(id) => Err(SuiError::ObjectNotFound { object_id: id }),
             Self::Exists(_, o, _) => Ok(o),
         }
     }
@@ -488,9 +544,7 @@ impl Display for Object {
         let type_string = self
             .data
             .type_()
-            .map_or("Type Unwrap Failed".to_owned(), |type_| {
-                format!("{}", type_)
-            });
+            .map_or("Move Package".to_owned(), |type_| format!("{}", type_));
 
         write!(
             f,
@@ -507,7 +561,7 @@ impl Display for Object {
 impl Default for ObjectFormatOptions {
     fn default() -> Self {
         ObjectFormatOptions {
-            include_types: true,
+            include_types: false,
         }
     }
 }
