@@ -169,8 +169,14 @@
                 "contents": {
                     "id": {},
                     "monster_name": "Brown Dog",
-                    "animal": "dog",
-                    "fur": "brown",
+                    "breed": 89,
+                    "monster_affinity": 2,
+                    "monster_description": "surprisingly cute",
+                    "monster_level": 5,
+                    "monster_xp": 9900,
+                    "hunger_level": 5,
+                    "affection_level": 3,
+                    "buddy_level": 7,
                     "display": {
                         "category": "imageURL",
                         "data": "https://geniteam-video-images.s3.amazonaws.com/131074_0_Brown_Dog.png"
@@ -197,8 +203,15 @@
                     },
                     "id": {},
                     "monster_name": "Brown Water Dog",
-                    "animal": "dog",
-                    "fur": "brown",
+                    "breed": 90,
+                    "monster_affinity": 2,
+                    "monster_description": "great swimmer",
+                    "monster_level": 9,
+                    "monster_xp": 24000,
+                    "hunger_level": 1,
+                    "affection_level": 6,
+                    "buddy_level": 9,
+                    "water_runes_count": 1,
                     "display": {
                         "category": "imageURL",
                         "data": "https://geniteam-video-images.s3.amazonaws.com/131842_0_Evolved_Water_Dog_Brown.png"
@@ -236,8 +249,14 @@
                 "contents": {
                     "id": {},
                     "monster_name": "White Cat",
-                    "animal": "cat",
-                    "fur": "white",
+                    "breed": 52,
+                    "monster_affinity": 3,
+                    "monster_description": "little angle feline",
+                    "monster_level": 8,
+                    "monster_xp": 16000,
+                    "hunger_level": 2,
+                    "affection_level": 8,
+                    "buddy_level": 5,
                     "display": {
                         "category": "imageURL",
                         "data": "https://geniteam-video-images.s3.amazonaws.com/65537_0_White_Cat.png"
@@ -256,6 +275,14 @@
                 "contents": {
                     "id": {},
                     "monster_name": "White Cat with Glasses",
+                    "breed": 53,
+                    "monster_affinity": 4,
+                    "monster_description": "a smart cat",
+                    "monster_level": 10,
+                    "monster_xp": 24000,
+                    "hunger_level": 1,
+                    "affection_level": 9,
+                    "buddy_level": 9,
                     "applied_monster_cosmetic_0_id": {
                         "vec": [
                             {
@@ -263,9 +290,6 @@
                             }
                         ]
                     },
-                    "animal": "cat",
-                    "fur": "white",
-                    "applied_monster_cosmetic": "glasses",
                     "display": {
                         "category": "imageURL",
                         "data": "https://geniteam-video-images.s3.amazonaws.com/4295032833_2_White_Cat_Goggles1.png"
@@ -310,9 +334,15 @@
                             }
                         ]
                     },
+                    "breed": 55,
+                    "monster_affinity": 8,
+                    "monster_description": "this cat burns",
+                    "monster_level": 10,
+                    "monster_xp": 24000,
+                    "hunger_level": 1,
+                    "affection_level": 6,
+                    "buddy_level": 9,
                     "fire_runes_count": 1,
-                    "animal": "cat",
-                    "fur": "white",
                     "display": {
                         "category": "imageURL",
                         "data": "https://geniteam-video-images.s3.amazonaws.com/66049_0_Evolved_Fire_Cat_White.png"
