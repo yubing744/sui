@@ -21,3 +21,8 @@ storage/
 
 # Cargo
 Cargo.lock
+
+**/node_modules/**
+
+authorities_db/**
+client_db_**
