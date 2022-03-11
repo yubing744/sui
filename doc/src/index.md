@@ -31,6 +31,7 @@ Navigate and search this site however you see fit. Here is the order we recommen
 
 Take note of these related repositories of information to make best use of the knowledge here:
 
+* [Move Book](https://move-book.com/) - The original and definitive source for all things Move.
 * [Core Move](https://github.com/diem/move/tree/main/language/documentation) documentation, including:
   * [Tutorial](https://github.com/diem/move/blob/main/language/documentation/tutorial/README.md) - A step-by-step guide through writing a Move module.
   * [Book](https://github.com/diem/move/blob/main/language/documentation/book/src/introduction.md) - A summary with pages on [various topics](https://github.com/diem/move/tree/main/language/documentation/book/src).
