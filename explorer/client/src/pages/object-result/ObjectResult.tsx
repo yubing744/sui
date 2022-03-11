@@ -130,6 +130,14 @@ function ObjectResult() {
                     }`}
                 >
                     {data.name && <h1>{data.name}</h1>}
+
+                    {Object.entries(data.data.contents)
+                        //TO DO remove when have distinct name field under Description
+                        .filter(([key, value]) => /name/i.test(key))
+                        .map(([key, value]) => (
+                            <h1>{value}</h1>
+                        ))}
+
                     <h2
                         className={styles.clickableheader}
                         onClick={() => setShowDescription(!showDescription)}
@@ -220,6 +228,11 @@ function ObjectResult() {
                                 <div className={styles.propertybox}>
                                     {data.data.contents &&
                                         Object.entries(data.data.contents)
+                                            //TO DO: remove when have distinct 'name' field in Description
+                                            .filter(
+                                                ([key, value]) =>
+                                                    !/name/i.test(key)
+                                            )
                                             .filter(([_, value]) =>
                                                 checkIsPropertyType(value)
                                             )
