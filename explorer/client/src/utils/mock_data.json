@@ -388,6 +388,7 @@
             "readonly": "true",
             "objType": "0x2::Cosmetic::Plant",
             "name": "Oncidium croesus",
+            "contract_id": { "bytes": "smartContract" },
             "data": {
                 "contents": {
                     "display": {
@@ -399,8 +400,7 @@
                     "Humidity": "High",
                     "Temperature": "Hot",
                     "Light": "Medium",
-                    "Flowering Period": "Spring to early Summer",
-                    "contract_id": { "bytes": "smartContract" }
+                    "Flowering Period": "Spring to early Summer"
                 }
             }
         },

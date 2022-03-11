@@ -20,5 +20,6 @@ module.exports = {
                 disallowTypeAnnotations: true,
             },
         ],
+        'react/jsx-key': ['error', {}],
     },
 };

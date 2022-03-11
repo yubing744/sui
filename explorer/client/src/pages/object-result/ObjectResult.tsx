@@ -20,6 +20,7 @@ type DataType = {
     name?: string;
     ethAddress?: string;
     ethTokenId?: string;
+    contract_id?: { bytes: string };
     data: {
         contents: {
             [key: string]: any;
@@ -122,6 +123,19 @@ function ObjectResult() {
     }, [data, setShowDescription, setShowProperties, setShowConnectedEntities]);
 
     if (instanceOfDataType(data)) {
+        //TO DO remove when have distinct name field under Description
+        const nameKeyValue = Object.entries(data?.data?.contents)
+            .filter(([key, value]) => /name/i.test(key))
+            .map(([key, value]) => value);
+
+        const ownedObjects = Object.entries(data.data.contents).filter(
+            ([key, value]) => checkIsIDType(key, value)
+        );
+        const properties = Object.entries(data.data.contents)
+            //TO DO: remove when have distinct 'name' field in Description
+            .filter(([key, value]) => !/name/i.test(key))
+            .filter(([_, value]) => checkIsPropertyType(value));
+
         return (
             <div className={styles.resultbox}>
                 {data?.data.contents.display?.data && (
@@ -134,15 +148,10 @@ function ObjectResult() {
                             : styles.noaccommodate
                     }`}
                 >
-                    {data.name && <h1>{data.name}</h1>}
-
-                    {Object.entries(data.data.contents)
-                        //TO DO remove when have distinct name field under Description
-                        .filter(([key, value]) => /name/i.test(key))
-                        .map(([key, value]) => (
-                            <h1>{value}</h1>
-                        ))}
-
+                    {data.name && <h1>{data.name}</h1>} {' '}
+                    {typeof nameKeyValue[0] === 'string' && (
+                        <h1>{nameKeyValue}</h1>
+                    )}
                     <h2
                         className={styles.clickableheader}
                         onClick={() => setShowDescription(!showDescription)}
@@ -192,6 +201,25 @@ function ObjectResult() {
                                 <div>Type</div>
                                 <div>{prepObjTypeValue(data.objType)}</div>
                             </div>
+                            <div>
+                                <div>Owner</div>
+                                <Longtext
+                                    text={extractOwnerData(data.owner)}
+                                    category="unknown"
+                                    isLink={true}
+                                />
+                            </div>
+                            {data.contract_id && (
+                                <div>
+                                    <div>Contract ID</div>
+                                    <Longtext
+                                        text={data.contract_id.bytes}
+                                        category="objects"
+                                        isLink={true}
+                                    />
+                                </div>
+                            )}
+
                             {data.ethAddress && (
                                 <div>
                                     <div>Ethereum Contract Address</div>
@@ -218,8 +246,7 @@ function ObjectResult() {
                             )}
                         </div>
                     )}
-
-                    {!IS_SMART_CONTRACT(data) && (
+                    {!IS_SMART_CONTRACT(data) && properties.length > 0 && (
                         <>
                             <h2
                                 className={styles.clickableheader}
@@ -231,28 +258,17 @@ function ObjectResult() {
                             </h2>
                             {showProperties && (
                                 <div className={styles.propertybox}>
-                                    {data.data.contents &&
-                                        Object.entries(data.data.contents)
-                                            //TO DO: remove when have distinct 'name' field in Description
-                                            .filter(
-                                                ([key, value]) =>
-                                                    !/name/i.test(key)
-                                            )
-                                            .filter(([_, value]) =>
-                                                checkIsPropertyType(value)
-                                            )
-                                            .map(([key, value], index) => (
-                                                <div key={`property-${index}`}>
-                                                    <p>{prepLabel(key)}</p>
-                                                    <p>{value}</p>
-                                                </div>
-                                            ))}
+                                    {properties.map(([key, value], index) => (
+                                        <div key={`property-${index}`}>
+                                            <p>{prepLabel(key)}</p>
+                                            <p>{value}</p>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </>
                     )}
-
-                    {data.owner && (
+                    {ownedObjects.length > 0 && (
                         <>
                             <h2
                                 className={styles.clickableheader}
@@ -262,57 +278,45 @@ function ObjectResult() {
                                     )
                                 }
                             >
-                                Connected Entities{' '}
-                                {showConnectedEntities ? '' : '+'}
+                                Owned Objects {showConnectedEntities ? '' : '+'}
                             </h2>
                             {showConnectedEntities && (
                                 <div className={theme.textresults}>
-                                    <div>
-                                        <div>Owner</div>
-                                        <Longtext
-                                            text={extractOwnerData(data.owner)}
-                                            category="unknown"
-                                            isLink={true}
-                                        />
-                                    </div>
-                                    {data.data.contents &&
-                                        Object.entries(data.data.contents)
-                                            .filter(([key, value]) =>
-                                                checkIsIDType(key, value)
-                                            )
-                                            .map(([key, value], index1) => (
-                                                <div
-                                                    key={`ConnectedEntity-${index1}`}
-                                                >
-                                                    <div>{prepLabel(key)}</div>
-                                                    {checkSingleID(value) && (
-                                                        <Longtext
-                                                            text={value.bytes}
-                                                            category="unknown"
-                                                        />
-                                                    )}
-                                                    {checkVecIDs(value) && (
-                                                        <div>
-                                                            {value?.vec.map(
-                                                                (
-                                                                    value2: {
-                                                                        bytes: string;
-                                                                    },
-                                                                    index2: number
-                                                                ) => (
-                                                                    <Longtext
-                                                                        text={
-                                                                            value2.bytes
-                                                                        }
-                                                                        category="unknown"
-                                                                        key={`ConnectedEntity-${index1}-${index2}`}
-                                                                    />
-                                                                )
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
+                                    {ownedObjects.map(
+                                        ([key, value], index1) => (
+                                            <div
+                                                key={`ConnectedEntity-${index1}`}
+                                            >
+                                                <div>{prepLabel(key)}</div>
+                                                {checkSingleID(value) && (
+                                                    <Longtext
+                                                        text={value.bytes}
+                                                        category="unknown"
+                                                    />
+                                                )}
+                                                {checkVecIDs(value) && (
+                                                    <div>
+                                                        {value?.vec.map(
+                                                            (
+                                                                value2: {
+                                                                    bytes: string;
+                                                                },
+                                                                index2: number
+                                                            ) => (
+                                                                <Longtext
+                                                                    text={
+                                                                        value2.bytes
+                                                                    }
+                                                                    category="unknown"
+                                                                    key={`ConnectedEntity-${index1}-${index2}`}
+                                                                />
+                                                            )
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    )}
                                 </div>
                             )}
                         </>
