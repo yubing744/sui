@@ -171,11 +171,5 @@ describe('End-to-end Tests', () => {
             fireEvent.click(screen.getByRole('link', { name: /home button/i }));
             expectHome();
         });
-        it('when Title Logo is clicked', () => {
-            render(<App />, { wrapper: MemoryRouter });
-            searchText('Mysten Labs');
-            fireEvent.click(screen.getByRole('link', { name: /logo/i }));
-            expectHome();
-        });
     });
 });
