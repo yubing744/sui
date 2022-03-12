@@ -211,7 +211,6 @@
                     "hunger_level": 5,
                     "affection_level": 3,
                     "buddy_level": 9,
-                    "water_runes_count": 1,
                     "display": {
                         "category": "imageURL",
                         "data": "https://geniteam-video-images.s3.amazonaws.com/131842_0_Evolved_Water_Dog_Brown.png"
