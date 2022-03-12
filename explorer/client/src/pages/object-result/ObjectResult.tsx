@@ -125,8 +125,9 @@ const ObjectResult = (() => {
     };
 
     useEffect(() => {
-        const objState = await getObjectState(objID)?;
-
+        const objState = await getObjectState(objID);
+        if (objState)
+            setObjectState(objState);
     }, []);
 
     useEffect(() => {
