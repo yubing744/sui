@@ -197,7 +197,7 @@
                     "applied_monster_cosmetic_0_id": {
                         "vec": [
                             {
-                                "bytes": "waterrune2810749de9e0434f01feg443hgg54v2"
+                                "bytes": "4a2e3179e2810749de9e0434f01feg443hgg54v2"
                             }
                         ]
                     },
@@ -219,7 +219,7 @@
             }
         },
         {
-            "id": "waterrune2810749de9e0434f01feg443hgg54v2",
+            "id": "3a4e674ce2810749de9e0434f01feg443hgg54v2",
             "owner": "SingleOwner(k#8cd943fd42810749de9e0434f01feg443hgg54v2)",
             "category": "object",
             "version": "1",
@@ -274,18 +274,18 @@
                 "contents": {
                     "id": {},
                     "monster_name": "White Cat with Glasses",
-                    "breed": 53,
-                    "monster_affinity": 4,
+                    "breed": 52,
+                    "monster_affinity": 3,
                     "monster_description": "a smart cat",
-                    "monster_level": 10,
+                    "monster_level": 9,
                     "monster_xp": 24000,
-                    "hunger_level": 1,
-                    "affection_level": 9,
-                    "buddy_level": 9,
+                    "hunger_level": 2,
+                    "affection_level": 8,
+                    "buddy_level": 5,
                     "applied_monster_cosmetic_0_id": {
                         "vec": [
                             {
-                                "bytes": "glassese53921850ef0f1545g12gfh554ihh65v2"
+                                "bytes": "f4a5535e53921850ef0f1545g12gfh554ihh65v2"
                             }
                         ]
                     },
@@ -297,7 +297,7 @@
             }
         },
         {
-            "id": "glassese53921850ef0f1545g12gfh554ihh65v2",
+            "id": "f4a5535e53921850ef0f1545g12gfh554ihh65v2",
             "owner": "SingleOwner(k#9de054ge53921850ef0f1545g12gfh554ihh65v2)",
             "category": "object",
             "version": "1",
@@ -329,7 +329,7 @@
                     "applied_monster_cosmetic_0_id": {
                         "vec": [
                             {
-                                "bytes": "firerune64032961fg1g2656h23hgi665jii7690"
+                                "bytes": "f14e489364032961fg1g2656h23hgi665jii7690"
                             }
                         ]
                     },
@@ -350,7 +350,7 @@
             }
         },
         {
-            "id": "firerune64032961fg1g2656h23hgi665jii7690",
+            "id": "f14e489364032961fg1g2656h23hgi665jii7690",
             "owner": "SingleOwner(k#0ef165hf64032961fg1g2656h23hgi665jii7690)",
             "category": "object",
             "version": "1",
