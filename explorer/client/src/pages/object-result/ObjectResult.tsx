@@ -5,7 +5,6 @@ import { useLocation, useParams } from 'react-router-dom';
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
-import { findDataFromID } from '../../utils/utility_functions';
 import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
