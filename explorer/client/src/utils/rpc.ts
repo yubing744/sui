@@ -1,26 +1,15 @@
-import { parseJsonBytes } from "./utility_functions";
-
-
-async function readJsonBody(response: { body: ReadableStream<Uint8Array> | null })
-    : Promise<object | null>
-{
-    if (!response.body) {
-        console.warn('missing response body:', response);
-        return null;
-    }
-    const buf = await response.body.getReader().read();
-    return buf?.value ? parseJsonBytes(buf.value) : null;
-}
-
 class SuiRpcClient {
     public host: string;
+
+    moveCallUrl: string;
 
     // TODO - stronger type for host
     public constructor(host: string) {
         this.host = host;
+        this.moveCallUrl = `${host}/wallet/call`;
     }
 
-    public async getObjectInfoRaw (id: string): Promise<ObjectInfoResponse<object>> {
+    public async getObjectInfoRaw (id: string): Promise<object> {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
         console.log(`GET   ${objUrl}`);
 
@@ -29,15 +18,40 @@ class SuiRpcClient {
 
         switch (response.status) {
             case 200: {
-                const parsedJson = await readJsonBody(response);
+                const parsedJson = await response.json();
                 if (!parsedJson)
                     throw new Error('unable to parse response body as JSON');
-
-                return parsedJson as ObjectInfoResponse<object>;
+                return parsedJson;
             }
             default: {
                 console.warn(response);
-                throw new Error('non-200 / unhandled response to GET /object_info');
+                throw new Error('non-200 response to GET /object_info');
+            }
+        }
+    }
+
+    public async moveCallRaw<TIn> (input: TIn): Promise<object> {
+        console.log(`POST   ${this.moveCallUrl}`);
+
+        let response = await fetch(this.moveCallUrl, {
+            method: 'POST',
+            body: JSON.stringify(input),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        console.log(response);
+
+        switch (response.status) {
+            case 200: {
+                const parsedJson = response.json();
+                if (!parsedJson)
+                    throw new Error('unable to parse response body as JSON');
+                return parsedJson;
+            }
+            default: {
+                console.warn(response);
+                throw new Error('non-200 response to POST /wallet/call');
             }
         }
     }
@@ -46,6 +60,12 @@ class SuiRpcClient {
         : Promise<ObjectInfoResponse<T>>
     {
         return await this.getObjectInfoRaw(id) as ObjectInfoResponse<T>;
+    }
+
+    public async moveCall<TIn extends object, TOut extends object> (input: TIn)
+        : Promise<MoveCallResponse<TOut>>
+    {
+        return {} as MoveCallResponse<TOut>;
     }
 }
 
@@ -69,5 +89,10 @@ export interface SuiObject<T> {
     owner: OwnerField;
     tx_digest: number[];
 }
+
+export interface MoveCallResponse<T> {
+    // TODO - fill in
+}
+
 
 export { SuiRpcClient }
