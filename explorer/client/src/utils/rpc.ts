@@ -1,15 +1,14 @@
-import fetch from 'node-fetch';
 
 
-async function readJsonBody(response: Response): Promise<object | null> {
-    const body = response.body;
-    if(body === null) {
-        console.log("no body in response!");
+async function readJsonBody(response: { body: ReadableStream<Uint8Array> | null })
+    : Promise<object | null>
+{
+    if (!response.body) {
+        console.warn('missing response body:', response);
         return null;
     }
-
-    if('getReader' in body) {
-        const buf = await response.body?.getReader().read();
+    if('getReader' in response.body) {
+        const buf = await response.body.getReader().read();
         return buf?.value ? parseJsonBytes(buf.value) : null;
     }
     else {
@@ -26,7 +25,7 @@ class SuiRpcClient {
         this.host = host;
     }
 
-    public readObject = async (id: string) => {
+    public getObjectInfoRaw = async (id: string) => {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
         console.log(`GET   ${objUrl}`);
 
@@ -35,12 +34,7 @@ class SuiRpcClient {
 
         switch (response.status) {
             case 200: {
-                const buf = await response.body?.getReader().read();
-                if(buf?.value) {
-                    const parsedData = parseJsonBytes(buf);
-                    console.log(parsedData)
-                    return parsedData;
-                }
+                return response.body != null ? readJsonBody(response) : null;
             }
             default:
                 console.warn(response); return null;
@@ -50,7 +44,7 @@ class SuiRpcClient {
     public async getObjectInfo<T extends object> (id: string)
         : Promise<ObjectInfoResponse<T>>
     {
-        const json = await this.readObject(id);
+        const json = await this.getObjectInfoRaw(id);
         const asType = json as ObjectInfoResponse<T>;
         // TODO - real errors
         return asType;
