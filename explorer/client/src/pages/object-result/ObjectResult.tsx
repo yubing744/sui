@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import AceEditor from 'react-ace';
 import { useLocation, useParams } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
 import { SuiRpcClient } from '../../utils/rpc';
+import { findDataFromID } from '../../utils/utility_functions';
 
 
 type DataType = {
@@ -31,10 +32,11 @@ type DataType = {
 const IS_SMART_CONTRACT = (data: DataType) =>
     data.data.contents.display?.category === 'moveScript';
 
-function instanceOfDataType(object: any): object is DataType {
+function instanceOfDataType(object: any) {
     return (
         object !== undefined &&
-        ['id', 'version', 'objType'].every((x) => x in object)
+        ['id', 'version', 'objType'].every((x) => x in object) &&
+        object['id'].length > 0
     );
 }
 
@@ -87,13 +89,20 @@ function DisplayBox({ data }: { data: DataType }) {
 
 const _rpc: SuiRpcClient = new SuiRpcClient('http://127.0.0.1:5000');
 
-async function getObjectState(objID: string): Promise<object | null> {
+async function getObjectState(objID: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+        let data = findDataFromID(objID, {});
+        if (data) resolve(data);
+        else reject('object ID not found');
+    });
+    /*
     _rpc.getObjectInfoRaw(objID)
     .then((data) => {
         console.log(data);
         return data;
     });
     return null;
+    */
 }
 
 const ObjectResult = ((): JSX.Element => {
@@ -105,7 +114,17 @@ const ObjectResult = ((): JSX.Element => {
     const [showProperties, setShowProperties] = useState(false);
     const [showConnectedEntities, setShowConnectedEntities] = useState(false);
 
-    const [showObjectState, setObjectState] = useState({});
+    let dt: DataType = {
+        id: '',
+        category: '',
+        owner: '',
+        version: '',
+        objType: '',
+        data: {
+            contents: {}
+        }
+    }
+    const [showObjectState, setObjectState] = useState(dt);
 
     const prepLabel = (label: string) => label.split('_').join(' ');
     const checkIsPropertyType = (value: any) =>
@@ -123,16 +142,19 @@ const ObjectResult = ((): JSX.Element => {
         return result ? result[1] : '';
     };
 
-    let data = {};
+    let dataRef = useRef(dt);
+
     useEffect(() => {
         console.log('trying to call API in useEffect...');
 
         getObjectState(objID as string)
         .then((objState) => {
-            console.log('got obj state?', objState);
             if (objState) {
-                setObjectState(objState);
-                data = objState;
+                let asType = objState as DataType;
+                console.log('got obj state?', asType);
+
+                setObjectState(asType);
+                dataRef.current = asType;
             }
         });
     }, []);
@@ -143,7 +165,11 @@ const ObjectResult = ((): JSX.Element => {
         setShowConnectedEntities(true);
     }, [setShowDescription, setShowProperties, setShowConnectedEntities]);
 
-    if (instanceOfDataType(data)) {
+    console.log('object data?', showObjectState);
+
+    if (instanceOfDataType(showObjectState)) {
+        console.log("is instance of DataType, RENDER?");
+        const data = showObjectState;
         return (<>
             <div className={styles.resultbox}>
                 {data?.data.contents.display?.data && (
@@ -336,6 +362,7 @@ const ObjectResult = ((): JSX.Element => {
             errorMsg="There was an issue with the data on the following object"
         />
     );
+
 });
 
 
