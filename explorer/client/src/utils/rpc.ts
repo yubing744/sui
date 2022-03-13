@@ -1,6 +1,23 @@
 import fetch from 'node-fetch';
 
 
+async function readJsonBody(response: Response): Promise<object | null> {
+    const body = response.body;
+    if(body === null) {
+        console.log("no body in response!");
+        return null;
+    }
+
+    if('getReader' in body) {
+        const buf = await response.body?.getReader().read();
+        return buf?.value ? parseJsonBytes(buf.value) : null;
+    }
+    else {
+        console.error("MISSING ReadableStream.getReader()");
+        return null;
+    }
+}
+
 class SuiRpcClient {
     public host: string;
 
