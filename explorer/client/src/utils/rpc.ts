@@ -40,8 +40,8 @@ class SuiRpcClient {
                 'Content-Type': 'application/json'
             },
         });
-        console.log(response);
 
+        console.log(response);
         switch (response.status) {
             case 200: {
                 const parsedJson = response.json();
@@ -65,6 +65,7 @@ class SuiRpcClient {
     public async moveCall<TIn extends object, TOut extends object> (input: TIn)
         : Promise<MoveCallResponse<TOut>>
     {
+        // TODO - implement
         return {} as MoveCallResponse<TOut>;
     }
 }
