@@ -20,7 +20,7 @@ class SuiRpcClient {
             case 200: {
                 const buf = await response.body?.getReader().read();
                 if(buf?.value) {
-                    const parsedData = u8ArrToObject(buf);
+                    const parsedData = parseJsonBytes(buf);
                     console.log(parsedData)
                     return parsedData;
                 }
@@ -32,7 +32,7 @@ class SuiRpcClient {
 }
 
 const textDecoder = new TextDecoder();
-export function u8ArrToObject(buffer: Uint8Array): object | null {
+export function parseJsonBytes(buffer: Uint8Array): object | null {
     let asStr = textDecoder.decode(buffer);
     return asStr ? JSON.parse(asStr) : null;
 }
