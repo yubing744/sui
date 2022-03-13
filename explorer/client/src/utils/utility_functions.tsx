@@ -34,4 +34,10 @@ const logResult = function logResult<T>(task: () => Promise<T>) {
     }, console.error);
 }
 
+
+export function asciiFromNumberBytes(bytes: number[]) {
+    return String.fromCharCode.apply(null, bytes)
+        .replace(/\0/g,'')
+}
+
 export { findDataFromID, navigateWithUnknown, logResult };

@@ -1,3 +1,5 @@
+import { asciiFromNumberBytes } from "./utility_functions";
+
 class SuiRpcClient {
     public host: string;
 
@@ -51,7 +53,7 @@ class SuiRpcClient {
             }
             default: {
                 console.warn(response);
-                throw new Error('non-200 response to POST /wallet/call');
+                throw new Error(`non-200 response to POST ${this.moveCallUrl}`);
             }
         }
     }
@@ -68,6 +70,25 @@ class SuiRpcClient {
         // TODO - implement
         return {} as MoveCallResponse<TOut>;
     }
+
+    modifyForDemo<T extends object>(obj: T): T {
+        for (var prop in obj) {
+            console.log('obj prop', prop);
+
+            const op = obj[prop];
+            console.log('op', op);
+            if (typeof(obj[prop]) == 'object') {
+                if ('bytes' in obj[prop]) {
+                    console.log("is addr byte array");
+                    //let newProp = asciiFromNumberBytes(obj[prop]);
+                    //console.log('new prop:', newProp);
+                }
+            }
+        }
+
+        return obj;
+
+    }
 }
 
 export type BoolString = "true" | "false";
@@ -75,6 +96,8 @@ export type OwnerField = { ObjectOwner: number[] }
 export type JsonBytes = { bytes: number[] }
 export type JsonHexBytes = { bytes: string }
 export type AnyVec = { vec: any[] }
+
+export type AddressOwner = { AddressOwner: Array<number>[20] }
 
 export interface ObjectInfoResponse<T> {
     owner: string;

@@ -29,6 +29,15 @@ type DataType = {
     };
 };
 
+const DATATYPE_DEFAULT: DataType = {
+    id: '',
+    category: '',
+    owner: '',
+    version: '',
+    objType: '',
+    data: { contents: {} }
+}
+
 const IS_SMART_CONTRACT = (data: DataType) =>
     data.data.contents.display?.category === 'moveScript';
 
@@ -95,36 +104,17 @@ async function getObjectState(objID: string): Promise<object> {
         if (data) resolve(data);
         else reject('object ID not found');
     });
-    /*
-    _rpc.getObjectInfoRaw(objID)
-    .then((data) => {
-        console.log(data);
-        return data;
-    });
-    return null;
-    */
+    //return _rpc.getObjectInfoRaw(objID);
 }
 
 const ObjectResult = ((): JSX.Element => {
     const { id: objID } = useParams();
-    //if (!objID)
-    //    return { type: undefined, props: undefined, key: null };
 
     const [showDescription, setShowDescription] = useState(true);
     const [showProperties, setShowProperties] = useState(false);
     const [showConnectedEntities, setShowConnectedEntities] = useState(false);
 
-    let dt: DataType = {
-        id: '',
-        category: '',
-        owner: '',
-        version: '',
-        objType: '',
-        data: {
-            contents: {}
-        }
-    }
-    const [showObjectState, setObjectState] = useState(dt);
+    const [showObjectState, setObjectState] = useState(DATATYPE_DEFAULT);
 
     const prepLabel = (label: string) => label.split('_').join(' ');
     const checkIsPropertyType = (value: any) =>
@@ -142,7 +132,7 @@ const ObjectResult = ((): JSX.Element => {
         return result ? result[1] : '';
     };
 
-    let dataRef = useRef(dt);
+    let dataRef = useRef(DATATYPE_DEFAULT);
 
     useEffect(() => {
         console.log('trying to call API in useEffect...');
@@ -169,7 +159,9 @@ const ObjectResult = ((): JSX.Element => {
 
     if (instanceOfDataType(showObjectState)) {
         console.log("is instance of DataType, RENDER?");
-        const data = showObjectState;
+        let data = showObjectState;
+        data = _rpc.modifyForDemo(data);
+
         return (<>
             <div className={styles.resultbox}>
                 {data?.data.contents.display?.data && (
