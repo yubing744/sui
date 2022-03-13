@@ -34,4 +34,15 @@ const logResult = function logResult<T>(task: () => Promise<T>) {
     }, console.error);
 }
 
-export { findDataFromID, navigateWithUnknown, logResult };
+const textDecoder = new TextDecoder();
+function parseJsonBytes(buffer: Uint8Array): object | null {
+    try {
+        return JSON.parse(textDecoder.decode(buffer));
+    }
+    catch(err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export { findDataFromID, navigateWithUnknown, logResult, parseJsonBytes };
