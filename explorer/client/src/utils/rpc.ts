@@ -30,10 +30,12 @@ class SuiRpcClient {
         }
     }
 
-    public async readObjectType<T extends object> (id: string): T
+    public async getObjectInfo<T extends object> (id: string)
+        : Promise<ObjectInfoResponse<T>>
     {
         const json = await this.readObject(id);
-        const asType = json as T;
+        const asType = json as ObjectInfoResponse<T>;
+        // TODO - real errors
         return asType;
     }
 }
