@@ -99,8 +99,8 @@ async function getObjectState(objID: string): Promise<object | null> {
 
 const ObjectResult = ((): JSX.Element => {
     const { id: objID } = useParams();
-    if (!objID)
-        return { type: undefined, props: undefined, key: null };
+    //if (!objID)
+    //    return { type: undefined, props: undefined, key: null };
 
     const [showDescription, setShowDescription] = useState(true);
     const [showProperties, setShowProperties] = useState(false);
@@ -128,10 +128,9 @@ const ObjectResult = ((): JSX.Element => {
     useEffect(() => {
         console.log('trying to call API in useEffect...');
 
-        getObjectState(objID)
+        getObjectState(objID as string)
         .then((objState) => {
             console.log('got obj state?', objState);
-
             if (objState) {
                 setObjectState(objState);
                 data = objState;
@@ -343,4 +342,3 @@ const ObjectResult = ((): JSX.Element => {
 
 export { ObjectResult };
 export type { DataType };
-

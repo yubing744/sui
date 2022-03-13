@@ -27,4 +27,11 @@ const navigateWithUnknown = (input: string, navigate: Function) => {
     }
 };
 
-export { findDataFromID, navigateWithUnknown };
+const logResult = function logResult<T>(task: () => Promise<T>) {
+    task()
+    .then((result) => {
+        console.log(result);
+    }, console.error);
+}
+
+export { findDataFromID, navigateWithUnknown, logResult };

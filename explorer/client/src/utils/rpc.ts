@@ -25,7 +25,7 @@ class SuiRpcClient {
         this.host = host;
     }
 
-    public getObjectInfoRaw = async (id: string) => {
+    public async getObjectInfoRaw (id: string): Promise<ObjectInfoResponse<object>> {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
         console.log(`GET   ${objUrl}`);
 
@@ -34,27 +34,35 @@ class SuiRpcClient {
 
         switch (response.status) {
             case 200: {
-                return response.body != null ? readJsonBody(response) : null;
+                const parsedJson = await readJsonBody(response);
+                if (!parsedJson)
+                    throw new Error('unable to parse response body as JSON');
+
+                return parsedJson as ObjectInfoResponse<object>;
             }
-            default:
-                console.warn(response); return null;
+            default: {
+                console.warn(response);
+                throw new Error('non-200 / unhandled response to GET /object_info');
+            }
         }
     }
 
     public async getObjectInfo<T extends object> (id: string)
         : Promise<ObjectInfoResponse<T>>
     {
-        const json = await this.getObjectInfoRaw(id);
-        const asType = json as ObjectInfoResponse<T>;
-        // TODO - real errors
-        return asType;
+        return await this.getObjectInfoRaw(id) as ObjectInfoResponse<T>;
     }
 }
 
 const textDecoder = new TextDecoder();
 export function parseJsonBytes(buffer: Uint8Array): object | null {
-    let asStr = textDecoder.decode(buffer);
-    return asStr ? JSON.parse(asStr) : null;
+    try {
+        return JSON.parse(textDecoder.decode(buffer));
+    }
+    catch(err) {
+        console.error(err);
+        return null;
+    }
 }
 
 
