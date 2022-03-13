@@ -1,4 +1,5 @@
-import { SuiRpcClient, RawMonster } from "./rpc";
+import { SuiRpcClient } from "./rpc";
+import { RawMonster } from "./demo_types";
 import { logResult } from "./utility_functions";
 
 
