@@ -29,6 +29,13 @@ class SuiRpcClient {
                 console.warn(response); return null;
         }
     }
+
+    public async readObjectType<T extends object> (id: string): T
+    {
+        const json = await this.readObject(id);
+        const asType = json as T;
+        return asType;
+    }
 }
 
 const textDecoder = new TextDecoder();
