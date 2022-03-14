@@ -1,5 +1,5 @@
 .footer {
-    @apply fixed bottom-0 bg-black w-full px-[5vw] z-10;
+    @apply fixed bottom-0 bg-offblack w-full px-[5vw] z-10;
 }
 
 nav.links {
@@ -7,5 +7,5 @@ nav.links {
 }
 
 .links > a {
-    @apply text-white  no-underline hover:underline mr-[5vw] font-light text-sm sm:text-lg my-[5vh];
+    @apply text-offwhite no-underline hover:text-sui mr-[5vw] font-light text-sm sm:text-lg my-[5vh];
 }

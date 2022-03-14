@@ -11,5 +11,5 @@
 
 .searchtext {
     @apply border-none rounded-l-md font-mono leading-8 flex-1 ml-[5vw]
-    text-xs mr-0;
+    text-xs mr-0 bg-offwhite;
 }

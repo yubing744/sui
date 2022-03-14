@@ -1,5 +1,5 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
 const defaultColors = require('tailwindcss/colors');
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
     content: ['./src/**/*.{js,jsx,ts,tsx}'],
@@ -12,6 +12,8 @@ module.exports = {
         colors: {
             sui: '#6fbcf0',
             suidark: '#1670b8',
+            offwhite: '#fefefe',
+            offblack: '#111111',
             ...defaultColors,
         },
     },

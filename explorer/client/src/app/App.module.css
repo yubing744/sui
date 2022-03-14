@@ -7,7 +7,7 @@ h2.suititle {
 }
 
 .search {
-    @apply bg-black text-white pb-4 w-[100vw];
+    @apply bg-offblack text-offwhite pb-4 w-[100vw];
 }
 
 main {
