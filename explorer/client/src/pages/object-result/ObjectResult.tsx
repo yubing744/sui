@@ -8,7 +8,7 @@ import theme from '../../styles/theme.module.css';
 import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
-import { type AddressOwner, SuiRpcClient, JsonHexBytes } from '../../utils/rpc';
+import { type AddressOwner, SuiRpcClient, type SuiParentChildRef, type TMoveVec } from '../../utils/rpc';
 import { asciiFromNumberBytes, trimStdLibPrefix } from '../../utils/utility_functions';
 
 
@@ -51,7 +51,6 @@ function instanceOfDataType(object: any) {
     );
 }
 
-const fixNameMsg = 'FIXME';
 function handleSpecialDemoNames(data: {
         name?: string,
         player_name?: string,
@@ -60,12 +59,9 @@ function handleSpecialDemoNames(data: {
         [key: string]: any;
     }): string
 {
-    console.log('handleSpecialDemoNames() - contents - ', data);
-
     let val = '';
-    if('player_name' in data) {
-        val = data.player_name ? data.player_name : fixNameMsg;
-    }
+    if('player_name' in data)
+        val = data.player_name ? data.player_name : val;
     else if('monster_name' in data)
         val = data.monster_name ? data.monster_name : val;
     else if('farm_name' in data)
@@ -85,7 +81,6 @@ function handleSpecialDemoNameArrays(data: {
     farm_name?: SuiIdBytes | string
 }): string
 {
-    //console.log('handleSpecialDemoNames() NUMBERS', data);
     let bytesObj: SuiIdBytes = { bytes: [] };
 
     if('player_name' in data) {
@@ -201,6 +196,7 @@ const ObjectResult = ((): JSX.Element => {
         /owned/.test(key) || (/_id/.test(key) && value?.bytes) || value?.vec;
     const checkSingleID = (value: any) => value?.bytes;
     const checkVecIDs = (value: any) => value?.vec;
+    const isMoveVecType = (value: { vec?: [] }) => Array.isArray(value?.vec);
 
     const extractOwnerData = (owner: string | AddressOwner): string => {
         switch (typeof(owner)) {
