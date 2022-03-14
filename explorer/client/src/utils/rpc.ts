@@ -81,6 +81,9 @@ class SuiRpcClient {
             if (typeof(property) == 'object') {
                 if ('bytes' in property) {
                     console.log("bytes IN PROPERTY", property);
+                    //const objProperty = property['bytes'];
+                    let mapChars = Object.assign({}, property);
+                    console.log('mapChars', mapChars);
 
                     const pb = property as unknown as JsonHexBytes;
                     if(isValidSuiIdBytes(pb)) {
@@ -93,7 +96,6 @@ class SuiRpcClient {
 
                 this.modifyForDemo(property as unknown as object);
             }
-
         }
 
         return obj;

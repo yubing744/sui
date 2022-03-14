@@ -26,7 +26,8 @@ type DataType = {
         contents: {
             [key: string]: any;
         };
-        owner?: { AddressOwner: number[] } | string
+        owner?: { AddressOwner: number[] } | string,
+        tx_digest?: number[] | string
     };
 };
 
@@ -159,6 +160,14 @@ async function getObjectState(objID: string): Promise<object> {
     return _rpc.getObjectInfoRaw(objID);
 }
 
+function toHexString(byteArray: number[]): string {
+    return '0x' +
+        Array.prototype.map.call(byteArray, (byte) => {
+            return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+        })
+        .join('');
+  }
+
 const ObjectResult = ((): JSX.Element => {
     const { id: objID } = useParams();
 
@@ -259,6 +268,11 @@ const ObjectResult = ((): JSX.Element => {
 
         const innerData = data.data;
 
+        if(innerData.tx_digest && typeof(innerData.tx_digest) === 'object') {
+            const digest_hex = toHexString(innerData.tx_digest as number[]);
+            innerData.tx_digest = digest_hex;
+        }
+
         const typeOfOwner = typeof(innerData.owner);
         console.log(`type of ' data.owner ':   ${typeOfOwner}`);
 
@@ -268,8 +282,9 @@ const ObjectResult = ((): JSX.Element => {
                 console.log('got obj OWNER value:', ownerObj);
 
                 if ('AddressOwner' in ownerObj) {
+                    console.log('ADDRESS OWNER');
                     console.log(ownerObj);
-                    innerData.owner = asciiFromNumberBytes((ownerObj as AddressOwner).AddressOwner);
+                    innerData.owner = toHexString((ownerObj as AddressOwner).AddressOwner);
                     console.log(innerData);
                 }
                 break;
