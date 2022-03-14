@@ -88,26 +88,27 @@ function handleSpecialDemoNameArrays(data: {
     console.log('handleSpecialDemoNames() NUMBERS', data);
     let bytesObj: SuiIdBytes = { bytes: [] };
 
-
     if('player_name' in data) {
         bytesObj = data.player_name as SuiIdBytes;
-        data.player_name = asciiFromNumberBytes(bytesObj.bytes);
-        return data.player_name;
+        const ascii = asciiFromNumberBytes(bytesObj.bytes);
+        delete data.player_name;
+        return ascii;
     }
     else if('monster_name' in data) {
         bytesObj = data.monster_name as SuiIdBytes;
-        data.monster_name = asciiFromNumberBytes(bytesObj.bytes);
-        return data.monster_name;
+        const ascii = asciiFromNumberBytes(bytesObj.bytes);
+        delete data.monster_name;
+        return ascii;
     }
     else if('farm_name' in data) {
         bytesObj = data.farm_name as SuiIdBytes;
-        data.farm_name = asciiFromNumberBytes(bytesObj.bytes);
-        return data.farm_name;
+        const ascii = asciiFromNumberBytes(bytesObj.bytes);
+        delete data.farm_name;
+        return ascii;
     }
     else if('name' in data) {
         bytesObj = data.name as SuiIdBytes;
-        data.name = asciiFromNumberBytes(bytesObj.bytes);
-        return data.name;
+        return asciiFromNumberBytes(bytesObj.bytes);
     }
     else
         bytesObj = { bytes: [] };
