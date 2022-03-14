@@ -99,12 +99,14 @@ function DisplayBox({ data }: { data: DataType }) {
 const _rpc: SuiRpcClient = new SuiRpcClient('http://127.0.0.1:5000');
 
 async function getObjectState(objID: string): Promise<object> {
+    /*
     return new Promise((resolve, reject) => {
         let data = findDataFromID(objID, {});
         if (data) resolve(data);
         else reject('object ID not found');
     });
-    //return _rpc.getObjectInfoRaw(objID);
+    */
+    return _rpc.getObjectInfoRaw(objID);
 }
 
 const ObjectResult = ((): JSX.Element => {
