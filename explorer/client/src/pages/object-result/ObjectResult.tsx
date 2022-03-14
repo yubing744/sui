@@ -8,14 +8,14 @@ import theme from '../../styles/theme.module.css';
 import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
-import { SuiRpcClient } from '../../utils/rpc';
-import { asciiFromNumberBytes, findDataFromID, trimStdLibPrefix } from '../../utils/utility_functions';
+import { type AddressOwner, SuiRpcClient } from '../../utils/rpc';
+import { asciiFromNumberBytes, trimStdLibPrefix } from '../../utils/utility_functions';
 
 
 type DataType = {
     id: string;
     category: string;
-    owner: string;
+    owner: string | AddressOwner;
     version: string;
     readonly?: string;
     objType: string;
@@ -26,6 +26,7 @@ type DataType = {
         contents: {
             [key: string]: any;
         };
+        owner?: { AddressOwner: number[] } | string
     };
 };
 
@@ -49,7 +50,7 @@ function instanceOfDataType(object: any) {
     );
 }
 
-const fixNameMsg = '';
+const fixNameMsg = 'FIXME';
 function handleSpecialDemoNames(data: {
         name?: string,
         player_name?: string,
@@ -176,15 +177,27 @@ const ObjectResult = ((): JSX.Element => {
     const checkSingleID = (value: any) => value?.bytes;
     const checkVecIDs = (value: any) => value?.vec;
 
-    const extractOwnerData = (ownerString: string): string => {
-        if(addrOwnerPattern.test(ownerString)) {
-            let ownerId = getAddressOwnerId(ownerString);
-            return ownerId ? ownerId : '';
+    const extractOwnerData = (owner: string | AddressOwner): string => {
+        switch (typeof(owner)) {
+            case 'string':
+                console.log(`STRING owner:  ${owner}`);
+                if(addrOwnerPattern.test(owner)) {
+                    let ownerId = getAddressOwnerId(owner);
+                    return ownerId ? ownerId : '';
+                }
+                const singleOwnerPattern = /SingleOwner\(k#(.*)\)/;
+                const result = singleOwnerPattern.exec(owner);
+                return result ? result[1] : '';
+            case 'object':
+                console.log(`OBJECT owner:  ${JSON.stringify(owner)}`);
+                if('AddressOwner' in owner) {
+                    let ownerId = extractAddressOwner(owner.AddressOwner);
+                    return ownerId ? ownerId : '';
+                }
+                return '';
+            default:
+                return '';
         }
-
-        const singleOwnerPattern = /SingleOwner\(k#(.*)\)/;
-        const result = singleOwnerPattern.exec(ownerString);
-        return result ? result[1] : '';
     };
 
     const addrOwnerPattern = /^AddressOwner\(k#/;
@@ -239,10 +252,31 @@ const ObjectResult = ((): JSX.Element => {
 
         data.objType = trimStdLibPrefix(data.objType);
         // TODO - fix up special name handling here
-        if(data.name === '')
+        if(data.name == '')
             data.name = handleSpecialDemoNames(data.data.contents);
-        if(data.name === '')
+        if(data.name == '')
             data.name = handleSpecialDemoNameArrays(data.data.contents);
+
+        const innerData = data.data;
+
+        const typeOfOwner = typeof(innerData.owner);
+        console.log(`type of ' data.owner ':   ${typeOfOwner}`);
+
+        switch (typeOfOwner) {
+            case 'object':
+                const ownerObj = innerData.owner as object;
+                console.log('got obj OWNER value:', ownerObj);
+
+                if ('AddressOwner' in ownerObj) {
+                    console.log(ownerObj);
+                    innerData.owner = asciiFromNumberBytes((ownerObj as AddressOwner).AddressOwner);
+                    console.log(innerData);
+                }
+                break;
+        }
+
+        console.log('data, modded?', data);
+
         //data.name = 'Hughe Nuts';
 
         return (<>

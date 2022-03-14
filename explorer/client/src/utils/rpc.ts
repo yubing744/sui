@@ -118,6 +118,9 @@ const SUI_ADDRESS_LEN = 20;
 type SuiAddressBytes = Array<number>;
 type SuiAddressHexStr = string;
 
+const TX_DIGEST_LEN = 32;
+type SuiTxDigest = Array<number>;   // 32 bytes
+
 const hexStringPattern = /$0x[0-9a-fA-F]*^/;
 const suiAddressHexPattern = /$0x[0-9a-fA-F]{20}^/;
 const isBytesHexStr = (str: string) => hexStringPattern.test(str);
@@ -147,7 +150,7 @@ const isValidSuiIdBytes = (obj: { bytes: string | number[] }) => {
     return false;
 }
 
-type AddressOwner = { AddressOwner: SuiAddressBytes }
+export type AddressOwner = { AddressOwner: SuiAddressBytes }
 type ObjectOwner = { ObjectOwner: SuiAddressBytes }
 export type AnyVec = { vec: any[] }
 type BoolString = "true" | "false";
