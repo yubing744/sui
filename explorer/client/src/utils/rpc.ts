@@ -15,7 +15,7 @@ class SuiRpcClient {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
         console.log(`GET   ${objUrl}`);
 
-        let response = await fetch(objUrl);
+        let response = await fetch(objUrl, { mode: 'cors' });
         console.log(response);
 
         switch (response.status) {
@@ -71,7 +71,7 @@ class SuiRpcClient {
         return {} as MoveCallResponse<TOut>;
     }
 
-    public static modifyForDemo<T extends object, U>(obj: T): T {
+    public static modifyForDemo <T extends object, U>(obj: T): T {
         for (var prop in obj) {
             //console.log('obj prop', prop);
 

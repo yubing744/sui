@@ -8,7 +8,7 @@ import theme from '../../styles/theme.module.css';
 import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
-import { type AddressOwner, SuiRpcClient } from '../../utils/rpc';
+import { type AddressOwner, SuiRpcClient, JsonHexBytes } from '../../utils/rpc';
 import { asciiFromNumberBytes, trimStdLibPrefix } from '../../utils/utility_functions';
 
 
@@ -56,48 +56,64 @@ function handleSpecialDemoNames(data: {
         name?: string,
         player_name?: string,
         monster_name?: string,
-        farm_name?: string
+        farm_name?: string,
+        [key: string]: any;
     }): string
 {
-    console.log('handleSpecialDemoNames()', data);
+    console.log('handleSpecialDemoNames() - contents - ', data);
 
+    let val = '';
     if('player_name' in data) {
-        console.log('OH FUCK PLAYER DATA DAMN', data);
-        return data.player_name ? data.player_name : fixNameMsg;
+        val = data.player_name ? data.player_name : fixNameMsg;
     }
-    if('monster_name' in data)
-        return data.monster_name ? data.monster_name : fixNameMsg;
-    if('farm_name' in data)
-        return data.farm_name ? data.farm_name : fixNameMsg;
-    if('name' in data)
-        return data.name ? data.name : fixNameMsg;
-    return fixNameMsg;
+    else if('monster_name' in data)
+        val = data.monster_name ? data.monster_name : val;
+    else if('farm_name' in data)
+        val = data.farm_name ? data.farm_name : val;
+    else if('name' in data)
+        val = data.name ? data.name : val;
+
+    return val;
 }
 
+type SuiIdBytes = { bytes: number[] };
+
 function handleSpecialDemoNameArrays(data: {
-    name?: number[],
-    player_name?: number[],
-    monster_name?: number[],
-    farm_name?: number[]
+    name?: SuiIdBytes | string,
+    player_name?: SuiIdBytes | string,
+    monster_name?: SuiIdBytes | string,
+    farm_name?: SuiIdBytes | string
 }): string
 {
     console.log('handleSpecialDemoNames() NUMBERS', data);
+    let bytesObj: SuiIdBytes = { bytes: [] };
 
-    let bytes: number[] = [];
+
     if('player_name' in data) {
-        console.log('OH FUCK PLAYER DATA DAMN', data);
-        bytes = data.player_name ? data.player_name : [];
+        bytesObj = data.player_name as SuiIdBytes;
+        data.player_name = asciiFromNumberBytes(bytesObj.bytes);
+        return data.player_name;
     }
-    if('monster_name' in data)
-        bytes =  data.monster_name ? data.monster_name : [];
-    if('farm_name' in data)
-        bytes = data.farm_name ? data.farm_name : [];
-    if('name' in data)
-        bytes = data.name ? data.name : [];
+    else if('monster_name' in data) {
+        bytesObj = data.monster_name as SuiIdBytes;
+        data.monster_name = asciiFromNumberBytes(bytesObj.bytes);
+        return data.monster_name;
+    }
+    else if('farm_name' in data) {
+        bytesObj = data.farm_name as SuiIdBytes;
+        data.farm_name = asciiFromNumberBytes(bytesObj.bytes);
+        return data.farm_name;
+    }
+    else if('name' in data) {
+        bytesObj = data.name as SuiIdBytes;
+        data.name = asciiFromNumberBytes(bytesObj.bytes);
+        return data.name;
+    }
     else
-        bytes = [];
+        bytesObj = { bytes: [] };
 
-    return asciiFromNumberBytes(bytes);
+    console.log('ascii-fying name arrays...', bytesObj);
+    return asciiFromNumberBytes(bytesObj.bytes);
 }
 
 function DisplayBox({ data }: { data: DataType }) {
@@ -166,7 +182,11 @@ function toHexString(byteArray: number[]): string {
             return ('0' + (byte & 0xFF).toString(16)).slice(-2);
         })
         .join('');
-  }
+}
+
+function toAsciiString(byteArray: number[]): string {
+    return byteArray?.map(b => String.fromCharCode(b)).join('');
+}
 
 const ObjectResult = ((): JSX.Element => {
     const { id: objID } = useParams();
@@ -256,17 +276,23 @@ const ObjectResult = ((): JSX.Element => {
     if (instanceOfDataType(showObjectState)) {
         console.log("is instance of DataType, RENDER?");
         let data = showObjectState;
-        console.log('data', data);
+        const innerData = data.data;
+
+        console.log('pre-modify data.data.contents', innerData.contents);
         data = SuiRpcClient.modifyForDemo(data);
 
         data.objType = trimStdLibPrefix(data.objType);
         // TODO - fix up special name handling here
-        if(data.name == '')
-            data.name = handleSpecialDemoNames(data.data.contents);
-        if(data.name == '')
-            data.name = handleSpecialDemoNameArrays(data.data.contents);
+        console.log('data.name', data.name);
+        //if(data.name === undefined)
 
-        const innerData = data.data;
+        console.log('name before handling', data.name);
+        //data.name = handleSpecialDemoNames(innerData.contents);
+        //console.log('name mid handling', data.name);
+        if(!data.name)
+            data.name = handleSpecialDemoNameArrays(innerData.contents);
+
+        console.log('name after handling', data.name);
 
         if(innerData.tx_digest && typeof(innerData.tx_digest) === 'object') {
             const digest_hex = toHexString(innerData.tx_digest as number[]);
@@ -289,6 +315,14 @@ const ObjectResult = ((): JSX.Element => {
                 }
                 break;
         }
+
+        /*
+        const playerName: { bytes: number[] } = innerData.contents['player_name'];
+        if (playerName) {
+            const pNameAscii = toAsciiString(playerName.bytes);
+            data.name = pNameAscii;
+        }
+        */
 
         console.log('data, modded?', data);
 
