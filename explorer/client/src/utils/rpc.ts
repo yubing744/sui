@@ -71,7 +71,7 @@ class SuiRpcClient {
         return {} as MoveCallResponse<TOut>;
     }
 
-    modifyForDemo<T extends object, U>(obj: T): T {
+    public static modifyForDemo<T extends object, U>(obj: T): T {
         for (var prop in obj) {
             //console.log('obj prop', prop);
 
@@ -79,11 +79,6 @@ class SuiRpcClient {
             //console.log('property', property);
 
             if (typeof(property) == 'object') {
-                for (var innerProp in property) {
-                    //console.log('inner prop:', innerProp, property[innerProp]);
-                    //this.modifyForDemo(property as unknown as object);
-                    //this.modifyForDemo(property[innerProp] as unknown as object);
-                }
                 if ('bytes' in property) {
                     console.log("bytes IN PROPERTY", property);
 
