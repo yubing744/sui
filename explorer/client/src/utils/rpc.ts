@@ -146,10 +146,18 @@ export type AnyVec = { vec: any[] }
 type BoolString = "true" | "false";
 const parseBoolString = (bs: BoolString) => bs === "true" ? true : false;
 
-
 export type JsonBytes = { bytes: number[] }
 export type JsonHexBytes = { bytes: string | number[] }
 
+export type SuiRefHexBytes = { bytes: string }      // TODO - better types for hex strings
+
+export interface SuiParentChildRef {
+    child_id: SuiRefHexBytes,
+    parent_id: SuiRefHexBytes
+}
+
+export type MoveVec = { vec: any[] }
+export type TMoveVec<T extends object> = { vec: T[] }
 
 export interface ObjectInfoResponse<T> {
     owner: string;
@@ -170,112 +178,5 @@ export interface MoveCallResponse<T> {
     // TODO - fill in
 }
 
-
-const TEST_OBJ_1 = {
-    owner: "AddressOwner(k#09818aac3edf9cf9b006b70c36e7241768b26386)",
-    version: "5",
-    id: "2164DB9A05AD6465A6F9D6FCDC1FA0C22AD79A95",
-    readonly: "false",
-    objType: "0x2::Geniteam::Player",
-    data: {
-        contents: {
-            "earth_runes_count": 0,
-            "fire_runes_count": 0,
-            "id": {
-                "id": {
-                    "id": { "bytes": "2164db9a05ad6465a6f9d6fcdc1fa0c22ad79a95" }
-                },
-                "version": 5
-            },
-            "inventory": {
-                "child_id": { "bytes": "c4afface77c09dc57eeb3b517bec3c1c69771e6f" },
-                "parent_id": { "bytes": "2164db9a05ad6465a6f9d6fcdc1fa0c22ad79a95" }
-            },
-            "owned_farm": {
-                "vec": [
-                    {
-                        "child_id": { "bytes": "fe538d19d8dbd20ee2c6e6793572cf4459800686" },
-                        "parent_id": { "bytes": "2164db9a05ad6465a6f9d6fcdc1fa0c22ad79a95" }
-                    }
-                ]
-            },
-            "player_name": {
-                "bytes": [
-                    84,
-                    101,
-                    115,
-                    116,
-                    32,
-                    80,
-                    108,
-                    97,
-                    121,
-                    101,
-                    114
-                ]
-            },
-            "water_runes_count": 0,
-            "wind_runes_count": 0
-        },
-        "owner": {
-            "AddressOwner": [
-                9,
-                129,
-                138,
-                172,
-                62,
-                223,
-                156,
-                249,
-                176,
-                6,
-                183,
-                12,
-                54,
-                231,
-                36,
-                23,
-                104,
-                178,
-                99,
-                134
-            ]
-        },
-        "tx_digest": [
-            153,
-            191,
-            38,
-            174,
-            15,
-            12,
-            148,
-            96,
-            175,
-            125,
-            128,
-            9,
-            95,
-            146,
-            59,
-            172,
-            53,
-            116,
-            145,
-            224,
-            91,
-            101,
-            130,
-            7,
-            202,
-            180,
-            205,
-            200,
-            99,
-            160,
-            113,
-            36
-        ]
-    }
-}
 
 export { SuiRpcClient }
