@@ -13,9 +13,15 @@ class SuiRpcClient {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
         console.log(`GET   ${objUrl}`);
 
-        let response = await fetch(objUrl, { mode: 'cors' });
-        console.log(response);
+        let response = null;
+        try {
+            response = await fetch(objUrl, { mode: 'cors' });
+        } catch (e) {
+            console.error(e);
+            return {};
+        }
 
+        console.log(response);
         switch (response.status) {
             case 200: {
                 const parsedJson = await response.json();
