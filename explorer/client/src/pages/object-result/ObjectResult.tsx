@@ -184,10 +184,6 @@ function toHexString(byteArray: number[]): string {
         .join('');
 }
 
-function toAsciiString(byteArray: number[]): string {
-    return byteArray?.map(b => String.fromCharCode(b)).join('');
-}
-
 const ObjectResult = ((): JSX.Element => {
     const { id: objID } = useParams();
 
@@ -209,7 +205,6 @@ const ObjectResult = ((): JSX.Element => {
     const extractOwnerData = (owner: string | AddressOwner): string => {
         switch (typeof(owner)) {
             case 'string':
-                console.log(`STRING owner:  ${owner}`);
                 if(addrOwnerPattern.test(owner)) {
                     let ownerId = getAddressOwnerId(owner);
                     return ownerId ? ownerId : '';
@@ -218,7 +213,6 @@ const ObjectResult = ((): JSX.Element => {
                 const result = singleOwnerPattern.exec(owner);
                 return result ? result[1] : '';
             case 'object':
-                console.log(`OBJECT owner:  ${JSON.stringify(owner)}`);
                 if('AddressOwner' in owner) {
                     let ownerId = extractAddressOwner(owner.AddressOwner);
                     return ownerId ? ownerId : '';
@@ -251,14 +245,10 @@ const ObjectResult = ((): JSX.Element => {
     let dataRef = useRef(DATATYPE_DEFAULT);
 
     useEffect(() => {
-        console.log('trying to call API in useEffect...');
-
         getObjectState(objID as string)
         .then((objState) => {
             if (objState) {
                 let asType = objState as DataType;
-                console.log('got obj state?', asType);
-
                 setObjectState(asType);
                 dataRef.current = asType;
             }
@@ -279,8 +269,6 @@ const ObjectResult = ((): JSX.Element => {
 
         data = SuiRpcClient.modifyForDemo(data);
         data.objType = trimStdLibPrefix(data.objType);
-        console.log('data.name', data.name);
-        console.log('name before handling', data.name);
 
         // hardcode a friendly name for gas for now
         const gasTokenTypeStr = 'Coin::Coin<0x2::GAS::GAS>';
@@ -289,8 +277,6 @@ const ObjectResult = ((): JSX.Element => {
 
         if(!data.name)
             data.name = handleSpecialDemoNameArrays(innerData.contents);
-
-        //console.log('name after handling', data.name);
 
         if(innerData.tx_digest && typeof(innerData.tx_digest) === 'object') {
             const digest_hex = toHexString(innerData.tx_digest as number[]);
