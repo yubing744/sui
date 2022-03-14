@@ -71,33 +71,97 @@ class SuiRpcClient {
         return {} as MoveCallResponse<TOut>;
     }
 
-    modifyForDemo<T extends object>(obj: T): T {
+    modifyForDemo<T extends object, U>(obj: T): T {
         for (var prop in obj) {
             console.log('obj prop', prop);
 
-            const op = obj[prop];
-            console.log('op', op);
-            if (typeof(obj[prop]) == 'object') {
-                if ('bytes' in obj[prop]) {
-                    console.log("is addr byte array");
-                    //let newProp = asciiFromNumberBytes(obj[prop]);
-                    //console.log('new prop:', newProp);
+            let property = obj[prop];
+            console.log('property', property);
+
+            if (typeof(property) == 'object') {
+                for (var innerProp in property) {
+                    console.log('inner prop:', innerProp, property[innerProp]);
+                    //this.modifyForDemo(property as unknown as object);
+                    //this.modifyForDemo(property[innerProp] as unknown as object);
                 }
+                if ('bytes' in property) {
+                    console.log("bytes IN PROPERTY", property);
+
+                    const pb = property as unknown as JsonHexBytes;
+                    if(isValidSuiIdBytes(pb)) {
+                        //let newProp = asciiFromNumberBytes(pb.bytes);
+                        console.log("VALID ID BYTE ARRAY", pb.bytes);
+                    }
+                    //let newProp = hexToAscii(bs);
+                    //console.log('ascii:  ', newProp);
+                }
+
+                this.modifyForDemo(property as unknown as object);
             }
+
         }
 
         return obj;
-
     }
 }
 
-export type BoolString = "true" | "false";
-export type OwnerField = { ObjectOwner: number[] }
-export type JsonBytes = { bytes: number[] }
-export type JsonHexBytes = { bytes: string }
-export type AnyVec = { vec: any[] }
+export const hexToAscii = function(hex: string) {
+    var str = "";
+    var i = 0, l = hex.length;
+    if (hex.substring(0, 2) === '0x') {
+        i = 2;
+    }
+    for (; i < l; i+=2) {
+        var code = parseInt(hex.substr(i, 2), 16);
+        str += String.fromCharCode(code);
+    }
 
-export type AddressOwner = { AddressOwner: Array<number>[20] }
+    return str;
+}
+
+const SUI_ADDRESS_LEN = 20;
+type SuiAddressBytes = Array<number>;
+type SuiAddressHexStr = string;
+
+const hexStringPattern = /$0x[0-9a-fA-F]*^/;
+const suiAddressHexPattern = /$0x[0-9a-fA-F]{20}^/;
+const isBytesHexStr = (str: string) => hexStringPattern.test(str);
+const isSuiAddressHexStr = (str: string) => suiAddressHexPattern.test(str);
+
+const isValidSuiIdBytes = (obj: { bytes: string | number[] }) => {
+    const bytesFieldType = typeof obj.bytes;
+
+    if (bytesFieldType === 'object') {
+        if (Array.isArray(obj.bytes)) {
+            const objBytesAsArray = obj.bytes as number[];
+            if(objBytesAsArray.length != SUI_ADDRESS_LEN)
+                return false;
+
+            for (let i = 0; i < objBytesAsArray.length; i++) {
+                if(objBytesAsArray[i] > 255)
+                    return false;
+            }
+            return true;
+        }
+        else return false
+    }
+    else if (bytesFieldType === 'string') {
+        return isSuiAddressHexStr(obj.bytes as string);
+    }
+
+    return false;
+}
+
+type AddressOwner = { AddressOwner: SuiAddressBytes }
+type ObjectOwner = { ObjectOwner: SuiAddressBytes }
+export type AnyVec = { vec: any[] }
+type BoolString = "true" | "false";
+const parseBoolString = (bs: BoolString) => bs === "true" ? true : false;
+
+
+export type JsonBytes = { bytes: number[] }
+export type JsonHexBytes = { bytes: string | number[] }
+
 
 export interface ObjectInfoResponse<T> {
     owner: string;
@@ -110,7 +174,7 @@ export interface ObjectInfoResponse<T> {
 
 export interface SuiObject<T> {
     contents: T;
-    owner: OwnerField;
+    owner: ObjectOwner;
     tx_digest: number[];
 }
 
