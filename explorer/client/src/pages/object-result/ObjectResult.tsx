@@ -49,6 +49,55 @@ function instanceOfDataType(object: any) {
     );
 }
 
+const fixNameMsg = '';
+function handleSpecialDemoNames(data: {
+        name?: string,
+        player_name?: string,
+        monster_name?: string,
+        farm_name?: string
+    }): string
+{
+    console.log('handleSpecialDemoNames()', data);
+
+    if('player_name' in data) {
+        console.log('OH FUCK PLAYER DATA DAMN', data);
+        return data.player_name ? data.player_name : fixNameMsg;
+    }
+    if('monster_name' in data)
+        return data.monster_name ? data.monster_name : fixNameMsg;
+    if('farm_name' in data)
+        return data.farm_name ? data.farm_name : fixNameMsg;
+    if('name' in data)
+        return data.name ? data.name : fixNameMsg;
+    return fixNameMsg;
+}
+
+function handleSpecialDemoNameArrays(data: {
+    name?: number[],
+    player_name?: number[],
+    monster_name?: number[],
+    farm_name?: number[]
+}): string
+{
+    console.log('handleSpecialDemoNames() NUMBERS', data);
+
+    let bytes: number[] = [];
+    if('player_name' in data) {
+        console.log('OH FUCK PLAYER DATA DAMN', data);
+        bytes = data.player_name ? data.player_name : [];
+    }
+    if('monster_name' in data)
+        bytes =  data.monster_name ? data.monster_name : [];
+    if('farm_name' in data)
+        bytes = data.farm_name ? data.farm_name : [];
+    if('name' in data)
+        bytes = data.name ? data.name : [];
+    else
+        bytes = [];
+
+    return asciiFromNumberBytes(bytes);
+}
+
 function DisplayBox({ data }: { data: DataType }) {
     const [hasDisplayLoaded, setHasDisplayLoaded] = useState(false);
 
@@ -185,9 +234,16 @@ const ObjectResult = ((): JSX.Element => {
     if (instanceOfDataType(showObjectState)) {
         console.log("is instance of DataType, RENDER?");
         let data = showObjectState;
+        console.log('data', data);
         data = SuiRpcClient.modifyForDemo(data);
 
         data.objType = trimStdLibPrefix(data.objType);
+        // TODO - fix up special name handling here
+        if(data.name === '')
+            data.name = handleSpecialDemoNames(data.data.contents);
+        if(data.name === '')
+            data.name = handleSpecialDemoNameArrays(data.data.contents);
+        //data.name = 'Hughe Nuts';
 
         return (<>
             <div className={styles.resultbox}>
