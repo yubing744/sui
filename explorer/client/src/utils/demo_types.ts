@@ -1,4 +1,4 @@
-import { AnyVec, JsonBytes, JsonHexBytes } from "./rpc";
+import { AnyVec, JsonBytes, SuiParentChildRef } from "./rpc";
 
 
 export type CosmeticOption = AnyVec | RawCosmetic;
@@ -24,10 +24,7 @@ export interface RawMonster {
     monster_xp: number;
 }
 
-export interface RawPetMonsters {
-    child_id: JsonHexBytes;
-    parent_id: JsonHexBytes;
-}
+export type RawPetMonsters = SuiParentChildRef;
 
 export interface RawFarm {
     applied_farm_cosmetic_0: CosmeticOption;
@@ -41,3 +38,5 @@ export interface RawFarm {
     pet_monsters: RawPetMonsters;
     total_monster_slots: number;
 }
+
+
