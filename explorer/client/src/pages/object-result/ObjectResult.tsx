@@ -85,7 +85,7 @@ function handleSpecialDemoNameArrays(data: {
     farm_name?: SuiIdBytes | string
 }): string
 {
-    console.log('handleSpecialDemoNames() NUMBERS', data);
+    //console.log('handleSpecialDemoNames() NUMBERS', data);
     let bytesObj: SuiIdBytes = { bytes: [] };
 
     if('player_name' in data) {
@@ -113,7 +113,6 @@ function handleSpecialDemoNameArrays(data: {
     else
         bytesObj = { bytes: [] };
 
-    console.log('ascii-fying name arrays...', bytesObj);
     return asciiFromNumberBytes(bytesObj.bytes);
 }
 
@@ -317,17 +316,7 @@ const ObjectResult = ((): JSX.Element => {
                 break;
         }
 
-        /*
-        const playerName: { bytes: number[] } = innerData.contents['player_name'];
-        if (playerName) {
-            const pNameAscii = toAsciiString(playerName.bytes);
-            data.name = pNameAscii;
-        }
-        */
-
         console.log('data, modded?', data);
-
-        //data.name = 'Hughe Nuts';
 
         return (<>
             <div className={styles.resultbox}>
