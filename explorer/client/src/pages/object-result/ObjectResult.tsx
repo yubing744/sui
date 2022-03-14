@@ -272,7 +272,8 @@ const ObjectResult = ((): JSX.Element => {
 
         // hardcode a friendly name for gas for now
         const gasTokenTypeStr = 'Coin::Coin<0x2::GAS::GAS>';
-        if (data.objType === gasTokenTypeStr)
+        const gasTokenId = '0000000000000000000000000000000000000003';
+        if (data.objType === gasTokenTypeStr && data.id === gasTokenId)
             data.name = 'GAS';
 
         if(!data.name)
