@@ -1,5 +1,3 @@
-import { asciiFromNumberBytes } from "./utility_functions";
-
 class SuiRpcClient {
     public host: string;
 
@@ -74,24 +72,14 @@ class SuiRpcClient {
     public static modifyForDemo <T extends object, U>(obj: T): T {
         for (var prop in obj) {
             //console.log('obj prop', prop);
-
             let property = obj[prop];
             //console.log('property', property);
 
             if (typeof(property) == 'object') {
                 if ('bytes' in property) {
-                    console.log("bytes IN PROPERTY", property);
-                    //const objProperty = property['bytes'];
-                    let mapChars = Object.assign({}, property);
-                    console.log('mapChars', mapChars);
-
                     const pb = property as unknown as JsonHexBytes;
-                    if(isValidSuiIdBytes(pb)) {
-                        //let newProp = asciiFromNumberBytes(pb.bytes);
-                        console.log("VALID ID BYTE ARRAY", pb.bytes);
-                    }
-                    //let newProp = hexToAscii(bs);
-                    //console.log('ascii:  ', newProp);
+                    if(isValidSuiIdBytes(pb))
+                        console.log("valid sui id bytes", pb.bytes);
                 }
 
                 this.modifyForDemo(property as unknown as object);

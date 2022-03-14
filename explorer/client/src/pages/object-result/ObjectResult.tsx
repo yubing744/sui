@@ -284,8 +284,6 @@ const ObjectResult = ((): JSX.Element => {
         data.objType = trimStdLibPrefix(data.objType);
         // TODO - fix up special name handling here
         console.log('data.name', data.name);
-        //if(data.name === undefined)
-
         console.log('name before handling', data.name);
         //data.name = handleSpecialDemoNames(innerData.contents);
         //console.log('name mid handling', data.name);
@@ -299,17 +297,10 @@ const ObjectResult = ((): JSX.Element => {
             innerData.tx_digest = digest_hex;
         }
 
-        const typeOfOwner = typeof(innerData.owner);
-        console.log(`type of ' data.owner ':   ${typeOfOwner}`);
-
-        switch (typeOfOwner) {
+        switch (typeof(innerData.owner)) {
             case 'object':
                 const ownerObj = innerData.owner as object;
-                console.log('got obj OWNER value:', ownerObj);
-
                 if ('AddressOwner' in ownerObj) {
-                    console.log('ADDRESS OWNER');
-                    console.log(ownerObj);
                     innerData.owner = toHexString((ownerObj as AddressOwner).AddressOwner);
                     console.log(innerData);
                 }
