@@ -73,14 +73,14 @@ class SuiRpcClient {
 
     modifyForDemo<T extends object, U>(obj: T): T {
         for (var prop in obj) {
-            console.log('obj prop', prop);
+            //console.log('obj prop', prop);
 
             let property = obj[prop];
-            console.log('property', property);
+            //console.log('property', property);
 
             if (typeof(property) == 'object') {
                 for (var innerProp in property) {
-                    console.log('inner prop:', innerProp, property[innerProp]);
+                    //console.log('inner prop:', innerProp, property[innerProp]);
                     //this.modifyForDemo(property as unknown as object);
                     //this.modifyForDemo(property[innerProp] as unknown as object);
                 }
