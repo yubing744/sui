@@ -274,23 +274,23 @@ const ObjectResult = ((): JSX.Element => {
     console.log('object data?', showObjectState);
 
     if (instanceOfDataType(showObjectState)) {
-        console.log("is instance of DataType, RENDER?");
         let data = showObjectState;
         const innerData = data.data;
 
-        console.log('pre-modify data.data.contents', innerData.contents);
         data = SuiRpcClient.modifyForDemo(data);
-
         data.objType = trimStdLibPrefix(data.objType);
-        // TODO - fix up special name handling here
         console.log('data.name', data.name);
         console.log('name before handling', data.name);
-        //data.name = handleSpecialDemoNames(innerData.contents);
-        //console.log('name mid handling', data.name);
+
+        // hardcode a friendly name for gas for now
+        const gasTokenTypeStr = 'Coin::Coin<0x2::GAS::GAS>';
+        if (data.objType === gasTokenTypeStr)
+            data.name = 'GAS';
+
         if(!data.name)
             data.name = handleSpecialDemoNameArrays(innerData.contents);
 
-        console.log('name after handling', data.name);
+        //console.log('name after handling', data.name);
 
         if(innerData.tx_digest && typeof(innerData.tx_digest) === 'object') {
             const digest_hex = toHexString(innerData.tx_digest as number[]);
