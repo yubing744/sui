@@ -11,7 +11,7 @@
 }
 
 body {
-    margin: 0;
+    @apply bg-offwhite m-0 text-offblack;
 }
 
 .ace_active-line {
