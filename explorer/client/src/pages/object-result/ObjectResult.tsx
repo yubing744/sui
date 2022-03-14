@@ -9,7 +9,7 @@ import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
 import { SuiRpcClient } from '../../utils/rpc';
-import { findDataFromID, trimStdLibPrefix } from '../../utils/utility_functions';
+import { asciiFromNumberBytes, findDataFromID, trimStdLibPrefix } from '../../utils/utility_functions';
 
 
 type DataType = {
@@ -127,11 +127,34 @@ const ObjectResult = ((): JSX.Element => {
     const checkSingleID = (value: any) => value?.bytes;
     const checkVecIDs = (value: any) => value?.vec;
 
-    const extractOwnerData = (singleownerstring: string) => {
-        const re = /SingleOwner\(k#(.*)\)/;
-        const result = re.exec(singleownerstring);
+    const extractOwnerData = (ownerString: string): string => {
+        if(addrOwnerPattern.test(ownerString)) {
+            let ownerId = getAddressOwnerId(ownerString);
+            return ownerId ? ownerId : '';
+        }
 
+        const singleOwnerPattern = /SingleOwner\(k#(.*)\)/;
+        const result = singleOwnerPattern.exec(ownerString);
         return result ? result[1] : '';
+    };
+
+    const addrOwnerPattern = /^AddressOwner\(k#/;
+    const endParensPattern = /\){1}$/
+    const getAddressOwnerId = (addrOwner: string): string | null => {
+        if (!addrOwnerPattern.test(addrOwner) || !endParensPattern.test(addrOwner))
+            return null;
+
+        let str = addrOwner.replace(addrOwnerPattern, '');
+        return str.replace(endParensPattern, '');
+    };
+
+    const extractAddressOwner = (addrOwner: number[]): string | null => {
+        if(addrOwner.length != 20) {
+            console.log('address owner byte length must be 20');
+            return null;
+        }
+
+        return asciiFromNumberBytes(addrOwner);
     };
 
     let dataRef = useRef(DATATYPE_DEFAULT);
@@ -162,7 +185,7 @@ const ObjectResult = ((): JSX.Element => {
     if (instanceOfDataType(showObjectState)) {
         console.log("is instance of DataType, RENDER?");
         let data = showObjectState;
-        data = _rpc.modifyForDemo(data);
+        data = SuiRpcClient.modifyForDemo(data);
 
         data.objType = trimStdLibPrefix(data.objType);
 
