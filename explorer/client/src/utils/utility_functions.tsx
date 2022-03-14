@@ -40,4 +40,7 @@ export function asciiFromNumberBytes(bytes: number[]) {
         .replace(/\0/g,'')
 }
 
+const stdLibPrefix = /^0x2::/;
+export const trimStdLibPrefix = (str: string): string => str.replace(stdLibPrefix, '');
+
 export { findDataFromID, navigateWithUnknown, logResult };

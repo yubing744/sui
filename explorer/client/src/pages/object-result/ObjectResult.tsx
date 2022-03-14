@@ -9,7 +9,7 @@ import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
 import { SuiRpcClient } from '../../utils/rpc';
-import { findDataFromID } from '../../utils/utility_functions';
+import { findDataFromID, trimStdLibPrefix } from '../../utils/utility_functions';
 
 
 type DataType = {
@@ -163,6 +163,8 @@ const ObjectResult = ((): JSX.Element => {
         console.log("is instance of DataType, RENDER?");
         let data = showObjectState;
         data = _rpc.modifyForDemo(data);
+
+        data.objType = trimStdLibPrefix(data.objType);
 
         return (<>
             <div className={styles.resultbox}>
