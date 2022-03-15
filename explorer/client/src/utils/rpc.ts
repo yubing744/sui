@@ -36,7 +36,7 @@ class SuiRpcClient {
         }
     }
 
-    public async moveCallRaw<TIn> (input: TIn): Promise<object> {
+    public async moveCall<TIn>(input: TIn): Promise<MoveCallResponse> {
         console.log(`POST   ${this.moveCallUrl}`);
 
         let response = await fetch(this.moveCallUrl, {
@@ -66,13 +66,6 @@ class SuiRpcClient {
         : Promise<ObjectInfoResponse<T>>
     {
         return await this.getObjectInfoRaw(id) as ObjectInfoResponse<T>;
-    }
-
-    public async moveCall<TIn extends object, TOut extends object> (input: TIn)
-        : Promise<MoveCallResponse<TOut>>
-    {
-        // TODO - implement
-        return {} as MoveCallResponse<TOut>;
     }
 
     public static modifyForDemo <T extends object, U>(obj: T): T {
@@ -111,11 +104,13 @@ export const hexToAscii = function(hex: string) {
 }
 
 const SUI_ADDRESS_LEN = 20;
-type SuiAddressBytes = Array<number>;
+export type SuiAddressBytes = number[];
+export type Signature = number[];
+
 type SuiAddressHexStr = string;
 
 const TX_DIGEST_LEN = 32;
-type SuiTxDigest = Array<number>;   // 32 bytes
+type SuiTxDigest = number[];   // 32 bytes
 
 const hexStringPattern = /$0x[0-9a-fA-F]*^/;
 const suiAddressHexPattern = /$0x[0-9a-fA-F]{20}^/;
@@ -180,9 +175,54 @@ export interface SuiObject<T> {
     tx_digest: number[];
 }
 
-export interface MoveCallResponse<T> {
-    // TODO - fill in
+
+export interface ObjectSummary {
+    id: string;
+    object_digest: string;
+    type: string;
+    version: string;
 }
 
+export interface ObjectEffectsSummary {
+    created_objects: ObjectSummary[];
+    mutated_objects: ObjectSummary[];
+}
+
+export interface CallTransactionResponse {
+    function: string;
+    gas_budget: number;
+    module: string;
+    object_arguments: any[];
+    package: any[];
+    pure_arguments: number[][];
+    shared_object_arguments: any[];
+    type_arguments: any[];
+}
+
+export interface TransactionKind {
+    Call?: CallTransactionResponse;
+}
+
+export interface TransactionData {
+    gas_payment: any[];
+    kind: TransactionKind;
+    sender: SuiAddressBytes;
+}
+
+export interface Transaction {
+    data: TransactionData;
+    signature: Signature;
+}
+
+export interface Certificate {
+    signatures: Signature[][];
+    transaction: Transaction;
+}
+
+export interface MoveCallResponse {
+    gasUsed: number;
+    objectEffectsSummary: ObjectEffectsSummary;
+    certificate: Certificate;
+}
 
 export { SuiRpcClient }
