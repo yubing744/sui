@@ -287,12 +287,14 @@ module Sui::Geniteam {
         _farm: &mut Farm,
         _pet_monsters: &mut Collection::Collection,
         self: &mut Monster,
+        monster_affinity: u8,
         monster_level: u64,
         hunger_level: u64,
         affection_level: u64,
         buddy_level: u8,
         _ctx: &mut TxContext
     ) {
+        self.monster_affinity = monster_affinity;
         self.monster_level = monster_level;
         self.hunger_level = hunger_level;
         self.affection_level = affection_level;

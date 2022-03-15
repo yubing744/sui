@@ -1,18 +1,19 @@
 // Copyright (c) Mysten Labs
 // SPDX-License-Identifier: Apache-2.0
 
+use http::Response;
 use move_core_types::identifier::Identifier;
 use move_core_types::parser::parse_type_tag;
 use move_core_types::value::MoveStructLayout;
 use sui::sui_json::{resolve_move_function_args, SuiJsonValue};
 
-use dropshot::{endpoint, Query};
+use dropshot::{endpoint, Query, CONTENT_TYPE_JSON};
 use dropshot::{
     ApiDescription, ConfigDropshot, ConfigLogging, ConfigLoggingLevel, HttpError, HttpResponseOk,
     HttpResponseUpdatedNoContent, HttpServerStarter, RequestContext, TypedBody,
 };
 
-use hyper::StatusCode;
+use hyper::{StatusCode, Body};
 use serde_json::json;
 use sui::config::{Config, GenesisConfig, NetworkConfig, WalletConfig};
 use sui::sui_commands;
@@ -155,7 +156,7 @@ network has been started on testnet or mainnet.
 async fn genesis(
     rqctx: Arc<RequestContext<ServerContext>>,
     request: TypedBody<GenesisRequest>,
-) -> Result<HttpResponseOk<GenesisResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let genesis_request_params = request.into_inner();
     let genesis_config_path = &server_context.genesis_config_path;
@@ -220,10 +221,14 @@ async fn genesis(
             )
         })?;
 
-    Ok(HttpResponseOk(GenesisResponse {
-        wallet_config: json!(wallet_config),
-        network_config: json!(network_config),
-    }))
+    custom_http_response(
+        StatusCode::OK,
+        GenesisResponse {
+            wallet_config: json!(wallet_config),
+            network_config: json!(network_config),
+        },
+    )
+    .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -239,7 +244,7 @@ network has been started on testnet or mainnet.
 }]
 async fn sui_start(
     rqctx: Arc<RequestContext<ServerContext>>,
-) -> Result<HttpResponseOk<String>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let network_config_path = &server_context.network_config_path;
 
@@ -353,10 +358,11 @@ async fn sui_start(
 
     *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
-    Ok(HttpResponseOk(format!(
-        "Started {} authorities",
-        num_authorities
-    )))
+    custom_http_response(
+        StatusCode::OK,
+        format!("Started {} authorities", num_authorities),
+    )
+    .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -409,7 +415,7 @@ Retrieve all managed addresses for this client.
 }]
 async fn get_addresses(
     rqctx: Arc<RequestContext<ServerContext>>,
-) -> Result<HttpResponseOk<GetAddressResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     // TODO: Find a better way to utilize wallet context here that does not require 'take()'
     let wallet_context = server_context.wallet_context.lock().unwrap().take();
@@ -445,12 +451,16 @@ async fn get_addresses(
 
     *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
-    Ok(HttpResponseOk(GetAddressResponse {
-        addresses: addresses
-            .into_iter()
-            .map(|address| format!("{}", address))
-            .collect(),
-    }))
+    custom_http_response(
+        StatusCode::OK,
+        GetAddressResponse {
+            addresses: addresses
+                .into_iter()
+                .map(|address| format!("{}", address))
+                .collect(),
+        },
+    )
+    .map_err(|err| custom_http_error(StatusCode::FAILED_DEPENDENCY, format!("{err}")))
 }
 
 /**
@@ -498,7 +508,7 @@ Returns list of objects owned by an address.
 async fn get_objects(
     rqctx: Arc<RequestContext<ServerContext>>,
     query: Query<GetObjectsRequest>,
-) -> Result<HttpResponseOk<GetObjectsResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
 
     let get_objects_params = query.into_inner();
@@ -522,16 +532,20 @@ async fn get_objects(
 
     let object_refs = wallet_context.address_manager.get_owned_objects(*address);
 
-    Ok(HttpResponseOk(GetObjectsResponse {
-        objects: object_refs
-            .iter()
-            .map(|(object_id, sequence_number, object_digest)| Object {
-                object_id: object_id.to_string(),
-                version: format!("{:?}", sequence_number),
-                object_digest: format!("{:?}", object_digest),
-            })
-            .collect::<Vec<Object>>(),
-    }))
+    custom_http_response(
+        StatusCode::OK,
+        GetObjectsResponse {
+            objects: object_refs
+                .iter()
+                .map(|(object_id, sequence_number, object_digest)| Object {
+                    object_id: object_id.to_string(),
+                    version: format!("{:?}", sequence_number),
+                    object_digest: format!("{:?}", object_digest),
+                })
+                .collect::<Vec<Object>>(),
+        },
+    )
+    .map_err(|err| custom_http_error(StatusCode::FAILED_DEPENDENCY, format!("{err}")))
 }
 
 /**
@@ -580,7 +594,7 @@ Returns the object information for a specified object.
 async fn object_info(
     rqctx: Arc<RequestContext<ServerContext>>,
     query: Query<GetObjectInfoRequest>,
-) -> Result<HttpResponseOk<ObjectInfoResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let object_info_params = query.into_inner();
 
@@ -617,17 +631,21 @@ async fn object_info(
 
     *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
-    Ok(HttpResponseOk(ObjectInfoResponse {
-        owner: format!("{:?}", object.owner),
-        version: format!("{:?}", object.version().value()),
-        id: format!("{:?}", object.id()),
-        readonly: format!("{:?}", object.is_read_only()),
-        obj_type: object
-            .data
-            .type_()
-            .map_or("Move Package".to_owned(), |type_| format!("{}", type_)),
-        data: object_data,
-    }))
+    custom_http_response(
+        StatusCode::OK,
+        &ObjectInfoResponse {
+            owner: format!("{:?}", object.owner),
+            version: format!("{:?}", object.version().value()),
+            id: format!("{:?}", object.id()),
+            readonly: format!("{:?}", object.is_read_only()),
+            obj_type: object
+                .data
+                .type_()
+                .map_or("Unknown Type".to_owned(), |type_| format!("{}", type_)),
+            data: object_data,
+        },
+    )
+    .map_err(|err| custom_http_error(StatusCode::FAILED_DEPENDENCY, format!("{err}")))
 }
 
 /**
@@ -685,7 +703,7 @@ Example TransferTransactionRequest
 async fn transfer_object(
     rqctx: Arc<RequestContext<ServerContext>>,
     request: TypedBody<TransferTransactionRequest>,
-) -> Result<HttpResponseOk<TransactionResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let transfer_order_params = request.into_inner();
     let to_address =
@@ -755,11 +773,15 @@ async fn transfer_object(
 
     *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
-    Ok(HttpResponseOk(TransactionResponse {
-        gas_used,
-        object_effects_summary: json!(object_effects_summary),
-        certificate: json!(cert),
-    }))
+    custom_http_response(
+        StatusCode::OK,
+        TransactionResponse {
+            gas_used,
+            object_effects_summary: json!(object_effects_summary),
+            certificate: json!(cert),
+        },
+    )
+    .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -837,7 +859,7 @@ module of the given package. Arguments are passed in and type will be
 inferred from function signature. Gas usage is capped by the gas_budget.
 Example CallRequest
 {
-    "sender": "b378b8d26c4daa95c5f6a2e2295e6e5f34371c1659e95f572788ffa55c265363",
+    "sender": "b378b8d26c4daa95c5f6a2e2295e6e5f34371c1659e95f572788ffa55c265363",sss
     "package_object_id": "0x2",
     "module": "ObjectBasics",
     "function": "create",
@@ -858,7 +880,7 @@ Example CallRequest
 async fn call(
     rqctx: Arc<RequestContext<ServerContext>>,
     request: TypedBody<CallRequest>,
-) -> Result<HttpResponseOk<TransactionResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let call_params = request.into_inner();
 
@@ -1048,11 +1070,12 @@ async fn call(
 
     *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
-    Ok(HttpResponseOk(TransactionResponse {
+    custom_http_response(StatusCode::OK, TransactionResponse {
         gas_used,
         object_effects_summary: json!(object_effects_summary),
         certificate: json!(cert),
-    }))
+    })
+        .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -1213,6 +1236,19 @@ async fn get_object_info(
         }
     };
     Ok((object_ref, object, layout))
+}
+
+fn custom_http_response<T: Serialize + JsonSchema>(
+    status_code: StatusCode,
+    response_body: T,
+) -> Result<Response<Body>, anyhow::Error> {
+    let body: Body = serde_json::to_string(&response_body)?.into();
+    let res = Response::builder()
+        .status(status_code)
+        .header(http::header::CONTENT_TYPE, CONTENT_TYPE_JSON)
+        .header(http::header::ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+        .body(body)?;
+    Ok(res)
 }
 
 fn custom_http_error(status_code: http::StatusCode, message: String) -> HttpError {
