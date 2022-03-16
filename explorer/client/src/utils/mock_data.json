@@ -461,7 +461,7 @@
             "id": "d78cdf9cdfea1c8705d7d09fd2c8ba0c3947846f",
             "category": "object",
             "owner": "SingleOwner(k#0x96169394f60281f3e537ecebd64e68990f0cff18)",
-            "version": "1",
+            "version": "3",
             "objType": "0x2::SoWork::NFT",
             "name": "Night Owl",
             "creator_address": "SingleOwner(k#0x73794768419b0d197142ef7d0bfd8d161f3cdaff)",
