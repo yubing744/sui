@@ -16,7 +16,7 @@ class SuiRpcClient {
 
     public async getObjectInfo (id: string): Promise<object> {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
-        console.log(`GET   ${objUrl}`);
+        //console.log(`GET   ${objUrl}`);
 
         let response = null;
         try {
@@ -26,8 +26,8 @@ class SuiRpcClient {
             throw e;
         }
 
-        console.log(response);
-        const parsedJson = response.json();
+        //console.log(response);
+        const parsedJson = await response.json();
         if (!parsedJson)
             throw new Error('unable to parse response body as JSON');
 
