@@ -11,7 +11,7 @@ class SuiRpcClient {
         this.addressesUrl = `${this.host}/addresses`;
     }
 
-    public getAddresses = async (): Promise<object> =>
+    public getAddresses = async (): Promise<Addresses> =>
         fetch(this.addressesUrl, { mode: 'cors' })
         .then(r => r.json())
 
@@ -21,7 +21,7 @@ class SuiRpcClient {
                .then(r => r.json())
     }
 
-    public async getObjectInfo (id: string): Promise<object> {
+    public async getObjectInfo (id: string): Promise<ObjectInfoResponse<object>> {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
         //console.log(`GET   ${objUrl}`);
 
@@ -205,8 +205,9 @@ export interface ObjectSummary {
 }
 
 export interface ObjectEffectsSummary {
-    created_objects: ObjectSummary[];
-    mutated_objects: ObjectSummary[];
+    created_objects?: ObjectSummary[];
+    mutated_objects?: ObjectSummary[];
+    deleted_objects?: ObjectSummary[];
 }
 
 export interface CallTransactionResponse {
@@ -244,6 +245,10 @@ export interface MoveCallResponse {
     gasUsed: number;
     objectEffectsSummary: ObjectEffectsSummary;
     certificate: Certificate;
+}
+
+export interface Addresses {
+    addresses: string[]
 }
 
 export interface AddressObjectsResponse {
