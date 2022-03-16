@@ -10,7 +10,7 @@ import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
 
-import { type AddressOwner, SuiRpcClient, type SuiParentChildRef, type TMoveVec } from '../../utils/rpc';
+import { type AddressOwner, SuiRpcClient, DemoClient} from '../../utils/rpc';
 import { asciiFromNumberBytes, trimStdLibPrefix } from '../../utils/utility_functions';
 
 
@@ -161,7 +161,7 @@ function DisplayBox({ data }: { data: DataType }) {
     return <div />;
 }
 
-const _rpc: SuiRpcClient = new SuiRpcClient('https://demo-rpc.sui.io');
+const _rpc = DemoClient;
 console.log(_rpc);
 
 async function getObjectState(objID: string): Promise<object> {

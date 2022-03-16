@@ -229,6 +229,7 @@ export interface Addresses {
 }
 
 export interface AddressObjectsResponse {
+    id?: string,                            // TODO - can we remove this ?
     objects: AddressObjectSummary[]
 }
 
@@ -240,5 +241,6 @@ export interface AddressObjectSummary {
     objectDigest: string
 }
 
+export const DemoClient = new SuiRpcClient('https://demo-rpc.sui.io');
 
 export { SuiRpcClient }

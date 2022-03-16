@@ -1,9 +1,14 @@
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
+import { DemoClient } from '../../utils/rpc';
 import { findDataFromID } from '../../utils/utility_functions';
+
+
+
 
 type DataType = {
     id: string;
@@ -15,10 +20,25 @@ function instanceOfDataType(object: any): object is DataType {
 }
 
 function AddressResult() {
+    const rpc = DemoClient;
     const { state } = useLocation();
     const { id: addressID } = useParams();
+    const defaultData = { id: addressID, objects: [{}] };
+    const [data, setData] = useState(defaultData);
 
-    const data = findDataFromID(addressID, state);
+    useEffect(() => {
+        if(addressID === undefined)
+            return;
+
+        rpc.getAddressObjects(addressID)
+        .then((json) => {
+            console.log(json);
+            json.id = addressID;
+            setData(json as DataType);
+        });
+    }, []);
+
+    //const data = findDataFromID(addressID, state);
 
     if (instanceOfDataType(data)) {
         return (
@@ -36,7 +56,8 @@ function AddressResult() {
                 <div>
                     <div>Owned Objects</div>
                     <div>
-                        {data.objects.map((objectID, index) => (
+                        {data.objects.map(
+                            (objectID: { objectId: string; }, index: any) => (
                             <div key={`object-${index}`}>
                                 <Longtext
                                     text={objectID.objectId}
