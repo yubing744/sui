@@ -15,6 +15,12 @@ class SuiRpcClient {
         fetch(this.addressesUrl, { mode: 'cors' })
         .then(r => r.json())
 
+    public getAddressObjects = async (address: SuiAddressHexStr): Promise<AddressObjectsResponse> => {
+        const url = `${this.host}/objects?address=${address}`;
+        return fetch(url, { mode: 'cors' })
+               .then(r => r.json())
+    }
+
     public async getObjectInfo (id: string): Promise<object> {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
         //console.log(`GET   ${objUrl}`);
@@ -239,5 +245,18 @@ export interface MoveCallResponse {
     objectEffectsSummary: ObjectEffectsSummary;
     certificate: Certificate;
 }
+
+export interface AddressObjectsResponse {
+    objects: AddressObjectSummary[]
+}
+
+// TODO - this format is inconsistent with other object summaries (camelCase vs snake_case, lack of type field)
+// also needs stronger types for fields
+export interface AddressObjectSummary {
+    objectId: string,
+    version: string,
+    objectDigest: string
+}
+
 
 export { SuiRpcClient }
