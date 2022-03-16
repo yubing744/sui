@@ -1,10 +1,10 @@
 class SuiRpcClient {
     public host: string;
 
-    moveCallUrl: string;
-    addressesUrl: string;
+    readonly moveCallUrl: string;
+    readonly addressesUrl: string;
 
-    // TODO - stronger type for host
+    // TODO - url type for host
     public constructor(host: string) {
         this.host = host;
         this.moveCallUrl = `${host}/wallet/call`;
@@ -12,78 +12,55 @@ class SuiRpcClient {
     }
 
     public getAddresses = async (): Promise<Addresses> =>
-        fetch(this.addressesUrl, { mode: 'cors' })
-        .then(r => r.json())
+        this.fetchJson(this.addressesUrl)
 
     public getAddressObjects = async (address: SuiAddressHexStr): Promise<AddressObjectsResponse> => {
         const url = `${this.host}/objects?address=${address}`;
-        return fetch(url, { mode: 'cors' })
-               .then(r => r.json())
+        return this.fetchJson(url);
     }
 
     public async getObjectInfo (id: string): Promise<ObjectInfoResponse<object>> {
-        const objUrl = `${this.host}/object_info?objectId=${id}`;
-        //console.log(`GET   ${objUrl}`);
-
-        let response = null;
-        try {
-            response = await fetch(objUrl, { mode: 'cors' });
-        } catch (e) {
-            console.error(e);
-            throw e;
-        }
-
-        //console.log(response);
-        const parsedJson = await response.json();
-        if (!parsedJson)
-            throw new Error('unable to parse response body as JSON');
-
-        console.log(parsedJson);
-        switch (response.status) {
-            case 200: {
-                return parsedJson;
-            }
-            // response that came up a lot during development
-            case 424: {
-                console.warn('424 response mean likely requesting missing data!')
-                return parsedJson;
-            }
-            default: {
-                throw new Error(`unhandled HTTP response code: ${response.status}`);
-            }
-        }
-    }
-
-    public async moveCall<TIn>(input: TIn): Promise<MoveCallResponse> {
-        console.log(`POST   ${this.moveCallUrl}`);
-
-        let response = await fetch(this.moveCallUrl, {
-            method: 'POST',
-            body: JSON.stringify(input),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-
-        console.log(response);
-        switch (response.status) {
-            case 200: {
-                const parsedJson = response.json();
-                if (!parsedJson)
-                    throw new Error('unable to parse response body as JSON');
-                return parsedJson;
-            }
-            default: {
-                console.warn(response);
-                throw new Error(`non-200 response to POST ${this.moveCallUrl}`);
-            }
-        }
+        const url = `${this.host}/object_info?objectId=${id}`;
+        return this.fetchJson(url);
     }
 
     public async getObjectInfoT<T extends object> (id: string)
         : Promise<ObjectInfoResponse<T>>
     {
         return await this.getObjectInfo(id) as ObjectInfoResponse<T>;
+    }
+
+    // TODO - more detailed type for input
+    public async moveCall<TIn extends object>(input: TIn): Promise<MoveCallResponse> {
+        return this.postJson(this.moveCallUrl, input);
+    }
+
+
+    async fetchJson(url: string): Promise<any> {
+        let response = await fetch(url, { mode: 'cors' });
+        switch (response.status) {
+            case 200:
+                return response.json();
+            case 424:
+                throw new Error('424 response status - likely requesting missing data!');
+            default:
+                throw new Error(`unhandled HTTP response code: ${response.status}`);
+        }
+    }
+
+    async postJson(url: string, body: object): Promise<any> {
+        const response = await fetch(url, {
+            mode: 'cors',
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: { 'Content-Type': 'application/json' },
+        });
+        switch (response.status) {
+            case 200:
+                return response.json();
+            default:
+                throw new Error(`non-200 response to POST ${this.moveCallUrl}: ${response.status}`);
+        }
     }
 
     public static modifyForDemo <T extends object, U>(obj: T): T {
