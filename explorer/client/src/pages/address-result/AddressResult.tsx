@@ -5,14 +5,15 @@ import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
 import { DemoClient } from '../../utils/rpc';
-import { findDataFromID } from '../../utils/utility_functions';
-
-
 
 
 type DataType = {
     id: string;
-    objects: { objectId: string }[];
+    objects: {
+        objectId: string,
+        version: string,
+        objectDigest: string
+    }[];
 };
 
 function instanceOfDataType(object: any): object is DataType {
@@ -21,7 +22,6 @@ function instanceOfDataType(object: any): object is DataType {
 
 function AddressResult() {
     const rpc = DemoClient;
-    const { state } = useLocation();
     const { id: addressID } = useParams();
     const defaultData = { id: addressID, objects: [{}] };
     const [data, setData] = useState(defaultData);
@@ -37,8 +37,6 @@ function AddressResult() {
             setData(json as DataType);
         });
     }, []);
-
-    //const data = findDataFromID(addressID, state);
 
     if (instanceOfDataType(data)) {
         return (
