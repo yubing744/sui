@@ -1,5 +1,5 @@
 export class SuiRpcClient {
-    public host: string;
+    public readonly host: string;
 
     readonly moveCallUrl: string;
     readonly addressesUrl: string;
