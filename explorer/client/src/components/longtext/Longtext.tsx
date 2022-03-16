@@ -42,14 +42,15 @@ function Longtext({
         icon = <span className={styles.copied}>&#10003; Copied</span>;
     }
 
-    let textComponent;
 
+    const navigateUnknown = () => navigateWithUnknown(text, navigate);
+    let textComponent;
     if (isLink) {
         if (category === 'unknown') {
             textComponent = (
                 <span
                     className={styles.longtext}
-                    onClick={() => navigateWithUnknown(text, navigate)}
+                    onClick={navigateUnknown}
                 >
                     {text}
                 </span>
