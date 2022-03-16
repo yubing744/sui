@@ -12,7 +12,8 @@ class SuiRpcClient {
     }
 
     public getAddresses = async (): Promise<object> =>
-        fetch(this.addressesUrl, { mode: 'cors' });
+        fetch(this.addressesUrl, { mode: 'cors' })
+        .then(r => r.json())
 
     public async getObjectInfo (id: string): Promise<object> {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
