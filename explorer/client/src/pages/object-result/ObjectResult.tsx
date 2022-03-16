@@ -162,6 +162,7 @@ function DisplayBox({ data }: { data: DataType }) {
 }
 
 const _rpc: SuiRpcClient = new SuiRpcClient('https://demo-rpc.sui.io');
+console.log(_rpc);
 
 async function getObjectState(objID: string): Promise<object> {
     /*
@@ -265,8 +266,6 @@ const ObjectResult = ((): JSX.Element => {
         setShowConnectedEntities(true);
     }, [setShowDescription, setShowProperties, setShowConnectedEntities]);
 
-    console.log('object data?', showObjectState);
-
     if (instanceOfDataType(showObjectState)) {
         let data = showObjectState;
         const innerData = data.data;
@@ -310,8 +309,6 @@ const ObjectResult = ((): JSX.Element => {
             //TO DO: remove when have distinct 'name' field in Description
             .filter(([key, value]) => !/name/i.test(key))
             .filter(([_, value]) => checkIsPropertyType(value));
-
-        console.log('data, modded?', data);
 
         return (<>
             <div className={styles.resultbox}>
