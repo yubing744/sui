@@ -1,6 +1,7 @@
 import { SuiRpcClient } from "./rpc";
-import { RawMonster } from "./demo_types";
 import { logResult } from "./utility_functions";
+
+import type { RawMonster } from "./demo_types";
 
 
 let _rpc = new SuiRpcClient('http://127.0.0.1:5000');

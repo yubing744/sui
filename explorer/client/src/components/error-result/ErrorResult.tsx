@@ -1,4 +1,5 @@
 import theme from '../../styles/theme.module.css';
+
 import styles from './ErrorResult.module.css';
 
 const ErrorResult = ({

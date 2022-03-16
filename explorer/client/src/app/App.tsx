@@ -1,6 +1,7 @@
 import Footer from '../components/footer/Footer';
 import Search from '../components/search/Search';
 import AppRoutes from '../pages/config/AppRoutes';
+
 import styles from './App.module.css';
 
 function App() {

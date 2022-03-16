@@ -1,4 +1,4 @@
-import { AnyVec, JsonBytes, SuiParentChildRef } from "./rpc";
+import type { AnyVec, JsonBytes, SuiParentChildRef } from "./rpc";
 
 
 export type CosmeticOption = AnyVec | RawCosmetic;
