@@ -1,4 +1,4 @@
-class SuiRpcClient {
+export class SuiRpcClient {
     public host: string;
 
     readonly moveCallUrl: string;
@@ -34,7 +34,6 @@ class SuiRpcClient {
     public async moveCall<TIn extends object>(input: TIn): Promise<MoveCallResponse> {
         return this.postJson(this.moveCallUrl, input);
     }
-
 
     async fetchJson(url: string): Promise<any> {
         let response = await fetch(url, { mode: 'cors' });
@@ -82,8 +81,6 @@ class SuiRpcClient {
 
         return obj;
     }
-
-
 }
 
 
@@ -242,5 +239,3 @@ export interface AddressObjectSummary {
 }
 
 export const DemoClient = new SuiRpcClient('https://demo-rpc.sui.io');
-
-export { SuiRpcClient }
