@@ -161,7 +161,7 @@ function DisplayBox({ data }: { data: DataType }) {
     return <div />;
 }
 
-const _rpc: SuiRpcClient = new SuiRpcClient('http://127.0.0.1:5000');
+const _rpc: SuiRpcClient = new SuiRpcClient('https://demo-rpc.sui.io');
 
 async function getObjectState(objID: string): Promise<object> {
     /*
@@ -171,7 +171,7 @@ async function getObjectState(objID: string): Promise<object> {
         else reject('object ID not found');
     });
     */
-    return _rpc.getObjectInfoRaw(objID);
+    return _rpc.getObjectInfo(objID);
 }
 
 function toHexString(byteArray: number[]): string {

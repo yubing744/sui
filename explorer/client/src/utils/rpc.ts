@@ -2,14 +2,19 @@ class SuiRpcClient {
     public host: string;
 
     moveCallUrl: string;
+    addressesUrl: string;
 
     // TODO - stronger type for host
     public constructor(host: string) {
         this.host = host;
         this.moveCallUrl = `${host}/wallet/call`;
+        this.addressesUrl = `${this.host}/addresses`;
     }
 
-    public async getObjectInfoRaw (id: string): Promise<object> {
+    public getAddresses = async (): Promise<object> =>
+        fetch(this.addressesUrl, { mode: 'cors' });
+
+    public async getObjectInfo (id: string): Promise<object> {
         const objUrl = `${this.host}/object_info?objectId=${id}`;
         console.log(`GET   ${objUrl}`);
 
@@ -18,20 +23,26 @@ class SuiRpcClient {
             response = await fetch(objUrl, { mode: 'cors' });
         } catch (e) {
             console.error(e);
-            return {};
+            throw e;
         }
 
         console.log(response);
+        const parsedJson = response.json();
+        if (!parsedJson)
+            throw new Error('unable to parse response body as JSON');
+
+        console.log(parsedJson);
         switch (response.status) {
             case 200: {
-                const parsedJson = await response.json();
-                if (!parsedJson)
-                    throw new Error('unable to parse response body as JSON');
+                return parsedJson;
+            }
+            // response that came up a lot during development
+            case 424: {
+                console.warn('424 response mean likely requesting missing data!')
                 return parsedJson;
             }
             default: {
-                console.warn(response);
-                throw new Error('non-200 response to GET /object_info');
+                throw new Error(`unhandled HTTP response code: ${response.status}`);
             }
         }
     }
@@ -62,10 +73,10 @@ class SuiRpcClient {
         }
     }
 
-    public async getObjectInfo<T extends object> (id: string)
+    public async getObjectInfoT<T extends object> (id: string)
         : Promise<ObjectInfoResponse<T>>
     {
-        return await this.getObjectInfoRaw(id) as ObjectInfoResponse<T>;
+        return await this.getObjectInfo(id) as ObjectInfoResponse<T>;
     }
 
     public static modifyForDemo <T extends object, U>(obj: T): T {
@@ -87,7 +98,10 @@ class SuiRpcClient {
 
         return obj;
     }
+
+
 }
+
 
 export const hexToAscii = function(hex: string) {
     var str = "";
