@@ -72,6 +72,10 @@ div.propertybox > div > p:first-child {
     @apply font-sans font-semibold uppercase;
 }
 
+div.propertybox > div > p:nth-child(2) {
+    @apply break-words;
+}
+
 /* Clickable Header CSS */
 
 h2.clickableheader {

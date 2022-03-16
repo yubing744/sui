@@ -21,6 +21,7 @@ type DataType = {
     ethAddress?: string;
     ethTokenId?: string;
     contract_id?: { bytes: string };
+    creator_address?: string;
     data: {
         contents: {
             [key: string]: any;
@@ -116,6 +117,9 @@ function ObjectResult() {
     const prepObjTypeValue = (typeString: string) =>
         typeString.replace(stdLibRe, '');
 
+    const convertEpochTimeToUTCDate = (epoch: number) =>
+        new Date(epoch * 1000).toUTCString();
+
     useEffect(() => {
         setShowDescription(true);
         setShowProperties(true);
@@ -123,9 +127,11 @@ function ObjectResult() {
     }, [data, setShowDescription, setShowProperties, setShowConnectedEntities]);
 
     if (instanceOfDataType(data)) {
+        const should_put_in_title = (key: string) =>
+            /name/i.test(key) && !/user_name/.test(key);
         //TO DO remove when have distinct name field under Description
         const nameKeyValue = Object.entries(data?.data?.contents)
-            .filter(([key, value]) => /name/i.test(key))
+            .filter(([key, value]) => should_put_in_title(key))
             .map(([key, value]) => value);
 
         const ownedObjects = Object.entries(data.data.contents).filter(
@@ -133,7 +139,7 @@ function ObjectResult() {
         );
         const properties = Object.entries(data.data.contents)
             //TO DO: remove when have distinct 'name' field in Description
-            .filter(([key, value]) => !/name/i.test(key))
+            .filter(([key, value]) => !should_put_in_title(key))
             .filter(([_, value]) => checkIsPropertyType(value));
 
         return (
@@ -148,7 +154,7 @@ function ObjectResult() {
                             : styles.noaccommodate
                     }`}
                 >
-                    {data.name && <h1>{data.name}</h1>} {' '}
+                    {data.name && <h1>{data.name}</h1>} 
                     {typeof nameKeyValue[0] === 'string' && (
                         <h1>{nameKeyValue}</h1>
                     )}
@@ -209,6 +215,19 @@ function ObjectResult() {
                                     isLink={true}
                                 />
                             </div>
+
+                            {data.creator_address && (
+                                <div>
+                                    <div>Creator Address</div>
+                                    <Longtext
+                                        text={extractOwnerData(
+                                            data.creator_address
+                                        )}
+                                        category="addresses"
+                                        isLink={true}
+                                    />
+                                </div>
+                            )}
                             {data.contract_id && (
                                 <div>
                                     <div>Contract ID</div>
@@ -261,7 +280,13 @@ function ObjectResult() {
                                     {properties.map(([key, value], index) => (
                                         <div key={`property-${index}`}>
                                             <p>{prepLabel(key)}</p>
-                                            <p>{value}</p>
+                                            <p>
+                                                {key === 'created_at'
+                                                    ? convertEpochTimeToUTCDate(
+                                                          value
+                                                      )
+                                                    : value}
+                                            </p>
                                         </div>
                                     ))}
                                 </div>

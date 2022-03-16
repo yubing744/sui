@@ -457,6 +457,30 @@
                 }
             }
         },
+        {
+            "id": "d78cdf9cdfea1c8705d7d09fd2c8ba0c3947846f",
+            "category": "object",
+            "owner": "SingleOwner(k#0x96169394f60281f3e537ecebd64e68990f0cff18)",
+            "version": "1",
+            "objType": "0x2::SoWork::NFT",
+            "name": "Night Owl",
+            "creator_address": "SingleOwner(k#0x73794768419b0d197142ef7d0bfd8d161f3cdaff)",
+            "data": {
+                "contents": {
+                    "display": {
+                        "category": "imageURL",
+                        "data": "https://sui-explorer-test-image.s3.amazonaws.com/nightowl.png"
+                    },
+                    "trophy_id": "badge_nightowl",
+                    "message": "For the one that works while the rest of the world sleeps.",
+                    "recipient_user_id": "00LDuXgrH2cRYz2aYYZOqRb8H002",
+                    "recipient_user_name": "Lauren Cadwell",
+                    "creator_user_id": "grlsjWYwIOg20XOop5cdqpRd6aF3",
+                    "creator_user_name": "Mark Liu",
+                    "created_at": 1647122942
+                }
+            }
+        },
 
         {
             "id": "smartContract",
