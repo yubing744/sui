@@ -4,6 +4,7 @@ import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
 import { findDataFromID } from '../../utils/utility_functions';
+import styles from './AddressResult.module.css';
 
 type DataType = {
     id: string;
@@ -36,14 +37,20 @@ function AddressResult() {
                 <div>
                     <div>Owned Objects</div>
                     <div>
-                        {data.objects.map((objectID, index) => (
-                            <div key={`object-${index}`}>
-                                <Longtext
-                                    text={objectID.objectId}
-                                    category="objects"
-                                />
+                        {data.objects && data.objects.length > 0 ? (
+                            data.objects.map((objectID, index) => (
+                                <div key={`object-${index}`}>
+                                    <Longtext
+                                        text={objectID.objectId}
+                                        category="objects"
+                                    />
+                                </div>
+                            ))
+                        ) : (
+                            <div className={styles.noobjects}>
+                                This address owns no objects
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             </div>

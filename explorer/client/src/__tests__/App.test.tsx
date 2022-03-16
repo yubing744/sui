@@ -41,6 +41,7 @@ const readOnlyObject = 'ComponentObject';
 const notReadOnlyObject = 'CollectionObject';
 
 const addressID = 'receiverAddress';
+const addressNoObjectsID = 'senderAddress';
 
 const problemAddressID = 'problemAddress';
 
@@ -152,6 +153,13 @@ describe('End-to-end Tests', () => {
                 screen.getByText(
                     'There was an issue with the data on the following address'
                 )
+            ).toBeInTheDocument();
+        });
+        it('when address has no objects', () => {
+            render(<App />, { wrapper: MemoryRouter });
+            searchText(addressNoObjectsID);
+            expect(
+                screen.getByText('This address owns no objects')
             ).toBeInTheDocument();
         });
     });

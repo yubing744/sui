@@ -1,0 +1,5 @@
+.noobjects {
+    @apply font-sans tracking-tight font-semibold
+  bg-amber-300 rounded-l-md
+  h-[1.5rem] p-2 mt-2;
+}
