@@ -33,8 +33,6 @@ const navigateWithUnknown = async (input: string, navigate: Function) => {
         navigate(`../missing/${input}`);
     else if (data.category === 'transaction')
         navigate(`../transactions/${input}`, { state: data });
-    else
-        navigate(`../missing/${input}`);
     */
 };
 
