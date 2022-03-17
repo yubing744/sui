@@ -16,15 +16,22 @@ const navigateWithUnknown = async (input: string, navigate: Function) => {
     // feels crude to just search each category for an ID, but works for now
     console.log('searching for ' + input);
 
-    rpc.getAddressObjects(input).then(data => {
+    const addrPromise = rpc.getAddressObjects(input)
+    .then(data => {
         console.log('address found:', data);
         if (data.objects.length > 0)
             navigate(`../addresses/${input}`, { state: data });
+        else throw new Error('no address found');
     });
-    rpc.getObjectInfo(input).then(data => {
+    const objInfoPromise = rpc.getObjectInfo(input)
+    .then(data => {
         console.log('object found:', data);
         navigate(`../objects/${input}`, { state: data });
     });
+
+    //if none of the queries find a result, show missing page
+    Promise.any([addrPromise, objInfoPromise])
+        .catch(_ => navigate(`../missing/${input}`));
 
     /*
     const data = findDataFromID(input, false);
