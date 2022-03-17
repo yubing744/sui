@@ -12,8 +12,8 @@ use dropshot::{
     ApiDescription, ConfigDropshot, ConfigLogging, ConfigLoggingLevel, HttpError, HttpResponseOk,
     HttpResponseUpdatedNoContent, HttpServerStarter, RequestContext, TypedBody,
 };
-
-use hyper::{StatusCode, Body};
+use futures::lock::Mutex;
+use hyper::{Body, StatusCode};
 use serde_json::json;
 use sui::config::{Config, GenesisConfig, NetworkConfig, WalletConfig};
 use sui::sui_commands;
@@ -38,7 +38,7 @@ use std::str::FromStr;
 use tokio::task::{self, JoinHandle};
 use tracing::{error, info};
 
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
@@ -210,7 +210,7 @@ async fn genesis(
     // IO Error when a restart is attempted.
     let client_db_path = format!("client_db_{:?}", ObjectID::random());
     wallet_config.db_folder_path = working_dir.join(&client_db_path);
-    *server_context.client_db_path.lock().unwrap() = client_db_path;
+    *server_context.client_db_path.lock().await = client_db_path;
 
     sui_commands::genesis(&mut network_config, genesis_conf, &mut wallet_config)
         .await
@@ -242,9 +242,7 @@ network has been started on testnet or mainnet.
     path = "/sui/start",
     tags = [ "debug" ],
 }]
-async fn sui_start(
-    rqctx: Arc<RequestContext<ServerContext>>,
-) -> Result<Response<Body>, HttpError> {
+async fn sui_start(rqctx: Arc<RequestContext<ServerContext>>) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let network_config_path = &server_context.network_config_path;
 
@@ -264,7 +262,7 @@ async fn sui_start(
     }
 
     {
-        if !(*server_context.authority_handles.lock().unwrap()).is_empty() {
+        if !(*server_context.authority_handles.lock().await).is_empty() {
             return Err(custom_http_error(
                 StatusCode::FORBIDDEN,
                 String::from("Sui network is already running."),
@@ -316,7 +314,7 @@ async fn sui_start(
         server_context
             .authority_handles
             .lock()
-            .unwrap()
+            .await
             .push(task::spawn(async {
                 if let Err(err) = spawned_server.unwrap().join().await {
                     error!("Server ended with an error: {}", err);
@@ -356,7 +354,7 @@ async fn sui_start(
             })?;
     }
 
-    *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
+    *server_context.wallet_context.lock().await = Some(wallet_context);
 
     custom_http_response(
         StatusCode::OK,
@@ -381,12 +379,12 @@ async fn sui_stop(
 ) -> Result<HttpResponseUpdatedNoContent, HttpError> {
     let server_context = rqctx.context();
 
-    for authority_handle in &*server_context.authority_handles.lock().unwrap() {
+    for authority_handle in &*server_context.authority_handles.lock().await {
         authority_handle.abort();
     }
-    (*server_context.authority_handles.lock().unwrap()).clear();
+    (*server_context.authority_handles.lock().await).clear();
 
-    fs::remove_dir_all(server_context.client_db_path.lock().unwrap().clone()).ok();
+    fs::remove_dir_all(server_context.client_db_path.lock().await.clone()).ok();
     fs::remove_dir_all(&server_context.authority_db_path).ok();
     fs::remove_file(&server_context.network_config_path).ok();
     fs::remove_file(&server_context.wallet_config_path).ok();
@@ -417,9 +415,8 @@ async fn get_addresses(
     rqctx: Arc<RequestContext<ServerContext>>,
 ) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
-    // TODO: Find a better way to utilize wallet context here that does not require 'take()'
-    let wallet_context = server_context.wallet_context.lock().unwrap().take();
-    let mut wallet_context = wallet_context.ok_or_else(|| {
+    let mut wallet_context = server_context.wallet_context.lock().await;
+    let wallet_context = wallet_context.as_mut().ok_or_else(|| {
         custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
             "Wallet Context does not exist.".to_string(),
@@ -441,15 +438,12 @@ async fn get_addresses(
             .sync_client_state(*address)
             .await
         {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(custom_http_error(
                 StatusCode::FAILED_DEPENDENCY,
                 format!("Can't create client state: {err}"),
             ));
         }
     }
-
-    *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
     custom_http_response(
         StatusCode::OK,
@@ -481,6 +475,8 @@ JSON representation of an object in the Sui network.
 struct Object {
     /** Hex code as string representing the object id */
     object_id: String,
+    /** Type of object, i.e. Coin */
+    obj_type: String,
     /** Object version */
     version: String,
     /** Hash of the object's contents used for local validation */
@@ -514,7 +510,7 @@ async fn get_objects(
     let get_objects_params = query.into_inner();
     let address = get_objects_params.address;
 
-    let wallet_context = &mut *server_context.wallet_context.lock().unwrap();
+    let wallet_context = &mut *server_context.wallet_context.lock().await;
     let wallet_context = wallet_context.as_mut().ok_or_else(|| {
         custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
@@ -531,21 +527,29 @@ async fn get_objects(
     })?;
 
     let object_refs = wallet_context.address_manager.get_owned_objects(*address);
+    let mut objects = vec![];
+    for (object_id, sequence_number, object_digest) in object_refs {
+        let object = match get_object_info(wallet_context, object_id).await {
+            Ok((_, object, _)) => object,
+            Err(error) => {
+                return Err(error);
+            }
+        };
+        let obj_type = object
+            .data
+            .type_()
+            .map_or("Unknown Type".to_owned(), |type_| format!("{}", type_));
 
-    custom_http_response(
-        StatusCode::OK,
-        GetObjectsResponse {
-            objects: object_refs
-                .iter()
-                .map(|(object_id, sequence_number, object_digest)| Object {
-                    object_id: object_id.to_string(),
-                    version: format!("{:?}", sequence_number),
-                    object_digest: format!("{:?}", object_digest),
-                })
-                .collect::<Vec<Object>>(),
-        },
-    )
-    .map_err(|err| custom_http_error(StatusCode::FAILED_DEPENDENCY, format!("{err}")))
+        objects.push(Object {
+            object_id: object_id.to_string(),
+            obj_type,
+            version: format!("{:?}", sequence_number),
+            object_digest: format!("{:?}", object_digest),
+        });
+    }
+
+    custom_http_response(StatusCode::OK, objects)
+        .map_err(|err| custom_http_error(StatusCode::FAILED_DEPENDENCY, format!("{err}")))
 }
 
 /**
@@ -598,9 +602,8 @@ async fn object_info(
     let server_context = rqctx.context();
     let object_info_params = query.into_inner();
 
-    // TODO: Find a better way to utilize wallet context here that does not require 'take()'
-    let wallet_context = server_context.wallet_context.lock().unwrap().take();
-    let wallet_context = wallet_context.ok_or_else(|| {
+    let mut wallet_context = server_context.wallet_context.lock().await;
+    let wallet_context = wallet_context.as_mut().ok_or_else(|| {
         custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
             "Wallet Context does not exist. Please make a POST request to `sui/genesis/` and `sui/start/` to bootstrap the network."
@@ -611,7 +614,6 @@ async fn object_info(
     let object_id = match ObjectID::try_from(object_info_params.object_id) {
         Ok(object_id) => object_id,
         Err(error) => {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(custom_http_error(
                 StatusCode::FAILED_DEPENDENCY,
                 format!("{error}"),
@@ -619,17 +621,14 @@ async fn object_info(
         }
     };
 
-    let (object, layout) = match get_object_info(&wallet_context, object_id).await {
+    let (object, layout) = match get_object_info(wallet_context, object_id).await {
         Ok((_, object, layout)) => (object, layout),
         Err(error) => {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(error);
         }
     };
 
     let object_data = object.to_json(&layout).unwrap_or_else(|_| json!(""));
-
-    *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
     custom_http_response(
         StatusCode::OK,
@@ -724,9 +723,8 @@ async fn transfer_object(
         )
     })?;
 
-    // TODO: Find a better way to utilize wallet context here that does not require 'take()'
-    let wallet_context = server_context.wallet_context.lock().unwrap().take();
-    let mut wallet_context = wallet_context.ok_or_else(|| {
+    let mut wallet_context = server_context.wallet_context.lock().await;
+    let wallet_context = wallet_context.as_mut().ok_or_else(|| {
         custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
             "Wallet Context does not exist.".to_string(),
@@ -742,7 +740,6 @@ async fn transfer_object(
             let gas_used = match effects.status {
                 ExecutionStatus::Success { gas_used } => gas_used,
                 ExecutionStatus::Failure { gas_used, error } => {
-                    *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
                     return Err(custom_http_error(
                         StatusCode::FAILED_DEPENDENCY,
                         format!(
@@ -755,7 +752,6 @@ async fn transfer_object(
             (cert, effects, gas_used)
         }
         Err(err) => {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(custom_http_error(
                 StatusCode::FAILED_DEPENDENCY,
                 format!("Transfer error: {err}"),
@@ -763,15 +759,12 @@ async fn transfer_object(
         }
     };
 
-    let object_effects_summary = match get_object_effects(&wallet_context, effects).await {
+    let object_effects_summary = match get_object_effects(wallet_context, effects).await {
         Ok(effects) => effects,
         Err(err) => {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(err);
         }
     };
-
-    *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
     custom_http_response(
         StatusCode::OK,
@@ -921,20 +914,17 @@ async fn call(
     let package_object_id = ObjectID::from_hex_literal(&call_params.package_object_id)
         .map_err(|error| custom_http_error(StatusCode::FAILED_DEPENDENCY, format!("{error}")))?;
 
-    let wallet_context = server_context.wallet_context.lock().unwrap().take();
-    if wallet_context.is_none() {
-        return Err(HttpError::for_client_error(
-            None,
+    let mut wallet_context = server_context.wallet_context.lock().await;
+    let wallet_context = wallet_context.as_mut().ok_or_else(|| {
+        custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
-            "Wallet Context does not exist".to_string(),
-        ));
-    }
-    let mut wallet_context = wallet_context.unwrap();
+            "Wallet Context does not exist.".to_string(),
+        )
+    })?;
 
     let sender: SuiAddress = match decode_bytes_hex(call_params.sender.as_str()) {
         Ok(sender) => sender,
         Err(error) => {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(HttpError::for_client_error(
                 None,
                 StatusCode::FAILED_DEPENDENCY,
@@ -944,10 +934,9 @@ async fn call(
     };
 
     let (package_object_ref, package_object, layout) =
-        match get_object_info(&wallet_context, package_object_id).await {
+        match get_object_info(wallet_context, package_object_id).await {
             Ok((object_ref, object, layout)) => (object_ref, object, layout),
             Err(error) => {
-                *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
                 return Err(error);
             }
         };
@@ -958,7 +947,6 @@ async fn call(
         match resolve_move_function_args(&package_object, module.clone(), function.clone(), args) {
             Ok(r) => r,
             Err(err) => {
-                *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
                 return Err(HttpError::for_client_error(
                     None,
                     StatusCode::FAILED_DEPENDENCY,
@@ -972,10 +960,9 @@ async fn call(
     // Fetch all the objects needed for this call
     let mut input_objs = vec![];
     for obj_id in object_ids.clone() {
-        input_objs.push(match get_object_info(&wallet_context, obj_id).await {
+        input_objs.push(match get_object_info(wallet_context, obj_id).await {
             Ok((_, object, _)) => object,
             Err(error) => {
-                *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
                 return Err(error);
             }
         });
@@ -991,7 +978,6 @@ async fn call(
         input_objs,
         pure_args.clone(),
     ) {
-        *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
         return Err(custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
             format!("Error while resolving and type checking: {:?}", error),
@@ -999,10 +985,9 @@ async fn call(
     };
 
     // Fetch the object info for the gas obj
-    let gas_obj_ref = match get_object_info(&wallet_context, gas_object_id).await {
+    let gas_obj_ref = match get_object_info(wallet_context, gas_object_id).await {
         Ok((obj_ref, _, _)) => obj_ref,
         Err(error) => {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(error);
         }
     };
@@ -1010,10 +995,9 @@ async fn call(
     // Fetch the objects for the object args
     let mut object_args_refs = Vec::new();
     for obj_id in object_ids {
-        object_args_refs.push(match get_object_info(&wallet_context, obj_id).await {
+        object_args_refs.push(match get_object_info(wallet_context, obj_id).await {
             Ok((obj_ref, _, _)) => obj_ref,
             Err(error) => {
-                *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
                 return Err(error);
             }
         });
@@ -1039,7 +1023,6 @@ async fn call(
             let gas_used = match effects.status {
                 ExecutionStatus::Success { gas_used } => gas_used,
                 ExecutionStatus::Failure { gas_used, error } => {
-                    *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
                     return Err(custom_http_error(
                         StatusCode::FAILED_DEPENDENCY,
                         format!(
@@ -1052,7 +1035,6 @@ async fn call(
             (cert, effects, gas_used)
         }
         Err(err) => {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(custom_http_error(
                 StatusCode::FAILED_DEPENDENCY,
                 format!("Move call error: {err}"),
@@ -1060,22 +1042,22 @@ async fn call(
         }
     };
 
-    let object_effects_summary = match get_object_effects(&wallet_context, effects).await {
+    let object_effects_summary = match get_object_effects(wallet_context, effects).await {
         Ok(effects) => effects,
         Err(err) => {
-            *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(err);
         }
     };
 
-    *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
-
-    custom_http_response(StatusCode::OK, TransactionResponse {
-        gas_used,
-        object_effects_summary: json!(object_effects_summary),
-        certificate: json!(cert),
-    })
-        .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
+    custom_http_response(
+        StatusCode::OK,
+        TransactionResponse {
+            gas_used,
+            object_effects_summary: json!(object_effects_summary),
+            certificate: json!(cert),
+        },
+    )
+    .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -1111,9 +1093,8 @@ async fn sync(
         )
     })?;
 
-    // TODO: Find a better way to utilize wallet context here that does not require 'take()'
-    let wallet_context = server_context.wallet_context.lock().unwrap().take();
-    let mut wallet_context = wallet_context.ok_or_else(|| {
+    let mut wallet_context = server_context.wallet_context.lock().await;
+    let wallet_context = wallet_context.as_mut().ok_or_else(|| {
         custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
             "Wallet Context does not exist.".to_string(),
@@ -1130,14 +1111,11 @@ async fn sync(
         .sync_client_state(address)
         .await
     {
-        *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
         return Err(custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
             format!("Can't create client state: {err}"),
         ));
     }
-
-    *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
     Ok(HttpResponseUpdatedNoContent())
 }
