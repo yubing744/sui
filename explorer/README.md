@@ -36,7 +36,7 @@ cargo build --release          # build the network and rest server
 # in another terminal tab, from the repo root:
 cd explorer/client       
 npm install              # install client deps
-npm start;                # start the development server for the client  
+npm start                # start the development server for the client  
 ```
 
 If everything worked, you should be able to view your local explorer at [127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F](http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F)
