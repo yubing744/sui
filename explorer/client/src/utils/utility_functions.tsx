@@ -6,23 +6,18 @@ import { DefaultRpcClient as rpc } from './rpc';
 // const ADDRESS_URL = `${BACKEND_URL}/objects?address=`;
 // const OBJECT_URL = `${BACKEND_URL}/object_info?objectId=`;
 
-const findDataFromID = (targetID: string | undefined, state: any) =>
-    state?.category !== undefined
-        ? state
-        : mockTransactionData.data.find(({ id }) => id === targetID);
-
-
 const navigateWithUnknown = async (input: string, navigate: Function) => {
-    // feels crude to just search each category for an ID, but works for now
     console.log('searching for ' + input);
 
+    // feels crude to just search each category for an ID, but works for now
     const addrPromise = rpc.getAddressObjects(input)
     .then(data => {
         console.log('address found:', data);
         if (data.objects.length > 0)
             navigate(`../addresses/${input}`, { state: data });
-        else throw new Error('no address found');
+        else throw new Error();
     });
+
     const objInfoPromise = rpc.getObjectInfo(input)
     .then(data => {
         console.log('object found:', data);
@@ -32,18 +27,21 @@ const navigateWithUnknown = async (input: string, navigate: Function) => {
     //if none of the queries find a result, show missing page
     Promise.any([addrPromise, objInfoPromise])
         .catch(_ => navigate(`../missing/${input}`));
-
     /*
     const data = findDataFromID(input, false);
-    if (data === undefined || !('category' in data)) {
+    if (data === undefined || !('category' in data))
         navigate(`../missing/${input}`);
-    } else if (data.category === 'transaction') {
+    else if (data.category === 'transaction')
         navigate(`../transactions/${input}`, { state: data });
-    } else {
+    else
         navigate(`../missing/${input}`);
-    }
     */
 };
+
+const findDataFromID = (targetID: string | undefined, state: any) =>
+    state?.category !== undefined
+        ? state
+        : mockTransactionData.data.find(({ id }) => id === targetID);
 
 const logResult = function logResult<T>(task: () => Promise<T>) {
     task()
