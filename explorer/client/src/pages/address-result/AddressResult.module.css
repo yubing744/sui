@@ -5,14 +5,22 @@
 }
 
 .objectbox {
-    @apply border-solid border-stone-300 rounded-lg m-2 p-[1vw] lg:w-[30vw] lg:inline-block;
+    @apply border-solid border-stone-300 rounded-lg my-2 mx-[1vw] p-[1vw] lg:w-[30vw] lg:inline-block;
 }
 
-.objectbox > div {
+.objectbox > div > div {
     @apply border-0 border-b border-solid border-gray-300
   mb-2;
 }
 
-.objectbox > div > span:first-child {
+.objectbox > div > div > span:first-child {
     @apply mr-[1rem] uppercase font-sans font-semibold block xl:inline;
+}
+
+.objectbox > .previewimage > img {
+    @apply h-[20vh] w-[80vw] lg:w-[30vw] object-scale-down;
+}
+
+.previewimage {
+    @apply h-[20vh] w-[80vw] lg:w-[30vw] mx-auto;
 }

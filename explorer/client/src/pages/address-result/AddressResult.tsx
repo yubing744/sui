@@ -17,9 +17,15 @@ function instanceOfDataType(object: any): object is DataType {
 }
 
 function SuccessAddress({ data }: { data: DataType }) {
-    const [results, setResults] = useState(
-        data?.objects.map(({ objectId }) => ({ id: objectId }))
-    );
+    const [results, setResults] = useState<
+        {
+            id: string;
+            display?: {
+                category: string;
+                data: string;
+            };
+        }[]
+    >(data?.objects.map(({ objectId }) => ({ id: objectId })));
 
     useEffect(() => {
         Promise.all(
@@ -27,7 +33,8 @@ function SuccessAddress({ data }: { data: DataType }) {
                 const entry = findDataFromID(objectId, undefined);
                 return {
                     id: entry.id,
-                    type: entry.objType,
+                    Type: entry.objType,
+                    display: entry?.data?.contents?.display,
                 };
             })
         )
@@ -56,19 +63,58 @@ function SuccessAddress({ data }: { data: DataType }) {
                                 className={styles.objectbox}
                                 key={`object-${index1}`}
                             >
+                                {'display' in entryObj &&
+                                entryObj?.display?.category === 'imageURL' ? (
+                                    <div className={styles.previewimage}>
+                                        <img
+                                            className={styles.imagebox}
+                                            alt="NFT preview"
+                                            src={entryObj.display.data}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className={styles.previewimage} />
+                                )}
                                 {Object.entries(entryObj).map(
                                     ([key, value], index2) => (
                                         <div key={`object-${index1}-${index2}`}>
-                                            <span>{key}:</span>
-                                            {key === 'id' ? (
-                                                <Longtext
-                                                    text={value}
-                                                    category="addresses"
-                                                    isLink={true}
-                                                />
-                                            ) : (
-                                                <span>{value}</span>
-                                            )}
+                                            {(() => {
+                                                switch (key) {
+                                                    case 'id':
+                                                        return (
+                                                            <div>
+                                                                <span>
+                                                                    {key}:
+                                                                </span>
+                                                                <Longtext
+                                                                    text={
+                                                                        typeof value ===
+                                                                        'string'
+                                                                            ? value
+                                                                            : ''
+                                                                    }
+                                                                    category="objects"
+                                                                    isLink={
+                                                                        true
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        );
+                                                    case 'display':
+                                                        break;
+                                                    default:
+                                                        return (
+                                                            <div>
+                                                                <span>
+                                                                    {key}:
+                                                                </span>
+                                                                <span>
+                                                                    {value}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                }
+                                            })()}
                                         </div>
                                     )
                                 )}
