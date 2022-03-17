@@ -39,10 +39,6 @@ const navigateWithUnknown = async (input: string, navigate: Function) => {
         navigate(`../missing/${input}`);
     } else if (data.category === 'transaction') {
         navigate(`../transactions/${input}`, { state: data });
-    } else if (data.category === 'object') {
-        navigate(`../objects/${input}`, { state: data });
-    } else if (data.category === 'address') {
-        navigate(`../addresses/${input}`, { state: data });
     } else {
         navigate(`../missing/${input}`);
     }
