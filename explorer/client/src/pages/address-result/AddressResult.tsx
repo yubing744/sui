@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
-import { DemoClient } from '../../utils/rpc';
+import { DefaultRpcClient } from '../../utils/rpc';
 
 
 type DataType = {
@@ -21,7 +21,7 @@ function instanceOfDataType(object: any): object is DataType {
 }
 
 function AddressResult() {
-    const rpc = DemoClient;
+    const rpc = DefaultRpcClient;
     const { id: addressID } = useParams();
     const defaultData = { id: addressID, objects: [{}] };
     const [data, setData] = useState(defaultData);

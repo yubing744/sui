@@ -238,4 +238,30 @@ export interface AddressObjectSummary {
     objectDigest: string
 }
 
-export const DemoClient = new SuiRpcClient('https://demo-rpc.sui.io');
+export const tryGetRpcParam = (): string | null => {
+    const params = new URLSearchParams(window.location.search);
+
+    let rpcParam = null;
+    params.forEach((value, key) => {
+        if(key === 'rpc') {
+            const decoded = decodeURIComponent(value);
+            if (isValidHttpUrl(decoded))
+                rpcParam = decoded;
+        }
+    });
+
+    return rpcParam;
+}
+
+const isValidHttpUrl = (url: string) => {
+    try { new URL(url); }
+    catch (e) { return false; }
+    return url.startsWith('http') || url.startsWith('https');
+  };
+
+
+// allow switching the default url with another RPC url (for local testing)
+const rpcParam = tryGetRpcParam();
+const rpcUrl = rpcParam ? rpcParam : 'https://demo-rpc.sui.io';
+
+export const DefaultRpcClient = new SuiRpcClient(rpcUrl);

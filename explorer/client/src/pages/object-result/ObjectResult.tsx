@@ -10,7 +10,7 @@ import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
 
-import { type AddressOwner, SuiRpcClient, DemoClient} from '../../utils/rpc';
+import { type AddressOwner, SuiRpcClient, DefaultRpcClient } from '../../utils/rpc';
 import { asciiFromNumberBytes, trimStdLibPrefix } from '../../utils/utility_functions';
 
 
@@ -54,26 +54,9 @@ function instanceOfDataType(object: any) {
     );
 }
 
-function handleSpecialDemoNames(data: {
-        name?: string,
-        player_name?: string,
-        monster_name?: string,
-        farm_name?: string,
-        [key: string]: any;
-    }): string
-{
-    let val = '';
-    if('player_name' in data)
-        val = data.player_name ? data.player_name : val;
-    else if('monster_name' in data)
-        val = data.monster_name ? data.monster_name : val;
-    else if('farm_name' in data)
-        val = data.farm_name ? data.farm_name : val;
-    else if('name' in data)
-        val = data.name ? data.name : val;
 
-    return val;
-}
+const _rpc = DefaultRpcClient;
+console.log(_rpc);
 
 type SuiIdBytes = { bytes: number[] };
 
@@ -161,8 +144,7 @@ function DisplayBox({ data }: { data: DataType }) {
     return <div />;
 }
 
-const _rpc = DemoClient;
-console.log(_rpc);
+
 
 async function getObjectState(objID: string): Promise<object> {
     /*
