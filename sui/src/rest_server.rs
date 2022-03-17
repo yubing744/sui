@@ -147,11 +147,11 @@ async fn docs(rqctx: Arc<RequestContext<ServerContext>>) -> Result<Response<Body
 
     custom_http_response(
         StatusCode::OK,
-        &DocumentationResponse {
+        DocumentationResponse {
             documentation: documentation.clone(),
         },
     )
-    .map_err(|err| custom_http_error(StatusCode::FAILED_DEPENDENCY, format!("{err}")))
+    .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -193,7 +193,7 @@ network has been started on testnet or mainnet.
 async fn genesis(
     rqctx: Arc<RequestContext<ServerContext>>,
     request: TypedBody<GenesisRequest>,
-) -> Result<HttpResponseOk<GenesisResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let genesis_request_params = request.into_inner();
     let genesis_config_path = &server_context.genesis_config_path;
@@ -265,10 +265,14 @@ async fn genesis(
             )
         })?;
 
-    Ok(HttpResponseOk(GenesisResponse {
-        wallet_config: json!(wallet_config),
-        network_config: json!(network_config),
-    }))
+    custom_http_response(
+        StatusCode::OK,
+        GenesisResponse {
+            wallet_config: json!(wallet_config),
+            network_config: json!(network_config),
+        },
+    )
+    .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -281,9 +285,7 @@ network has been started on testnet or mainnet.
     path = "/sui/start",
     tags = [ "debug" ],
 }]
-async fn sui_start(
-    rqctx: Arc<RequestContext<ServerContext>>,
-) -> Result<HttpResponseOk<String>, HttpError> {
+async fn sui_start(rqctx: Arc<RequestContext<ServerContext>>) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let network_config_path = &server_context.network_config_path;
 
@@ -385,7 +387,7 @@ async fn sui_start(
     for address in addresses.iter() {
         wallet_context
             .gateway
-            .sync_client_state(*address)
+            .sync_account_state(*address)
             .await
             .map_err(|err| {
                 custom_http_error(
@@ -397,10 +399,11 @@ async fn sui_start(
 
     *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
-    Ok(HttpResponseOk(format!(
-        "Started {} authorities",
-        num_authorities
-    )))
+    custom_http_response(
+        StatusCode::OK,
+        format!("Started {} authorities", num_authorities),
+    )
+    .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -462,7 +465,7 @@ async fn get_addresses(
     // TODO: Speed up sync operations by kicking them off concurrently.
     // Also need to investigate if this should be an automatic sync or manually triggered.
     for address in addresses.iter() {
-        if let Err(err) = wallet_context.gateway.sync_client_state(*address).await {
+        if let Err(err) = wallet_context.gateway.sync_account_state(*address).await {
             *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
             return Err(custom_http_error(
                 StatusCode::FAILED_DEPENDENCY,
@@ -475,7 +478,7 @@ async fn get_addresses(
 
     custom_http_response(
         StatusCode::OK,
-        &GetAddressResponse {
+        GetAddressResponse {
             addresses: addresses
                 .into_iter()
                 .map(|address| format!("{}", address))
@@ -555,7 +558,7 @@ async fn get_objects(
 
     custom_http_response(
         StatusCode::OK,
-        &GetObjectsResponse {
+        GetObjectsResponse {
             objects: object_refs
                 .iter()
                 .map(|(object_id, sequence_number, object_digest)| Object {
@@ -653,7 +656,7 @@ async fn object_schema(
         )
     })?;
 
-    custom_http_response(StatusCode::OK, &ObjectSchemaResponse { schema })
+    custom_http_response(StatusCode::OK, ObjectSchemaResponse { schema })
         .map_err(|err| custom_http_error(StatusCode::FAILED_DEPENDENCY, format!("{err}")))
 }
 
@@ -680,7 +683,7 @@ struct ObjectInfoResponse {
     owner: String,
     /** Sequence number of the object */
     version: String,
-    /** Hex code as string representing the objet id */
+    /** Hex code as string representing the object id */
     id: String,
     /** Boolean representing if the object is mutable */
     readonly: String,
@@ -771,7 +774,7 @@ associated with the transaction that verifies the transaction.
 #[derive(Deserialize, Serialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 struct TransactionResponse {
-    /** Integer representing the acutal cost of the transaction */
+    /** Integer representing the actual cost of the transaction */
     gas_used: u64,
     /** JSON representation of the list of resulting effects on the object */
     object_effects_summary: serde_json::Value,
@@ -803,7 +806,7 @@ Example TransferTransactionRequest
 async fn transfer_object(
     rqctx: Arc<RequestContext<ServerContext>>,
     request: TypedBody<TransferTransactionRequest>,
-) -> Result<HttpResponseOk<TransactionResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let transfer_order_params = request.into_inner();
     let to_address =
@@ -872,11 +875,15 @@ async fn transfer_object(
 
     *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
-    Ok(HttpResponseOk(TransactionResponse {
-        gas_used,
-        object_effects_summary: json!(object_effects_summary),
-        certificate: json!(cert),
-    }))
+    custom_http_response(
+        StatusCode::OK,
+        TransactionResponse {
+            gas_used,
+            object_effects_summary: json!(object_effects_summary),
+            certificate: json!(cert),
+        },
+    )
+    .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -897,7 +904,7 @@ struct PublishRequest {
 
 /**
 Publish move module. It will perform proper verification and linking to make
-sure the pacakge is valid. If some modules have initializers, these initializers
+sure the package is valid. If some modules have initializers, these initializers
 will also be executed in Move (which means new Move objects can be created in
 the process of publishing a Move package). Gas budget is required because of the
 need to execute module initializers.
@@ -973,7 +980,7 @@ Example CallRequest
 async fn call(
     rqctx: Arc<RequestContext<ServerContext>>,
     request: TypedBody<CallRequest>,
-) -> Result<HttpResponseOk<TransactionResponse>, HttpError> {
+) -> Result<Response<Body>, HttpError> {
     let server_context = rqctx.context();
     let call_params = request.into_inner();
 
@@ -990,7 +997,8 @@ async fn call(
 
     *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
 
-    Ok(HttpResponseOk(transaction_response))
+    custom_http_response(StatusCode::OK, transaction_response)
+        .map_err(|err| custom_http_error(StatusCode::BAD_REQUEST, format!("{err}")))
 }
 
 /**
@@ -1031,7 +1039,7 @@ async fn sync(
         get_wallet_context(server_context.wallet_context.lock().unwrap().take())?;
 
     // Attempt to create a new account state, but continue if it already exists.
-    if let Err(err) = wallet_context.gateway.sync_client_state(address).await {
+    if let Err(err) = wallet_context.gateway.sync_account_state(address).await {
         *server_context.wallet_context.lock().unwrap() = Some(wallet_context);
         return Err(custom_http_error(
             StatusCode::FAILED_DEPENDENCY,
