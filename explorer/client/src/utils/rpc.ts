@@ -261,7 +261,7 @@ export const tryGetRpcParam = (): string | null => {
 const LOCALSTORE_RPC_KEY = 'sui-explorer-rpc'
 const LOCALSTORE_RPC_TIME_KEY = 'sui-explorer-rpc-lastset'
 
-const LOCALSTORE_RPC_VALID_MS = 1 * 60 * 3;
+const LOCALSTORE_RPC_VALID_MS = 60000 * 60 * 3;
 
 // persisting this preference ad-hoc in local storage is to support localhost rpc
 const tryGetRpcLocalStorage = (): string | null => {
