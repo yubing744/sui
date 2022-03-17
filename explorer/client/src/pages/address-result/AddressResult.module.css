@@ -5,7 +5,8 @@
 }
 
 .objectbox {
-    @apply border-solid border-stone-300 rounded-lg my-2 mx-[1vw] p-[1vw] lg:w-[30vw] lg:inline-block;
+    @apply border-solid border-stone-300 rounded-lg my-2 mx-[1vw] p-[1vw] lg:w-[30vw] lg:inline-block
+    hover:shadow-md cursor-pointer;
 }
 
 .objectbox > div > div {

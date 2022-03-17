@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLocation, useParams } from 'react-router-dom';
 
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
 import { findDataFromID } from '../../utils/utility_functions';
+import { navigateWithUnknown } from '../../utils/utility_functions';
 import styles from './AddressResult.module.css';
 
 type DataType = {
@@ -26,6 +28,8 @@ function SuccessAddress({ data }: { data: DataType }) {
             };
         }[]
     >(data?.objects.map(({ objectId }) => ({ id: objectId })));
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         Promise.all(
@@ -62,6 +66,9 @@ function SuccessAddress({ data }: { data: DataType }) {
                             <div
                                 className={styles.objectbox}
                                 key={`object-${index1}`}
+                                onClick={() =>
+                                    navigateWithUnknown(entryObj.id, navigate)
+                                }
                             >
                                 {'display' in entryObj &&
                                 entryObj?.display?.category === 'imageURL' ? (
