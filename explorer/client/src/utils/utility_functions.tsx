@@ -27,13 +27,6 @@ const navigateWithUnknown = async (input: string, navigate: Function) => {
     //if none of the queries find a result, show missing page
     Promise.any([addrPromise, objInfoPromise])
         .catch(_ => navigate(`../missing/${input}`));
-    /*
-    const data = findDataFromID(input, false);
-    if (data === undefined || !('category' in data))
-        navigate(`../missing/${input}`);
-    else if (data.category === 'transaction')
-        navigate(`../transactions/${input}`, { state: data });
-    */
 };
 
 const findDataFromID = (targetID: string | undefined, state: any) =>
@@ -47,7 +40,6 @@ const logResult = function logResult<T>(task: () => Promise<T>) {
         console.log(result);
     }, console.error);
 }
-
 
 export function asciiFromNumberBytes(bytes: number[]) {
     return String.fromCharCode.apply(null, bytes)
