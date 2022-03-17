@@ -87,26 +87,6 @@ function SuccessAddress({ data }: { data: DataType }) {
                                         <div key={`object-${index1}-${index2}`}>
                                             {(() => {
                                                 switch (key) {
-                                                    case 'id':
-                                                        return (
-                                                            <div>
-                                                                <span>
-                                                                    {key}:
-                                                                </span>
-                                                                <Longtext
-                                                                    text={
-                                                                        typeof value ===
-                                                                        'string'
-                                                                            ? value
-                                                                            : ''
-                                                                    }
-                                                                    category="objects"
-                                                                    isLink={
-                                                                        true
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        );
                                                     case 'display':
                                                         break;
                                                     default:
