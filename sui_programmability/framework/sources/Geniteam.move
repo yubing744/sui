@@ -318,15 +318,9 @@ module Sui::Geniteam {
 
         // Assign by slot
         if (cosmetic_slot_id == 0) {
-            // Check that the slot has no items
-            assert!(Option::is_none(&farm.applied_farm_cosmetic_0_id), ETOO_MANY_COSMETICS);
-
             // Fill the slot ID
             farm.applied_farm_cosmetic_0_id = Option::some(*ID::id(&farm_cosmetic));
         } else {
-            // Check that the slot has no items
-            assert!(Option::is_none(&farm.applied_farm_cosmetic_1_id), ETOO_MANY_COSMETICS);
-
             // Fill the slot ID
             farm.applied_farm_cosmetic_1_id = Option::some(*ID::id(&farm_cosmetic));
         };
@@ -344,15 +338,9 @@ module Sui::Geniteam {
 
         // Assign by slot
         if (cosmetic_slot_id == 0) {
-            // Check that the slot has no items
-            assert!(Option::is_none(&monster.applied_monster_cosmetic_0_id), ETOO_MANY_COSMETICS);
-
             // Fill the slot ID
             monster.applied_monster_cosmetic_0_id = Option::some(*ID::id(&monster_cosmetic));
         } else {
-            // Check that the slot has no items
-            assert!(Option::is_none(&monster.applied_monster_cosmetic_1_id), ETOO_MANY_COSMETICS);
-
             // Fill the slot ID
             monster.applied_monster_cosmetic_1_id = Option::some(*ID::id(&monster_cosmetic));
         };
