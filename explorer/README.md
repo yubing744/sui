@@ -1,6 +1,49 @@
 # Sui Explorer
 A chain explorer for the Sui network, similiar in functionality to [Etherscan](https://etherscan.io/) or [Solana Explorer](https://explorer.solana.com/).
 
+## Data Source / RPC URL
+The explorer front-end can use any Sui RPC url as a backend, but it must have CORS setup. 
+
+To change the RPC url, pass a [url-encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding) URL to the rpc parameter:
+
+to use http://127.0.0.1:5000 (the REST api's default local port):
+
+```?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F```
+
+it defaults to https://demo-rpc.sui.io (for now).
+
+The rpc url preference will be remembered for 3 hours before being discarded - this way, it's not necessary to continually pass it on every page.
+
+If the explorer is served over HTTPS, the rpc also needs to be HTTPS (proxied from HTTP).
+
+
+## Running Locally
+
+### Getting started
+
+You need [Rust](https://www.rust-lang.org/tools/install) & [Node.js](https://nodejs.org/en/download/) installed for this.
+
+from the root of the repo:
+
+```bash
+cargo build --release;    # build the network and rest server
+cd explorer/client;       
+npm install;              # install client deps
+npm start;                # start the development server for the client  
+```
+
+If everything worked, you should be able to view your local explorer at [127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F](http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F)
+
+### CORS issues / USE FIREFOX LOCALLY
+
+Due to current technical issues, the rest api doesn't have CORS headers setup, and must be proxied to add them. The demo server has this.
+
+Chrome doesn't let you make requests without CORS on the local host, but **Firefox does**, so it is **strongly recommended to use Firefox for local testing**.
+
+## ----------------------------------------------------------------------
+## no more about running locally
+## ----------------------------------------------------------------------
+
 ## Proposed Basic Architecture
 
 This is described in order of how data flows, from the source network to the end usder.
