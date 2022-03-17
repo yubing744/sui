@@ -21,6 +21,8 @@ If the explorer is served over HTTPS, the rpc also needs to be HTTPS (proxied fr
 
 This is how you can run with a local REST server and local copy of the explorer.
 
+Make sure you are on a branch of the repo that supports this - `explorer-rest` at time of writing, others soon.
+
 ### Getting started
 
 You need [Rust](https://www.rust-lang.org/tools/install) & [Node.js](https://nodejs.org/en/download/) installed for this.
