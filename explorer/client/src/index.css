@@ -11,7 +11,7 @@
 }
 
 body {
-    @apply bg-offwhite m-0 text-offblack;
+    @apply bg-offwhite m-0 mb-[5vh] text-offblack;
 }
 
 .ace_active-line {

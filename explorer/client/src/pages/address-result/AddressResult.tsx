@@ -51,7 +51,29 @@ function SuccessAddress({ data }: { data: DataType }) {
                 <div>Owned Objects</div>
                 <div>
                     {results && results.length > 0 ? (
-                        <div>{JSON.stringify(results)}</div>
+                        results.map((entryObj, index1) => (
+                            <div
+                                className={styles.objectbox}
+                                key={`object-${index1}`}
+                            >
+                                {Object.entries(entryObj).map(
+                                    ([key, value], index2) => (
+                                        <div key={`object-${index1}-${index2}`}>
+                                            <span>{key}:</span>
+                                            {key === 'id' ? (
+                                                <Longtext
+                                                    text={value}
+                                                    category="addresses"
+                                                    isLink={true}
+                                                />
+                                            ) : (
+                                                <span>{value}</span>
+                                            )}
+                                        </div>
+                                    )
+                                )}
+                            </div>
+                        ))
                     ) : (
                         <div className={styles.noobjects}>
                             This address owns no objects
