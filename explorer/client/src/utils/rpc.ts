@@ -1,3 +1,5 @@
+import { Console } from "console";
+
 export class SuiRpcClient {
     public readonly host: string;
 
@@ -245,13 +247,54 @@ export const tryGetRpcParam = (): string | null => {
     params.forEach((value, key) => {
         if(key === 'rpc') {
             const decoded = decodeURIComponent(value);
-            if (isValidHttpUrl(decoded))
+            if (isValidHttpUrl(decoded)) {
                 rpcParam = decoded;
+                window.localStorage.setItem(LOCALSTORE_RPC_KEY, decoded);
+                window.localStorage.setItem(LOCALSTORE_RPC_TIME_KEY, Date.now().toString());
+            }
         }
     });
 
     return rpcParam;
 }
+
+const LOCALSTORE_RPC_KEY = 'sui-explorer-rpc'
+const LOCALSTORE_RPC_TIME_KEY = 'sui-explorer-rpc-lastset'
+
+const LOCALSTORE_RPC_VALID_MS = 1 * 60 * 3;
+
+// persisting this preference ad-hoc in local storage is to support localhost rpc
+const tryGetRpcLocalStorage = (): string | null => {
+    let value = window.localStorage.getItem(LOCALSTORE_RPC_KEY);
+    const lastUpdated = window.localStorage.getItem(LOCALSTORE_RPC_TIME_KEY);
+
+    if(lastUpdated) {
+        console.log(lastUpdated);
+        const last = Number.parseInt(lastUpdated);
+        const now = Date.now().valueOf();
+        console.log(last, now);
+        if(now == last)
+            return value;
+
+        const elapsed = now.valueOf() - last.valueOf();
+        if (elapsed >= LOCALSTORE_RPC_VALID_MS) {
+            console.log(`removing stale rpc url preference`);
+            window.localStorage.removeItem(LOCALSTORE_RPC_KEY);
+            window.localStorage.removeItem(LOCALSTORE_RPC_TIME_KEY);
+            value = null;
+        }
+    }
+
+    return value;
+}
+
+export const tryGetRpcSetting = (): string | null => {
+    const queryParam = tryGetRpcParam();
+    const localStore = tryGetRpcLocalStorage();
+    // query param takes precedence over local store
+    return queryParam ? queryParam : localStore;
+}
+
 
 const isValidHttpUrl = (url: string) => {
     try { new URL(url); }
@@ -261,7 +304,7 @@ const isValidHttpUrl = (url: string) => {
 
 
 // allow switching the default url with another RPC url (for local testing)
-const rpcParam = tryGetRpcParam();
+const rpcParam = tryGetRpcSetting();
 const rpcUrl = rpcParam ? rpcParam : 'https://demo-rpc.sui.io';
 
 export const DefaultRpcClient = new SuiRpcClient(rpcUrl);
