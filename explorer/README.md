@@ -26,7 +26,10 @@ You need [Rust](https://www.rust-lang.org/tools/install) & [Node.js](https://nod
 from the root of the repo:
 
 ```bash
-cargo build --release;    # build the network and rest server
+cargo build --release;          # build the network and rest server
+./target/release/rest_server;        # run the rest server - defaults to port 5000
+
+# in another terminal tab, from the repo root:
 cd explorer/client;       
 npm install;              # install client deps
 npm start;                # start the development server for the client  
