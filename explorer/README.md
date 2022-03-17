@@ -8,7 +8,7 @@ To change the RPC url, pass a [url-encoded](https://developer.mozilla.org/en-US/
 
 to use http://127.0.0.1:5000 (the REST api's default local port):
 
-```?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F```
+[http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F](http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F)
 
 it defaults to https://demo-rpc.sui.io (for now).
 
@@ -30,12 +30,12 @@ You need [Rust](https://www.rust-lang.org/tools/install) & [Node.js](https://nod
 from the root of the repo:
 
 ```bash
-cargo build --release;          # build the network and rest server
-./target/release/rest_server;        # run the rest server - defaults to port 5000
+cargo build --release          # build the network and rest server
+./target/release/rest_server        # run the rest server - defaults to port 5000
 
 # in another terminal tab, from the repo root:
-cd explorer/client;       
-npm install;              # install client deps
+cd explorer/client       
+npm install              # install client deps
 npm start;                # start the development server for the client  
 ```
 
