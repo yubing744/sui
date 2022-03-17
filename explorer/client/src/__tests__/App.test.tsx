@@ -140,27 +140,30 @@ describe('End-to-end Tests', () => {
     });
 
     describe('Displays data on addresses', () => {
-        it('when address has required fields', () => {
+        it('when address has required fields', async () => {
             render(<App />, { wrapper: MemoryRouter });
             searchText(addressID);
-            expect(screen.getByText('Address ID')).toBeInTheDocument();
-            expect(screen.getByText('Owned Objects')).toBeInTheDocument();
+            const el1 = await screen.findByText('Address ID');
+            const el2 = await screen.findByText('Owned Objects');
+            expect(el1).toBeInTheDocument();
+            expect(el2).toBeInTheDocument();
         });
-        it('when address has missing fields', () => {
+        it('when address has missing fields', async () => {
             render(<App />, { wrapper: MemoryRouter });
             searchText(problemAddressID);
-            expect(
-                screen.getByText(
-                    'There was an issue with the data on the following address'
-                )
-            ).toBeInTheDocument();
+
+            const el1 = await screen.findByText(
+                'There was an issue with the data on the following address'
+            );
+            expect(el1).toBeInTheDocument();
         });
-        it('when address has no objects', () => {
+        it('when address has no objects', async () => {
             render(<App />, { wrapper: MemoryRouter });
             searchText(addressNoObjectsID);
-            expect(
-                screen.getByText('This address owns no objects')
-            ).toBeInTheDocument();
+
+            const el2 = await screen.findByText('This address owns no objects');
+
+            expect(el2).toBeInTheDocument();
         });
     });
 
