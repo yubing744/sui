@@ -290,6 +290,15 @@ impl AuthorityState {
         transaction.check_signature()?;
         let transaction_digest = transaction.digest();
 
+        // Ensure an idempotent answer.
+        if self
+            ._database
+            .signed_transaction_exists(&transaction_digest)?
+        {
+            let transaction_info = self.make_transaction_info(&transaction_digest).await?;
+            return Ok(transaction_info);
+        }
+
         let owned_objects: Vec<_> = self
             .check_locks(&transaction)
             .instrument(tracing::trace_span!("tx_check_locks"))
@@ -337,8 +346,8 @@ impl AuthorityState {
         let transaction_digest = transaction.digest();
 
         // Ensure an idempotent answer.
-        let transaction_info = self.make_transaction_info(&transaction_digest).await?;
-        if transaction_info.signed_effects.is_some() {
+        if self._database.signed_effects_exists(&transaction_digest)? {
+            let transaction_info = self.make_transaction_info(&transaction_digest).await?;
             return Ok(transaction_info);
         }
 
@@ -590,7 +599,7 @@ impl AuthorityState {
                             // Read only objects have no locks.
                             None
                         } else {
-                            self.get_transaction_lock(&object.to_object_reference())
+                            self.get_transaction_lock(&object.compute_object_reference())
                                 .await?
                         };
                         let layout = match request_layout {
@@ -689,18 +698,7 @@ impl AuthorityState {
         genesis_packages: Vec<Vec<CompiledModule>>,
         genesis_ctx: &mut TxContext,
     ) -> Self {
-        let native_functions =
-            sui_framework::natives::all_natives(MOVE_STDLIB_ADDRESS, SUI_FRAMEWORK_ADDRESS);
-        let state = AuthorityState {
-            committee,
-            name,
-            secret,
-            _native_functions: native_functions.clone(),
-            move_vm: adapter::new_move_vm(native_functions)
-                .expect("We defined natives to not fail here"),
-            _database: store,
-            batch_channels: None,
-        };
+        let state = AuthorityState::new_without_genesis(committee, name, secret, store).await;
 
         for genesis_modules in genesis_packages {
             state
@@ -709,6 +707,27 @@ impl AuthorityState {
                 .expect("We expect publishing the Genesis packages to not fail");
         }
         state
+    }
+
+    pub async fn new_without_genesis(
+        committee: Committee,
+        name: AuthorityName,
+        secret: StableSyncAuthoritySigner,
+        store: Arc<AuthorityStore>,
+    ) -> Self {
+        let native_functions =
+            sui_framework::natives::all_natives(MOVE_STDLIB_ADDRESS, SUI_FRAMEWORK_ADDRESS);
+
+        AuthorityState {
+            committee,
+            name,
+            secret,
+            _native_functions: native_functions.clone(),
+            move_vm: adapter::new_move_vm(native_functions)
+                .expect("We defined natives to not fail here"),
+            _database: store,
+            batch_channels: None,
+        }
     }
 
     pub(crate) fn db(&self) -> Arc<AuthorityStore> {
@@ -781,13 +800,6 @@ impl AuthorityState {
     }
 
     // Helper function to manage transaction_locks
-
-    /// Initialize a transaction lock for an object/sequence to None
-    pub async fn init_transaction_lock(&self, object_ref: ObjectRef) {
-        self._database
-            .init_transaction_lock(object_ref)
-            .expect("TODO: propagate the error")
-    }
 
     /// Set the transaction lock to a specific transaction
     pub async fn set_transaction_lock(
