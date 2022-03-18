@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocation, useParams } from 'react-router-dom';
 
@@ -46,6 +46,12 @@ function SuccessAddress({ data }: { data: DataType }) {
             .catch((err) => console.log(err));
     }, [data]);
 
+    const handlePreviewClick = useCallback(
+        (id: string, navigate: Function) => (e: React.MouseEvent) =>
+            navigateWithUnknown(id, navigate),
+        []
+    );
+
     return (
         <div className={theme.textresults}>
             <div>
@@ -66,9 +72,10 @@ function SuccessAddress({ data }: { data: DataType }) {
                             <div
                                 className={styles.objectbox}
                                 key={`object-${index1}`}
-                                onClick={() =>
-                                    navigateWithUnknown(entryObj.id, navigate)
-                                }
+                                onClick={handlePreviewClick(
+                                    entryObj.id,
+                                    navigate
+                                )}
                             >
                                 {'display' in entryObj &&
                                 entryObj?.display?.category === 'imageURL' ? (
