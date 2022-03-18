@@ -236,6 +236,5 @@ Gameplay:
 
 ## Further reading
 
-* See the entire [Unity project](https://github.com/MystenLabs/sui-monstars)
 * Check out Sui [APIs](https://app.swaggerhub.com/apis/MystenLabs/sui-api/0.1).
 * Learn about Sui [objects](https://github.com/MystenLabs/sui/blob/main/doc/src/build/objects.md).
