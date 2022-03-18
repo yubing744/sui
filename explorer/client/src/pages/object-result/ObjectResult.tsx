@@ -5,7 +5,10 @@ import { useLocation, useParams } from 'react-router-dom';
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
-import { findDataFromID } from '../../utils/utility_functions';
+import {
+    findDataFromID,
+    prepObjTypeValue,
+} from '../../utils/utility_functions';
 import styles from './ObjectResult.module.css';
 
 import 'ace-builds/src-noconflict/theme-github';
@@ -111,11 +114,6 @@ function ObjectResult() {
 
         return result ? result[1] : '';
     };
-
-    const stdLibRe = /0x2::/;
-
-    const prepObjTypeValue = (typeString: string) =>
-        typeString.replace(stdLibRe, '');
 
     const convertEpochTimeToUTCDate = (epoch: number) =>
         new Date(epoch * 1000).toUTCString();

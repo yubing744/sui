@@ -5,6 +5,11 @@ import mockTransactionData from './mock_data.json';
 // const ADDRESS_URL = `${BACKEND_URL}/objects?address=`;
 // const OBJECT_URL = `${BACKEND_URL}/object_info?objectId=`;
 
+const stdLibRe = /0x2::/;
+
+const prepObjTypeValue = (typeString: string) =>
+    typeString.replace(stdLibRe, '');
+
 const findDataFromID = (targetID: string | undefined, state: any) =>
     state?.category !== undefined
         ? state
@@ -25,4 +30,4 @@ const navigateWithUnknown = (input: string, navigate: Function) => {
     }
 };
 
-export { findDataFromID, navigateWithUnknown };
+export { findDataFromID, navigateWithUnknown, prepObjTypeValue };

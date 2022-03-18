@@ -5,7 +5,10 @@ import { useLocation, useParams } from 'react-router-dom';
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
-import { findDataFromID } from '../../utils/utility_functions';
+import {
+    findDataFromID,
+    prepObjTypeValue,
+} from '../../utils/utility_functions';
 import { navigateWithUnknown } from '../../utils/utility_functions';
 import styles from './AddressResult.module.css';
 
@@ -96,11 +99,27 @@ function SuccessAddress({ data }: { data: DataType }) {
                                                 switch (key) {
                                                     case 'display':
                                                         break;
+                                                    case 'Type':
+                                                        return (
+                                                            <div>
+                                                                <span>
+                                                                    {key}
+                                                                </span>
+                                                                <span>
+                                                                    {typeof value ===
+                                                                    'string'
+                                                                        ? prepObjTypeValue(
+                                                                              value
+                                                                          )
+                                                                        : ''}
+                                                                </span>
+                                                            </div>
+                                                        );
                                                     default:
                                                         return (
                                                             <div>
                                                                 <span>
-                                                                    {key}:
+                                                                    {key}
                                                                 </span>
                                                                 <span>
                                                                     {value}
