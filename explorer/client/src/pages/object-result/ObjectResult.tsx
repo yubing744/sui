@@ -166,7 +166,7 @@ function ObjectResult() {
                         <div className={theme.textresults}>
                             <div>
                                 <div>Object ID</div>
-                                <div>
+                                <div data-testid="object-id">
                                     <Longtext
                                         text={data.id}
                                         category="objects"

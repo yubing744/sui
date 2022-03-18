@@ -59,7 +59,7 @@ function SuccessAddress({ data }: { data: DataType }) {
         <div className={theme.textresults}>
             <div>
                 <div>Address ID</div>
-                <div>
+                <div data-testid="address-id">
                     <Longtext
                         text={data?.id}
                         category="addresses"

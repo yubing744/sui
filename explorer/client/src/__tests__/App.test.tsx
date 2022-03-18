@@ -26,6 +26,15 @@ function expectReadOnlyStatus(result: 'True' | 'False') {
     expect(screen.getByTestId('read-only-text')).toHaveTextContent(result);
 }
 
+function checkObjectId(result: string) {
+    expect(screen.getByTestId('object-id')).toHaveTextContent(result);
+}
+
+const checkAddressId = async (result: string) => {
+    const el1 = await screen.findByTestId('address-id');
+    expect(el1).toHaveTextContent(result);
+};
+
 const successTransactionID = 'txCreateSuccess';
 const failTransactionID = 'txFails';
 const pendingTransactionID = 'txSendPending';
@@ -113,6 +122,7 @@ describe('End-to-end Tests', () => {
         it('when object was a success', () => {
             render(<App />, { wrapper: MemoryRouter });
             searchText(successObjectID);
+            checkObjectId(successObjectID);
             expect(screen.getByText('Object ID')).toBeInTheDocument();
         });
 
@@ -143,6 +153,7 @@ describe('End-to-end Tests', () => {
         it('when address has required fields', async () => {
             render(<App />, { wrapper: MemoryRouter });
             searchText(addressID);
+            await checkAddressId(addressID);
             const el1 = await screen.findByText('Address ID');
             const el2 = await screen.findByText('Owned Objects');
             expect(el1).toBeInTheDocument();
@@ -164,6 +175,39 @@ describe('End-to-end Tests', () => {
             const el2 = await screen.findByText('This address owns no objects');
 
             expect(el2).toBeInTheDocument();
+        });
+    });
+
+    describe('Enables clicking links to', () => {
+        it('go from address to object and back', async () => {
+            render(<App />, { wrapper: MemoryRouter });
+            searchText(addressID);
+            const el1 = await screen.findByText('playerOne');
+            fireEvent.click(el1);
+
+            checkObjectId('playerOne');
+
+            const el2 = await screen.findByText(addressID);
+
+            fireEvent.click(el2);
+
+            await checkAddressId(addressID);
+        });
+        it('go from object to child object and back', async () => {
+            const parentObj = 'playerTwo';
+            const childObj = 'standaloneObject';
+
+            render(<App />, { wrapper: MemoryRouter });
+            searchText(parentObj);
+            checkObjectId(parentObj);
+
+            const el1 = await screen.findByText(childObj);
+            fireEvent.click(el1);
+            checkObjectId(childObj);
+
+            const el2 = await screen.findByText(parentObj);
+            fireEvent.click(el2);
+            checkObjectId(parentObj);
         });
     });
 
