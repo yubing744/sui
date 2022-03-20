@@ -1,37 +1,31 @@
 <template>
-    <section class="container _sui-container-l">
-        <section class="sui-game-monstars">
-            <iframe title="Sue Monstars Game" src="/games/monstars/index.html">
-            </iframe>
-        </section>
+  <section class="container _sui-container-l">
+    <section class="sui-game-monstars">
+      <iframe title="Sue Monstars Game" src="/games/monstars/index.html">
+      </iframe>
     </section>
+  </section>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'nuxt-property-decorator'
-import { MetaInfo } from 'vue-meta'
+  import { Component, Vue } from "nuxt-property-decorator";
+  import { MetaInfo } from "vue-meta";
 
-@Component({
-    layout: 'game',
-})
-export default class HomePageComponent extends Vue {
+  @Component({
+    layout: "game",
+  })
+  export default class HomePageComponent extends Vue {
     head(): MetaInfo {
-        return {
-            title: 'Sui - Game -Monstars',
-        }
+      return {
+        title: "Sui - Game -Monstars",
+      };
     }
-    mounted() {
-        const $this = this
-        setTimeout(() => {
-            $this.$sal()
-        }, 200)
-    }
-}
+  }
 </script>
 <style lang="scss" scoped>
-.content {
+  .content {
     max-height: 70vh;
-}
-.sui-game-monstars {
+  }
+  .sui-game-monstars {
     background-color: #fff;
     padding: 20px;
     display: flex;
@@ -40,13 +34,13 @@ export default class HomePageComponent extends Vue {
     position: relative;
     padding-top: 56.25%;
     margin-top: 40px;
-}
-iframe {
+  }
+  iframe {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     min-height: 600px;
-}
+  }
 </style>
