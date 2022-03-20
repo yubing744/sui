@@ -1,6 +1,6 @@
 <template>
-  <section class="container _sui-container-l">
-    <section class="sui-game-monstars">
+  <section class="container">
+    <section class="sui-game-monstars gt">
       <iframe title="Sue Monstars Game" src="/games/monstars/index.html">
       </iframe>
     </section>
@@ -42,5 +42,8 @@
     width: 100%;
     height: 100%;
     min-height: 600px;
+  }
+  .gt {
+    margin-top: 150px;
   }
 </style>
