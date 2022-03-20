@@ -4308,6 +4308,14 @@ Pagination
 
     }
 
+    &:hover {
+      .sui-btn {
+        background: var(--color-background);
+
+        color: #34526E;
+      }
+    }
+
   }
 
   @media only screen and (max-width: 1399px) {
