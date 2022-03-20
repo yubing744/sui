@@ -26,12 +26,7 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     {
-      src: "~/plugins/sal",
-      ssr: false,
-      mode: "client",
-    },
-    {
-      src: "~/plugins/core",
+      src: "@/plugins/sal.ts",
       ssr: false,
       mode: "client",
     },
