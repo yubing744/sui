@@ -1,0 +1,88 @@
+.sui-community {
+  min-height: 500px;
+
+  p {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 150%;
+    text-align: center;
+    color: $sui__black;
+    width: 60%;
+
+    @media only screen and (max-width: 767px) {
+      font-size: 20px;
+      width: 80%;
+    }
+
+  }
+
+  form {
+    max-width: 528px;
+    margin: 0 auto;
+
+    .input-group {
+      border-radius: 60px;
+      height: 80px;
+      padding: 5px;
+    }
+
+    .form-control {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 150%;
+      border: 0;
+      line-height: 150%;
+      height: 69px;
+      padding: 10px;
+
+      @media only screen and (max-width: 767px) {
+        text-align: center;
+        border: 0;
+      }
+    }
+
+    .subscribe-btn {
+      background: #6FBCF0;
+      border-radius: 60px !important;
+      width: 201.66px;
+      height: 69px;
+      font-weight: 600;
+
+      &:hover {
+        background: #34526E;
+      }
+
+      @media only screen and (max-width: 767px) {
+        width: 100%;
+        height: 50px;
+      }
+    }
+  }
+
+}
+
+.bg-bottom {
+  background-image: url(/assets/img/bg/bg-lower1.png);
+  position: absolute;
+  left: 0;
+
+  top: 0;
+  background-size: 95%;
+  background-position: top center;
+  background-repeat: no-repeat;
+
+  @media only screen and (max-width: 767px) {
+
+    background-size: 325%;
+    background-position: top right;
+
+  }
+
+  z-index: -1;
+  width: 100vw;
+  height: 100vh;
+}
