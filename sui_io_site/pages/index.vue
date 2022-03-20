@@ -151,12 +151,5 @@
         title: "Sui - Build without boundaries",
       };
     }
-
-    mounted() {
-      const $this = this;
-      setTimeout(() => {
-        $this.$sal();
-      }, 200);
-    }
   }
 </script>
