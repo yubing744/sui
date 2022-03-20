@@ -1,0 +1,85 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="bootstrap-css.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://use.fontawesome.com/de58f08536.js"></script>
+<script src="audiocontext-polyfill.js"></script>
+<script src="Build/UnityLoader.js"></script>
+<style>
+    body {
+        overflow: hidden;
+        padding: 10px;
+        margin: 0;
+    }
+
+    .wrapper {
+        width: 100%;
+        text-align: center;
+    }
+
+    #loader {
+        margin: 0 auto;
+        position: relative;
+    }
+
+    #background {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+
+    #loading {
+        color: #91dd0c;
+        font-size: 40pt;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        text-align: center;
+        padding-top: 25%;
+
+    }
+
+    #progress {
+        border: solid 1px #91dd0c;
+        width: 20%;
+        height: 20px;
+        text-align: center;
+        margin: auto;
+        margin-top: 20px;
+    }
+
+    #progressFill {
+        background-color: #91dd0c;
+        width: 0;
+        height: 20px;
+
+    }
+
+
+    #BtnPrevious,
+    #BtnNext,
+    #BtnSelect,
+    #BtnInfo,
+    #BtnClose {
+
+        opacity: 0;
+
+    }
+
+    #cont {
+
+        position: fixed;
+        cursor: pointer;
+
+        bottom: 10px;
+
+        border: 2px;
+
+        padding-left: initial;
+    }
+</style>

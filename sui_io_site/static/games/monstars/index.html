@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="bootstrap-css.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"
+  integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://use.fontawesome.com/de58f08536.js"></script>
+<script src="audiocontext-polyfill.js"></script>
+<script src="Build/UnityLoader.js"></script>
+<style>
+  body {
+    overflow: hidden;
+    padding: 10px;
+    margin: 0;
+  }
+
+  .wrapper {
+    width: 100%;
+    text-align: center;
+  }
+
+  #loader {
+    margin: 0 auto;
+    position: relative;
+  }
+
+  #background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+
+  #loading {
+    color: #91dd0c;
+    font-size: 40pt;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    text-align: center;
+    padding-top: 25%;
+
+  }
+
+  #progress {
+    border: solid 1px #91dd0c;
+    width: 20%;
+    height: 20px;
+    text-align: center;
+    margin: auto;
+    margin-top: 20px;
+  }
+
+  #progressFill {
+    background-color: #91dd0c;
+    width: 0;
+    height: 20px;
+
+  }
+
+
+  #BtnPrevious,
+  #BtnNext,
+  #BtnSelect,
+  #BtnInfo,
+  #BtnClose {
+
+    opacity: 0;
+
+  }
+
+  #cont {
+
+    position: fixed;
+    cursor: pointer;
+
+    bottom: 10px;
+
+    border: 2px;
+
+    padding-left: initial;
+  }
+
+</style>
+
+<head>
+
+</head>
+
+<body>
+
+  <div id="geniteam-demo">
+    <div class="wrapper">
+      <div id="loader">
+        <img id="background" src="imgs/splash-bg.png" />
+        <div id="loading">
+          <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading
+          <div id="progress">
+            <div id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+      <div id="gameContainer" style="opacity: 0;"></div>
+    </div>
+    <script>
+      var isMobile = false;
+
+      function CheckDevice() {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          isMobile = true;
+          window.alert("Cant Play on Mobile Device kindly visit the link on a Desktop Device");
+
+          var x = document.getElementById("loading");
+          x.style.display = "none";
+
+        } else {
+          InitGame();
+        }
+      }
+
+      window.onload = CheckDevice;
+
+      function onProgressChanged(r, p) {
+        if (!isMobile) {
+          $("#progressFill").css({
+            width: (p * 100).toString() + '%'
+          });
+        }
+      }
+
+      function hideLoader() {
+        $("#loader").hide();
+        $('#gameContainer').css({
+          opacity: 1,
+          'background-color': 'transparent'
+        });
+      }
+
+      function setGameSize() {
+        document.body.style.overflow = "hidden";
+        var maxWidth = $(window).width() - 20;
+        var maxHeight = $(window).height() - 20;
+        document.body.style.overflow = "";
+
+        var ratio = 1.77;
+
+        var height = maxWidth / ratio;
+        var width = maxHeight * ratio;
+
+        if (height > maxHeight) {
+          height = maxHeight;
+          width = height * ratio;
+        }
+
+        if (width > maxWidth) {
+          width = maxWidth;
+          height = width / ratio;
+        }
+
+        var canvas = $("canvas");
+
+        canvas.width(width);
+        canvas.height(height);
+
+        var loader = $("#loader");
+
+        loader.width(width);
+        loader.height(height);
+      }
+
+      setGameSize();
+
+      $(window).resize(function () {
+        setGameSize();
+      });
+
+      function InitGame() {
+        var gameInstance = UnityLoader.instantiate("gameContainer", "Build/buld1.json", {
+          onProgress: onProgressChanged,
+          compatibilityCheck: function (e, t, r) {
+            t();
+          }
+        });
+      }
+
+
+      function OnGameStarted() {
+        if (!isMobile) {
+          hideLoader();
+          setGameSize();
+        }
+      }
+
+    </script>
+  </div>
+</body>
+
+</html>

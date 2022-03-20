@@ -1,0 +1,111 @@
+<div id="geniteam-demo">
+<div class="wrapper">
+    <div id="loader">
+        <img id="background" src="imgs/splash-bg.png" />
+        <div id="loading">
+            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading
+            <div id="progress">
+                <div id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+    <div id="gameContainer" style="opacity: 0;"></div>
+</div>
+<script>
+    var isMobile=false;
+
+    function CheckDevice()
+    {
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )
+        {
+            isMobile= true;
+            window.alert("Cant Play on Mobile Device kindly visit the link on a Desktop Device");
+
+            var x = document.getElementById("loading");
+            x.style.display = "none";
+
+        }
+        else
+        {
+            InitGame();
+        }
+    }
+
+    window.onload = CheckDevice;
+
+    function onProgressChanged(r, p) {
+        if(!isMobile)
+        {
+            $("#progressFill").css({
+                width: (p * 100).toString() + '%'
+            });
+        }
+    }
+
+    function hideLoader() {
+        $("#loader").hide();
+        $('#gameContainer').css({
+            opacity: 1,
+            'background-color': 'transparent'
+        });
+    }
+
+    function setGameSize()
+    {
+        document.body.style.overflow = "hidden";
+        var maxWidth = $(window).width() - 20;
+        var maxHeight = $(window).height() - 20;
+        document.body.style.overflow = "";
+
+        var ratio = 1.77;
+
+        var height = maxWidth / ratio;
+        var width = maxHeight * ratio;
+
+        if (height > maxHeight) {
+            height = maxHeight;
+            width = height * ratio;
+        }
+
+        if (width > maxWidth) {
+            width = maxWidth;
+            height = width / ratio;
+        }
+
+        var canvas = $("canvas");
+
+        canvas.width(width);
+        canvas.height(height);
+
+        var loader = $("#loader");
+
+        loader.width(width);
+        loader.height(height);
+    }
+
+    setGameSize();
+
+    $(window).resize(function () {
+        setGameSize();
+    });
+
+    function InitGame()
+    {
+        var gameInstance = UnityLoader.instantiate("gameContainer", "Build/buld1.json", {
+        onProgress: onProgressChanged,
+        compatibilityCheck: function (e, t, r) {
+            t();
+        }
+        });
+    }
+
+
+    function OnGameStarted() {
+        if(!isMobile)
+        {
+            hideLoader();
+            setGameSize();
+        }
+    }
+</script>
+</div>
