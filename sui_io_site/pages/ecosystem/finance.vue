@@ -1,16 +1,17 @@
 <template>
-    <main class="_sui-container-l" ref="main">
+    <main class="_sui-gaming _sui-container-l">
         <LandingBanner>
             <h1
                 class="title"
-                data-behavior="Animate"
-                data-animateType="fadeInLeftSmall"
+                data-sal="slide-up"
+                data-sal-duration="1000"
+                data-sal-delay="100"
             >
-                Build without <span class="_sui-blue">boundaries</span>
+                Build tomorrow’s financial systems today
             </h1>
             <p class="mb--20" data-sal="slide-up" data-sal-duration="1000">
-                Sui is a boundless platform to build rich and dynamic on-chain
-                assets from gaming to finance
+                Serve billions of users with financial assets at a fraction of
+                the cost
             </p>
             <div class="sui-gaming-cta">
                 <a
@@ -18,53 +19,48 @@
                     class="sui-btn btn-fill-primary"
                     >Start Building →</a
                 >
+                <a href="#" class="sui-btn btn-line">Learn more →</a>
             </div>
         </LandingBanner>
-        <Whysui :content="whySui">
-            <div class="row sui-grid">
-                <div
-                    class="_grid-item _sui_ws"
-                    data-sal="slide-up"
-                    data-sal-duration="1000"
-                    data-sal-delay="100"
-                >
+        <Whysui :content="whySuiGaming">
+            <div class="row mb--40 sui-grid">
+                <div class="_grid-item _sui_ws">
                     <div
-                        class="project-grid _whysui-list _sui-fast _sui_why-bg1 _sub-grid-item"
-                    >
-                        <div class="content">
-                            <h3 class="title">Fast A*F</h3>
-
-                            <p class="mt--20 _copy">
-                                Horizontally scalable,<br />
-                                instant finality, low fees.
-                            </p>
-                        </div>
-                    </div>
-                    <div
-                        class="project-grid _whysui-list _sui-fast _sui_why-bg2 _sub-grid-item"
-                        data-sal="slide-up"
-                        data-sal-duration="1000"
-                        data-sal-delay="150"
+                        class="project-grid _whysui-list _sui-fast _sui_why-bg6"
                     >
                         <div class="content">
                             <h3 class="title">
-                                Digital assets<br />
+                                Financial assets<br />
                                 unlocked
                             </h3>
 
                             <p class="mt--20 _copy">
-                                Create more utility into NFTs. Make NFTs work
-                                for you.
+                                Enable real-time, low latency trading and define
+                                complex assets with rich attributes that live
+                                directly on-chain.
+                            </p>
+                            <a
+                                href="https://devportal-30dd0.web.app/"
+                                class="sui-btn btn-fill-primary"
+                            >
+                                Learn more -></a
+                            >
+                        </div>
+                    </div>
+                    <div
+                        class="project-grid _whysui-list _sui-fast _sui_why-bg7"
+                    >
+                        <div class="content">
+                            <h3 class="title">Near-zero fees</h3>
+
+                            <p class="mt--20 _copy">
+                                Each transaction on Sui costs a fraction of a
+                                cent.
                             </p>
                         </div>
                     </div>
                 </div>
-                <div
-                    class="_grid-item"
-                    data-sal="slide-up"
-                    data-sal-duration="1000"
-                    data-sal-delay="200"
-                >
+                <div class="_grid-item">
                     <div
                         class="project-grid _whysui-list _sui-fast-1 _sui_why-bg3"
                     >
@@ -91,50 +87,40 @@
                     </div>
                 </div>
             </div>
-            <div
-                class="row mb--40 _fl-fix"
-                data-sal="slide-up"
-                data-sal-duration="1000"
-                data-sal-delay="250"
-            >
+            <div class="row mb--40 _fl-fix">
                 <div class="col-md-12">
                     <DeveloperResources />
                 </div>
             </div>
-            <div class="row sui-grid-1-3">
-                <div class="_sui_ws _grid-item _fl-fix">
+            <div class="row mb--40 sui-grid">
+                <div class="_grid-item _fl-fix">
                     <div
-                        class="project-grid _whysui-list _sui-fast _sui_why-bg4"
+                        class="project-grid _whysui-list _sui-fast _sui_why-bg2"
                     >
                         <div class="content">
-                            <div class="col-md-6">
-                                <h3 class="title">
-                                    Safe & <br />secure smart contracts
-                                </h3>
+                            <h3 class="title">
+                                Simple, safe and<br />secure smart contracts
+                                powered by Move
+                            </h3>
 
-                                <p class="mt--20 _copy">
-                                    Spend less time fixing smart contracts, more
-                                    time building cool sh*t.
-                                </p>
-                                <a
-                                    href="https://devportal-30dd0.web.app/build/move"
-                                    class="sui-btn btn-fill-primary"
-                                    >Learn about Move →</a
-                                >
-                            </div>
+                            <p class="mt--20 _copy">
+                                Implement on-chain logic transparently and
+                                extend functionality of your assets
+                            </p>
                         </div>
                     </div>
                 </div>
                 <div class="_grid-item _fl-fix">
                     <div
-                        class="project-grid _whysui-list _sui-fast _sui_why-bg5"
+                        class="project-grid _whysui-list _sui-fast _sui_why-bg1"
                     >
                         <div class="content">
-                            <h3 class="title">Green</h3>
+                            <h3 class="title">Fast A*F</h3>
 
                             <p class="mt--20 _copy">
-                                Sui has the lowest cost per compute of any
-                                blockchain.
+                                Sui has horizontally scalable throughput and
+                                storage, increasing capacity as your
+                                applications scale.
                             </p>
                         </div>
                     </div>
@@ -142,11 +128,7 @@
             </div>
         </Whysui>
         <Community />
-        <div
-            class="bg-top rellax"
-            data-sal="slide-up"
-            data-sal-delay="100"
-        ></div>
+        <div class="bg-top" data-sal="slide-up" data-sal-delay="100"></div>
     </main>
 </template>
 
@@ -157,24 +139,22 @@ import { MetaInfo } from 'vue-meta'
 @Component
 export default class HomePageComponent extends Vue {
     title!: string
-    whySui: any = {
+    whySuiGaming: any = {
         title: 'Why Sui?',
         subtitle: 'A STEP-FUNCTION CHANGE IN BLOCKCHAIN DESIGN',
         description:
             'Sui is the first permissionless Layer 1 blockchain designed from the ground up to enable creators and developers to build experiences that cater to the next billion users in web3.',
     }
+
     head(): MetaInfo {
         return {
-            title: 'Sui - Build without boundaries',
+            title: 'Sui - Finance',
         }
     }
-
     mounted() {
         const $this = this
         setTimeout(() => {
             $this.$sal()
-            const refEl = $this.$refs.main
-            $this.$coreDemoFunction(refEl)
         }, 200)
     }
 }
