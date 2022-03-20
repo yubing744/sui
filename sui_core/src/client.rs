@@ -296,7 +296,6 @@ impl ClientState {
         self.store.object_refs.clear()?;
         Ok(())
     }
-
     pub fn insert_object(&self, object: Object) -> SuiResult {
         self.store
             .objects
@@ -405,17 +404,27 @@ impl ClientState {
     /// The caller has to explicitly find which objects are locked
     /// TODO: always return true for immutable objects https://github.com/MystenLabs/fastnft/issues/305
     fn can_lock_or_unlock(&self, transaction: &Transaction) -> Result<bool, SuiError> {
+        println!("can_lock_or_unlock {:?}", transaction.digest());
         let iter_matches = self.store.pending_transactions.multi_get(
             &transaction
                 .input_objects()
                 .iter()
-                .map(|q| q.object_id())
+                .filter_map(|q| match q {
+                    InputObjectKind::MovePackage(_) => None,
+                    InputObjectKind::OwnedMoveObject(w) => Some(w.0),
+                    InputObjectKind::SharedMoveObject(w) => Some(*w),
+                })
                 .collect_vec(),
         )?;
         if iter_matches.into_iter().any(|match_for_transaction| {
-            matches!(match_for_transaction,
-                // If we find any transaction that isn't the given transaction, we cannot proceed
-                Some(o) if o != *transaction)
+            if match_for_transaction.is_some() {
+                let unwrapped_trx = match_for_transaction.unwrap();
+                if unwrapped_trx != *transaction {
+                    println!("Found a transaction - {:?} that isn’t the given transaction - {:?}, we cannot proceed", unwrapped_trx.digest(), transaction.digest());
+                    return true;
+                }
+            }
+            false
         }) {
             return Ok(false);
         }
@@ -436,13 +445,22 @@ impl ClientState {
         if !self.can_lock_or_unlock(transaction)? {
             return Err(SuiError::ConcurrentTransactionError);
         }
+        println!(
+            "lock_pending_transaction_objects {:?}",
+            transaction.digest()
+        );
         self.store
             .pending_transactions
             .multi_insert(
                 transaction
                     .input_objects()
                     .iter()
-                    .map(|e| (e.object_id(), transaction.clone())),
+                    .filter_map(|q| match q {
+                        InputObjectKind::MovePackage(_) => None,
+                        InputObjectKind::OwnedMoveObject(w) => Some(w.0),
+                        InputObjectKind::SharedMoveObject(w) => Some(*w),
+                    })
+                    .map(|e| (e, transaction.clone())),
             )
             .map_err(|e| e.into())
     }
@@ -456,9 +474,17 @@ impl ClientState {
         if !self.can_lock_or_unlock(transaction)? {
             return Err(SuiError::ConcurrentTransactionError);
         }
+        println!(
+            "unlock_pending_transaction_objects {:?}",
+            transaction.digest()
+        );
         self.store
             .pending_transactions
-            .multi_remove(transaction.input_objects().iter().map(|e| e.object_id()))
+            .multi_remove(transaction.input_objects().iter().filter_map(|q| match q {
+                InputObjectKind::MovePackage(_) => None,
+                InputObjectKind::OwnedMoveObject(w) => Some(w.0),
+                InputObjectKind::SharedMoveObject(w) => Some(*w),
+            }))
             .map_err(|e| e.into())
     }
 }
@@ -512,6 +538,7 @@ where
                 SuiError::UnexpectedSequenceNumber {
                     object_id,
                     expected_sequence: next_sequence_number,
+                    given_sequence: object_kind.version(),
                 }
                 .into()
             );

@@ -29,7 +29,7 @@ impl KeyPair {
         })
     }
 
-    // TODO: eradicate uneeded uses (i.e. most)
+    // TODO: eradicate unneeded uses (i.e. most)
     /// Avoid implementing `clone` on secret keys to prevent mistakes.
     #[must_use]
     pub fn copy(&self) -> KeyPair {
@@ -216,7 +216,12 @@ impl Signature {
             .expect("byte lengths match");
         let received_addr = SuiAddress::from(&PublicKeyBytes(public_key_bytes));
         if received_addr != author {
-            return Err(SuiError::IncorrectSigner);
+            return Err(SuiError::IncorrectSigner {
+                error: format!(
+                    "Signature check failure. Author is {}, received address is {}",
+                    author, received_addr
+                ),
+            });
         }
 
         // is this a cryptographically correct public key?

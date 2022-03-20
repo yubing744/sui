@@ -120,6 +120,7 @@ impl AuthorityState {
                     SuiError::UnexpectedSequenceNumber {
                         object_id,
                         expected_sequence: object.version(),
+                        given_sequence: sequence_number,
                     }
                 );
 
@@ -164,7 +165,9 @@ impl AuthorityState {
                         fp_ensure!(
                             transaction.sender_address() == owner
                                 || mutable_object_addresses.contains(&owner),
-                            SuiError::IncorrectSigner
+                                SuiError::IncorrectSigner {
+                                    error: format!("Object {:?} is owned by account address {:?} or it's {} that mutable object contains owner, but signer address is {:?}", object.id(), owner, mutable_object_addresses.contains(&owner), transaction.sender_address()),
+                                }
                         );
                     }
                     Owner::SharedMutable => {

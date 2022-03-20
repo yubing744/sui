@@ -47,19 +47,20 @@ pub enum SuiError {
     // Signature verification
     #[error("Signature is not valid: {}", error)]
     InvalidSignature { error: String },
-    #[error("Value was not signed by the correct sender")]
-    IncorrectSigner,
+    #[error("Value was not signed by the correct sender: {}", error)]
+    IncorrectSigner { error: String },
     #[error("Value was not signed by a known authority")]
     UnknownSigner,
     // Certificate verification
     #[error("Signatures in a certificate must form a quorum")]
     CertificateRequiresQuorum,
     #[error(
-        "The given sequence number must match the next expected sequence ({expected_sequence:?}) number of the object ({object_id:?})"
+        "The given sequence number ({given_sequence:?}) must match the next expected sequence ({expected_sequence:?}) number of the object ({object_id:?})"
     )]
     UnexpectedSequenceNumber {
         object_id: ObjectID,
         expected_sequence: SequenceNumber,
+        given_sequence: SequenceNumber,
     },
     #[error("Conflicting transaction already received: {pending_transaction:?}")]
     ConflictingTransaction { pending_transaction: Transaction },
@@ -231,8 +232,8 @@ pub enum SuiError {
     ConcurrentTransactionError,
     #[error("Transfer should be received by us.")]
     IncorrectRecipientError,
-    #[error("Too many authority errors were detected.")]
-    TooManyIncorrectAuthorities,
+    #[error("Too many authority errors were detected: {:?}", errors)]
+    TooManyIncorrectAuthorities { errors: Vec<SuiError> },
     #[error("Inconsistent gas coin split result.")]
     IncorrectGasSplit,
     #[error("Inconsistent gas coin merge result.")]
