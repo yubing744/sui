@@ -7,7 +7,6 @@ const SENDGRID_API_KEY: string = process.env.SENDGRID_API_KEY!;
 sendgrid.setApiKey(SENDGRID_API_KEY);
 client.setApiKey(SENDGRID_API_KEY);
 
-
 // Add email to SendGrid list and send welcome email
 const addEmailToList = async (email: string) => {
   try {
@@ -34,7 +33,7 @@ const addEmailToList = async (email: string) => {
 };
 
 // Send welcome email
-const emailSender = "info@sui.io";
+const emailSender = "info@mystenlabs.com";
 const emailTemplateId = "d-746d506a0a3e4c6f9e6b595bd0ab9381";
 export const sendEmail = async (email: string): Promise<any> => {
   try {
@@ -47,6 +46,7 @@ export const sendEmail = async (email: string): Promise<any> => {
       from: emailSender,
       to: email,
     };
+
     return sendgrid.send(emailRequest);
   } catch (err) {
     let message;

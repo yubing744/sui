@@ -151,6 +151,13 @@
     head(): MetaInfo {
       return {
         title: "Sui - Build without boundaries",
+        meta: [
+          {
+            name: "description",
+            content:
+              "Sui is the first permissionless Layer 1 blockchain designed from the ground up to enable creators and developers to build experiences that cater to the next billion users in web3.",
+          },
+        ],
       };
     }
     mounted() {

@@ -131,6 +131,18 @@
     head(): MetaInfo {
       return {
         title: "Sui - Finance",
+        meta: [
+          {
+            name: "description",
+            content:
+              "Serve billions of users with financial assets at a fraction of the cost",
+          },
+          {
+            name: "og:description",
+            content:
+              "Serve billions of users with financial assets at a fraction of the cost",
+          },
+        ],
       };
     }
   }

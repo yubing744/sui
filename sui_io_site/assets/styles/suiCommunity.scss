@@ -51,6 +51,8 @@
       width: 201.66px;
       height: 69px;
       font-weight: 600;
+      -webkit-transition: var(--transition);
+      transition: var(--transition);
 
       &:hover {
         background: #34526E;
@@ -58,11 +60,33 @@
 
       @media only screen and (max-width: 767px) {
         width: 100%;
-        height: 50px;
+        height: 60px;
       }
     }
   }
 
+  .suiLoading {
+
+    .subscribe-btn {
+      position: absolute;
+      width: 100%;
+      right: 0;
+      color: #1D2947;
+      background: #76839D;
+
+      &:hover {
+        background: #76839D;
+      }
+    }
+  }
+
+  .error {
+    .subscribe-btn {
+      background: #b8babb;
+      -webkit-transition: var(--transition);
+      transition: var(--transition);
+    }
+  }
 }
 
 .bg-bottom {

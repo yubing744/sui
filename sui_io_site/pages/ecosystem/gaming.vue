@@ -142,6 +142,13 @@
     head(): MetaInfo {
       return {
         title: "Sui - Gaming",
+        meta: [
+          {
+            name: "description",
+            content:
+              "Welcoming the next generation of players, creators and games",
+          },
+        ],
       };
     }
   }

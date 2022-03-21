@@ -4,7 +4,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: "sui.io",
+    title: "Build without boundaries",
     htmlAttrs: {
       lang: "en",
     },
@@ -14,7 +14,21 @@ export default {
         name: "viewport",
         content: "width=device-width, initial-scale=1",
       },
-      { hid: "description", name: "description", content: "" },
+      {
+        hid: "description",
+        name: "description",
+        content:
+          "Sui is the first permissionless Layer 1 blockchain designed from the ground up to enable creators and developers to build experiences that cater to the next billion users in web3.",
+      },
+      {
+        property: "og:title",
+        content: "Build without boundaries",
+      },
+      {
+        property: "og:description",
+        content:
+          "Sui is the first permissionless Layer 1 blockchain designed from the ground up to enable creators and developers to build experiences that cater to the next billion users in web3.",
+      },
       { name: "format-detection", content: "telephone=no" },
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
