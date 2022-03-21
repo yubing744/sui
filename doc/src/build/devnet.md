@@ -5,35 +5,40 @@ title: Sui Devnet
 
 # Overview
 
-TBD
+The Sui Devnet runs the latest version of the network for testing purposes only. The Sui devnet is currently
+Mysten-internal, and we are planning to launch a public testnet in the coming months.
 
 ## Devnet Admin
 
-At a high level, the devnet Admin simply provides additional features/control over the network and its state.
-A tiny agent runs in the authority server machine which handles requests from the Admin.
+At a high level, the devnet Admin simply provides additional features and control over the network and its state.
+A tiny agent runs in the authority server machine that handles requests from the Admin.
 ![Devnet Admin](../../static/devnet.png "How the Admin interacts with Sui")
 
 The red portions represent normal Sui operation while the blue portions represent the devnet Admin operations.
 It is important to note that the devnet Admin is not part of Sui.
 
-There are 7 authorities in the devnet, each hosted on an individual EC2 server (subject to change).
+There are seven authorities in the devnet, each hosted on an individual EC2 server (subject to change).
 
-Currently the Admin only support the `/give_gas` endpoint which gives the caller some gas
-Additional endpoints for killing authorities, getting logs, checking network state, etc will be added incrementally
+Currently the Admin supports only the `/give_gas` endpoint that gives the caller some gas.
+Additional endpoints for killing authorities, getting logs, checking network state, etc. will be added incrementally.
 
 ## Devnet version
 
-The devnet is currently pinned to authority code on main commit `3ac9ae193c440da7b753bb7d976f257d6e88955e` and will be manually updated on a cadence TBD
+The devnet is currently pinned to authority code on main commit `3ac9ae193c440da7b753bb7d976f257d6e88955e` and will be manually updated on a regular cadence.
 
 # Quickstart
 
 ## 1. Build Sui
 
-`cargo build --release`
+[Install Sui](install.md) normally and build it with:
+
+```
+cargo build --release
+```
 
 ## 2. Copy configs
 
-To access the network, you need to start Sui with a config file which points to the authority servers.
+To access the network, you need to start Sui with a config file that points to the authority servers.
 Save the JSON text below as `wallet.conf` and copy it to `{build_dir}/target/release`.
 
 ```
@@ -97,9 +102,11 @@ Save the JSON text below as `wallet.conf` and copy it to `{build_dir}/target/rel
 }
 ```
 
+See the [Wallet Quick Start](wallet.md) for full details on the Sui Wallet.
+
 ## 3. Run Sui Wallet CLI
 
-Start `./wallet` and it will connect to the servers as shown below
+Start `./wallet` and it will connect to the servers as shown below:
 
 ```
    _____       _    _       __      ____     __
@@ -123,47 +130,73 @@ sui>-$
 
 ## 4. Create a new address
 
+To create a new address, issue the command:
+
 ```
 sui>-$ new-address
+```
+
+Receiving output like:
+
+```
 Created new keypair for address : C4C6D0A6A39B5DE4D6C85AD4ADAA667DE2AB65A6
 ```
 
-We will be using `C4C6D0A6A39B5DE4D6C85AD4ADAA667DE2AB65A6` as our address in this example
+We will be using `C4C6D0A6A39B5DE4D6C85AD4ADAA667DE2AB65A6` as our address in this example.
 
 ## 5. Request gas from the Admin
 
-The new address will have no objects. Confirm this by checking the objects
+The new address will have no objects. Confirm this by checking the objects:
 
 ```
 sui>-$ objects --address C4C6D0A6A39B5DE4D6C85AD4ADAA667DE2AB65A6
+```
+
+And see this output:
+
+```
 Showing 0 results.
 ```
 
-In a new terminal, request gas from the Admin using  `curl -v "http://44.201.86.217:8080/give_gas?recipient={YOUR_ADDRESS}"`
+In a new terminal, request gas from the Admin using  `curl -v "http://44.201.86.217:8080/give_gas?recipient={YOUR_ADDRESS}"`.
+
+For example:
 
 ```
 curl "http://44.201.86.217:8080/give_gas?recipient=C4C6D0A6A39B5DE4D6C85AD4ADAA667DE2AB65A6" 
 ```
 
-You should get a response such as
+You should get a response resembling:
 
 ```
 {"new_obj": "C0363325560CACC1C082F32B4335474CED9B423B"}
 ```
 
-This is your new gas object which will have a value `10000`
+This is your new gas object that will have a value of `10000`.
 
 ## 6. Sync address in Sui wallet CLI to download new gas
 
+Sync the address with:
+
 ```
 sui>-$ sync --address C4C6D0A6A39B5DE4D6C85AD4ADAA667DE2AB65A6
+```
+
+You will see:
+
+```
 Client state sync complete.
 ```
 
-Confirm that the new gas object is present and has value 10000
+Confirm the new gas object is present and has the value `10000`:
 
 ```
 sui>-$ objects --address C4C6D0A6A39B5DE4D6C85AD4ADAA667DE2AB65A6
+```
+
+Output:
+
+```
 Showing 1 results.
 (CAC2E3B16FB7F57F46A21FF39502569CFD14D533, SequenceNumber(2), o#3cc239b9f8331410797df91f2d67f132abd6eb184fae09b7c9760cbeb5a389ef)
 
