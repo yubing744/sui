@@ -168,8 +168,6 @@
                     "water_runes_count": 1,
                     "wind_runes_count": 8,
                     "id": {},
-                    "owned_standalone_id": {},
-                    "owned_collections_id": { "vec": [] },
                     "player_name": {
                         "bytes": [
                             84, 101, 115, 116, 32, 80, 108, 97, 121, 101, 114

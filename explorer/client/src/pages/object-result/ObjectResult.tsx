@@ -4,6 +4,7 @@ import { useLocation, useParams } from 'react-router-dom';
 
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
+import OwnedObjects from '../../components/ownedobjects/OwnedObjects';
 import theme from '../../styles/theme.module.css';
 import {
     findDataFromID,
@@ -39,6 +40,14 @@ function instanceOfDataType(object: any): object is DataType {
     return (
         object !== undefined &&
         ['id', 'version', 'objType'].every((x) => x in object)
+    );
+}
+
+function isNonEmptyArrayOfStrings(array: any[]): array is string[] {
+    return (
+        array &&
+        array.length > 0 &&
+        array.map((item) => typeof item).every((item) => item === 'string')
     );
 }
 
@@ -105,8 +114,8 @@ function ObjectResult() {
 
     const checkIsIDType = (key: string, value: any) =>
         /owned/.test(key) || (/_id/.test(key) && value?.bytes) || value?.vec;
-    const checkSingleID = (value: any) => value?.bytes;
-    const checkVecIDs = (value: any) => value?.vec;
+    const checkSingleID = (value: any) => value?.bytes !== undefined;
+    const checkVecIDs = (value: any) => value?.vec !== undefined;
 
     const extractOwnerData = (singleownerstring: string) => {
         const re = /SingleOwner\(k#(.*)\)/;
@@ -135,6 +144,7 @@ function ObjectResult() {
         const ownedObjects = Object.entries(data.data.contents).filter(
             ([key, value]) => checkIsIDType(key, value)
         );
+
         const properties = Object.entries(data.data.contents)
             //TO DO: remove when have distinct 'name' field in Description
             .filter(([key, value]) => !should_put_in_title(key))
@@ -291,59 +301,64 @@ function ObjectResult() {
                             )}
                         </>
                     )}
-                    {ownedObjects.length > 0 && (
-                        <>
-                            <h2
-                                className={styles.clickableheader}
-                                onClick={() =>
-                                    setShowConnectedEntities(
-                                        !showConnectedEntities
-                                    )
-                                }
-                            >
-                                Owned Objects {showConnectedEntities ? '' : '+'}
-                            </h2>
-                            {showConnectedEntities && (
-                                <div className={theme.textresults}>
-                                    {ownedObjects.map(
-                                        ([key, value], index1) => (
-                                            <div
-                                                key={`ConnectedEntity-${index1}`}
-                                            >
-                                                <div>{prepLabel(key)}</div>
-                                                {checkSingleID(value) && (
-                                                    <Longtext
-                                                        text={value.bytes}
-                                                        category="unknown"
-                                                    />
-                                                )}
-                                                {checkVecIDs(value) && (
-                                                    <div>
-                                                        {value?.vec.map(
-                                                            (
-                                                                value2: {
-                                                                    bytes: string;
-                                                                },
-                                                                index2: number
-                                                            ) => (
-                                                                <Longtext
-                                                                    text={
-                                                                        value2.bytes
-                                                                    }
-                                                                    category="unknown"
-                                                                    key={`ConnectedEntity-${index1}-${index2}`}
-                                                                />
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
+                    {ownedObjects.length > 0 &&
+                        ownedObjects.map(([_, value]) =>
+                            isNonEmptyArrayOfStrings(value)
+                        ) && (
+                            <>
+                                <h2
+                                    className={styles.clickableheader}
+                                    onClick={() =>
+                                        setShowConnectedEntities(
+                                            !showConnectedEntities
                                         )
-                                    )}
-                                </div>
-                            )}
-                        </>
-                    )}
+                                    }
+                                >
+                                    Owned Objects{' '}
+                                    {showConnectedEntities ? '' : '+'}
+                                </h2>
+                                {showConnectedEntities && (
+                                    <div className={theme.textresults}>
+                                        {ownedObjects.map(
+                                            ([key, valueDict], index) => (
+                                                <div
+                                                    key={`ownedObjectBox-${index}`}
+                                                >
+                                                    <h3>{prepLabel(key)}</h3>
+                                                    <OwnedObjects
+                                                        objects={((
+                                                            value: any
+                                                        ) => {
+                                                            switch (true) {
+                                                                case checkSingleID(
+                                                                    value
+                                                                ):
+                                                                    return [
+                                                                        value.bytes,
+                                                                    ];
+                                                                case checkVecIDs(
+                                                                    value
+                                                                ):
+                                                                    return value.vec.map(
+                                                                        ({
+                                                                            bytes,
+                                                                        }: {
+                                                                            bytes: string;
+                                                                        }) =>
+                                                                            bytes
+                                                                    );
+                                                                default:
+                                                                    return [''];
+                                                            }
+                                                        })(valueDict)}
+                                                    />
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        )}
                 </div>
             </div>
         );

@@ -1,15 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useLocation, useParams } from 'react-router-dom';
 
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
+import OwnedObjects from '../../components/ownedobjects/OwnedObjects';
 import theme from '../../styles/theme.module.css';
-import {
-    findDataFromID,
-    prepObjTypeValue,
-} from '../../utils/utility_functions';
-import { navigateWithUnknown } from '../../utils/utility_functions';
+import { findDataFromID } from '../../utils/utility_functions';
 import styles from './AddressResult.module.css';
 
 type DataType = {
@@ -21,40 +16,16 @@ function instanceOfDataType(object: any): object is DataType {
     return object !== undefined && ['id', 'objects'].every((x) => x in object);
 }
 
-function SuccessAddress({ data }: { data: DataType }) {
-    const [results, setResults] = useState<
-        {
-            id: string;
-            display?: {
-                category: string;
-                data: string;
-            };
-        }[]
-    >(data?.objects.map(({ objectId }) => ({ id: objectId })));
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        Promise.all(
-            data.objects.map(({ objectId }: { objectId: string }) => {
-                const entry = findDataFromID(objectId, undefined);
-                return {
-                    id: entry.id,
-                    Type: entry.objType,
-                    display: entry?.data?.contents?.display,
-                };
-            })
-        )
-            .then((resp) => setResults(resp))
-            .catch((err) => console.log(err));
-    }, [data]);
-
-    const handlePreviewClick = useCallback(
-        (id: string, navigate: Function) => (e: React.MouseEvent) =>
-            navigateWithUnknown(id, navigate),
-        []
+function isNonEmptyArrayOfStrings(array: any[]): array is string[] {
+    return (
+        array &&
+        array.length > 0 &&
+        array.map((item) => typeof item).every((item) => item === 'string')
     );
+}
 
+function SuccessAddress({ data }: { data: DataType }) {
+    const ownedObjects = data?.objects.map(({ objectId }) => objectId);
     return (
         <div className={theme.textresults}>
             <div>
@@ -69,76 +40,13 @@ function SuccessAddress({ data }: { data: DataType }) {
             </div>
             <div>
                 <div>Owned Objects</div>
-                <div>
-                    {results && results.length > 0 ? (
-                        results.map((entryObj, index1) => (
-                            <div
-                                className={styles.objectbox}
-                                key={`object-${index1}`}
-                                onClick={handlePreviewClick(
-                                    entryObj.id,
-                                    navigate
-                                )}
-                            >
-                                {'display' in entryObj &&
-                                entryObj?.display?.category === 'imageURL' ? (
-                                    <div className={styles.previewimage}>
-                                        <img
-                                            className={styles.imagebox}
-                                            alt="NFT preview"
-                                            src={entryObj.display.data}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className={styles.previewimage} />
-                                )}
-                                {Object.entries(entryObj).map(
-                                    ([key, value], index2) => (
-                                        <div key={`object-${index1}-${index2}`}>
-                                            {(() => {
-                                                switch (key) {
-                                                    case 'display':
-                                                        break;
-                                                    case 'Type':
-                                                        return (
-                                                            <div>
-                                                                <span>
-                                                                    {key}
-                                                                </span>
-                                                                <span>
-                                                                    {typeof value ===
-                                                                    'string'
-                                                                        ? prepObjTypeValue(
-                                                                              value
-                                                                          )
-                                                                        : ''}
-                                                                </span>
-                                                            </div>
-                                                        );
-                                                    default:
-                                                        return (
-                                                            <div>
-                                                                <span>
-                                                                    {key}
-                                                                </span>
-                                                                <span>
-                                                                    {value}
-                                                                </span>
-                                                            </div>
-                                                        );
-                                                }
-                                            })()}
-                                        </div>
-                                    )
-                                )}
-                            </div>
-                        ))
-                    ) : (
-                        <div className={styles.noobjects}>
-                            This address owns no objects
-                        </div>
-                    )}
-                </div>
+                {isNonEmptyArrayOfStrings(ownedObjects) ? (
+                    <OwnedObjects objects={ownedObjects} />
+                ) : (
+                    <div className={styles.noobjects}>
+                        This address owns no objects
+                    </div>
+                )}
             </div>
         </div>
     );
