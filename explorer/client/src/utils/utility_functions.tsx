@@ -48,6 +48,8 @@ export function asciiFromNumberBytes(bytes: number[]) {
 
 export function hexToAscii(hex: string)
 {
+    if(!hex || typeof hex != 'string')
+        return;
     hex = hex.replace(/^0x/, '');
 
     var str = '';
