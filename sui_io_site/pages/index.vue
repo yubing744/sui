@@ -130,7 +130,8 @@
       </div>
     </Whysui>
     <Community />
-    <div class="bg-top rellax" data-sal="slide-up" data-sal-delay="100"></div>
+
+    <div class="bg-top"></div>
   </main>
 </template>
 
@@ -151,6 +152,11 @@
       return {
         title: "Sui - Build without boundaries",
       };
+    }
+    mounted() {
+      setTimeout(() => {
+        // const rellax = new Rellax('.rellax');
+      }, 500);
     }
   }
 </script>

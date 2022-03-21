@@ -6004,3 +6004,22 @@ Pagination
       line-height: 150%;
     }
   }
+
+  ._sui-ani-top {
+    position: fixed;
+    width: 100%;
+    top: 90vh;
+  }
+
+  ._sui-ani-bottom {
+    position: fixed;
+    width: 100%;
+    top: 120vh;
+  }
+
+  .sticky {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 500px;
+    width: 100%;
+  }
