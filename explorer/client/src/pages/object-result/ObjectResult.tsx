@@ -43,8 +43,8 @@ const DATATYPE_DEFAULT: DataType = {
     data: { contents: {} }
 }
 
-const IS_SMART_CONTRACT = (data: DataType) =>
-    data.data.contents.display?.category === 'moveScript';
+// TODO - restore or remove this functionality
+const IS_SMART_CONTRACT = (data: DataType) => false;
 
 function instanceOfDataType(object: any) {
     return (
@@ -107,7 +107,7 @@ function DisplayBox({ data }: { data: DataType }) {
         [setHasDisplayLoaded]
     );
 
-    if (data.data.contents.display?.category === 'imageURL') {
+    if (data.data.contents.display) {
         return (
             <div className={styles['display-container']}>
                 {!hasDisplayLoaded && (
@@ -119,7 +119,7 @@ function DisplayBox({ data }: { data: DataType }) {
                     className={styles.imagebox}
                     style={imageStyle}
                     alt="NFT"
-                    src={data.data.contents.display.data}
+                    src={data.data.contents.display}
                     onLoad={handleImageLoad}
                 />
             </div>
@@ -131,7 +131,7 @@ function DisplayBox({ data }: { data: DataType }) {
             <div className={styles['display-container']}>
                 <AceEditor
                     theme="github"
-                    value={data.data.contents.display?.data}
+                    value={data.data.contents.display}
                     showGutter={true}
                     readOnly={true}
                     fontSize="0.8rem"
@@ -294,12 +294,12 @@ const ObjectResult = ((): JSX.Element => {
 
         return (<>
             <div className={styles.resultbox}>
-                {data?.data.contents.display?.data && (
+                {data?.data.contents.display && (
                     <DisplayBox data={data} />
                 )}
                 <div
                     className={`${styles.textbox} ${
-                        data?.data.contents.display?.data !== undefined
+                        data?.data.contents.display
                             ? styles.accommodate
                             : styles.noaccommodate
                     }`}
