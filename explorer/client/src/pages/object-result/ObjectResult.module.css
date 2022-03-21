@@ -86,3 +86,12 @@ h2.clickableheader {
 div.accommodate > h2.clickableheader {
     @apply lg:w-[50vw];
 }
+
+/* Owned Object CSS */
+div.ownedObjectLabel {
+    @apply ml-[5vw];
+}
+
+div.ownedObjectLabel > div > h3 {
+    @apply border-0 border-b-2 border-solid border-sui pb-2;
+}

@@ -318,7 +318,7 @@ function ObjectResult() {
                                     {showConnectedEntities ? '' : '+'}
                                 </h2>
                                 {showConnectedEntities && (
-                                    <div className={theme.textresults}>
+                                    <div className={styles.ownedObjectLabel}>
                                         {ownedObjects.map(
                                             ([key, valueDict], index) => (
                                                 <div
