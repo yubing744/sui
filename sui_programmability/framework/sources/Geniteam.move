@@ -5,6 +5,7 @@ module Sui::Geniteam {
     use Std::Option::{Self, Option};
     use Sui::Transfer;
     use Std::ASCII::{Self, String};
+    use Std::Vector;
 
     /// Trying to add more than `total_monster_slots` monsters to a Farm
     const ETOO_MANY_MONSTERS: u64 = 0;
@@ -76,6 +77,7 @@ module Sui::Geniteam {
         hunger_level: u64,
         affection_level: u64,
         buddy_level: u8,
+        display: String,
 
 
         // ID of the applied cosmetic at this slot
@@ -163,6 +165,7 @@ module Sui::Geniteam {
         breed: u8,
         monster_affinity: u8,
         monster_description: vector<u8>,
+        display: vector<u8>,
         ctx: &mut TxContext
     ): Monster {
 
@@ -178,6 +181,7 @@ module Sui::Geniteam {
             hunger_level: 0,
             affection_level: 0,
             buddy_level: 0,
+            display: ASCII::string(display),
             applied_monster_cosmetic_0_id: Option::none(),
             applied_monster_cosmetic_1_id: Option::none(),
         }
@@ -220,6 +224,7 @@ module Sui::Geniteam {
                                 breed: u8,
                                 monster_affinity: u8,
                                 monster_description: vector<u8>,
+                                display: vector<u8>,
                                 ctx: &mut TxContext
     ) {
 
@@ -229,6 +234,7 @@ module Sui::Geniteam {
             breed,
             monster_affinity,
             monster_description,
+            display,
             ctx
         );
         // Check if this is the right collection
@@ -292,6 +298,7 @@ module Sui::Geniteam {
         hunger_level: u64,
         affection_level: u64,
         buddy_level: u8,
+        display: vector<u8>,
         _ctx: &mut TxContext
     ) {
         self.monster_affinity = monster_affinity;
@@ -299,6 +306,9 @@ module Sui::Geniteam {
         self.hunger_level = hunger_level;
         self.affection_level = affection_level;
         self.buddy_level = buddy_level;
+        if (Vector::length<u8>(&display) != 0) {
+            self.display = ASCII::string(display);
+        }
     }
 
 
