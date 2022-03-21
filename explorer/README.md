@@ -1,79 +1,78 @@
 # Sui Explorer
-A chain explorer for the Sui network, similiar in functionality to [Etherscan](https://etherscan.io/) or [Solana Explorer](https://explorer.solana.com/).
+Sui Explorer is a chain explorer for the Sui network, similiar in functionality to [Etherscan](https://etherscan.io/) or [Solana Explorer](https://explorer.solana.com/). Use Sui Explorer to see the latest blocks, transactions, and cluster statistics.
 
-## Data Source / RPC URL
-The explorer front-end can use any Sui RPC url as a backend, but it must have CORS setup. 
+## Data source / RPC URL
+The Sui Explorer front end can use any Sui RPC URL as a backend, but it must have Cross-Origin Resource Sharing (CORS) set up.
 
-To change the RPC url, pass a [url-encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding) URL to the rpc parameter:
+TODO: Link to guidance for how we want this done. Something generic resembling:
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html
 
-to use http://127.0.0.1:5000 (the REST api's default local port):
+To change the RPC URL, pass a [url-encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding) URL to the RPC parameter. So to use http://127.0.0.1:5000, the Sui REST API's default local port, use the URL:
 
-[http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F](http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F)
+http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F
 
-it defaults to https://demo-rpc.sui.io (for now).
+TODO: Find out if we need the "%2F" URL at the end. Also, can we include the URL without character substitution?
 
-The rpc url preference will be remembered for 3 hours before being discarded - this way, it's not necessary to continually pass it on every page.
+This defaults to https://demo-rpc.sui.io (for now).
 
-If the explorer is served over HTTPS, the rpc also needs to be HTTPS (proxied from HTTP).
+The RPC URL preference will be remembered for three hours before being discarded - this way, it's not necessary to continually pass it on every page.
 
+If the Sui Explorer is served over HTTPS, the RPC also needs to be HTTPS (proxied from HTTP).
 
 ## Running Locally
 
-This is how you can run with a local REST server and local copy of the explorer.
+This is how you can run with a local REST server and local copy of the Sui Explorer.
 
-Make sure you are on a branch of the repo that supports this - `explorer-rest` at time of writing, others soon.
+Make sure you are in the `explorer-rest` project of the Sui repository, where this README resides.
 
 ### Getting started
 
 You need [Rust](https://www.rust-lang.org/tools/install) & [Node.js](https://nodejs.org/en/download/) installed for this.
 
-from the root of the repo:
+From the root of the `explorer-rest` project, run:
 
 ```bash
 cargo build --release          # build the network and rest server
 ./target/release/rest_server        # run the rest server - defaults to port 5000
+```
 
-# in another terminal tab, from the repo root:
+Now in another terminal tab, also run this from the repo root:
+
+```
 cd explorer/client       
-npm install              # install client deps
+npm install              # install client dependencies
 npm start                # start the development server for the client  
 ```
 
-If everything worked, you should be able to view your local explorer at [127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F](http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F)
+If everything worked, you should be able to view your local explorer at:
+http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F
 
 ### CORS issues / USE FIREFOX LOCALLY
 
-Due to current technical issues, the rest api doesn't have CORS headers setup, and must be proxied to add them. The demo server has this.
+Due to current technical issues, the REST API doesn't have CORS headers setup and must be proxied to add them. The demo server has this.
 
-Chrome doesn't let you make requests without CORS on the local host, but **Firefox does**, so it is **strongly recommended to use Firefox for local testing**.
+Chrome doesn't let you make requests without CORS on the local host, but **Firefox does**; so it is **strongly recommended to use Firefox for local testing**.
 
 ## ----------------------------------------------------------------------
 ## no more about running locally
 ## ----------------------------------------------------------------------
 
-## Proposed Basic Architecture
+TODO: Remove or populate the header above.
 
-This is described in order of how data flows, from the source network to the end usder.
+## Proposed basic architecture
 
-* We get raw data from the network using the in-progress "bulk sync" API
+This is described in order of how data flows, from the source network to the end user. Browser front end is a standard React app, powered by the HTTP API:
 
-    This raw data is dumped into a document store / noSQL kind of DB (which one not decided yet).
+1. We get raw data from the network using the in-progress "bulk sync" API.
+1. This raw data is dumped into a document store / noSQL kind of database (which one not decided yet).
+1. A sync process runs to move new data from this raw cache into a more structured, relational database. (This DB is PostgreSQL, unless there's a strong argument for using something else presented.)
+1. We index this database to optimize common queries: "all transactions for an address", "objects owned by address", etc. 
+1. The HTTP API is implemented as a Rust webserver, talks to the relational database & encodes query results as JSON.
 
-    Plenty of the Cosmos explorers use this step, citing how much easier it makes syncing history & recovering from periods of being offline. Access to untouched historical data means that any errors in converting the data into relational table form can be corrected later.
+Plenty of the Cosmos explorers use the database step, citing how much easier it makes syncing history and recovering from periods of being offline. Access to untouched historical data means that any errors in converting the data into relational table form can be corrected later.
 
-* A sync process runs to move new data from this raw cache into a more structured, relational database. 
+## Sub-projects
 
-    This DB is PostgreSQL, unless there's a strong argument for using something else presented. 
+Front end code goes in `client` folder.
 
-    We index this database to optimize common queries - "all transactions for an address", "objects owned by address", etc. 
-
-* The HTTP api is implemented as a Rust webserver, talks to the relational database & encodes query results as JSON
-
-* Browser frontend is a standard React app, powered by the HTTP api
-
-
-## Sub-Projects
-
-Front-end code goes in `client` folder,
-
-All back-end pieces (historical data store, relational DB, & HTTP layer) go in `server` sub-folders.
+All back-end pieces (historical data store, relational DB, and HTTP layer) go in `server` sub-folders.
