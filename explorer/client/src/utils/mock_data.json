@@ -474,6 +474,20 @@
                         "category": "imageURL",
                         "data": "https://sui-explorer-test-image.s3.amazonaws.com/testImage.png"
                     },
+                    "some_runes_id": {
+                        "vec": [
+                            { "bytes": "ComponentObject" },
+                            { "bytes": "ComponentObject" },
+                            { "bytes": "ComponentObject" },
+                            { "bytes": "ComponentObject" },
+                            { "bytes": "ComponentObject" },
+                            { "bytes": "ComponentObject" },
+                            { "bytes": "ComponentObject" }
+                        ]
+                    },
+                    "some_monsters_id": {
+                        "vec": [{ "bytes": "ComponentObject" }]
+                    },
                     "cosmetic_type": 1,
                     "lore": "This is a species of orchid only found in Brazil",
                     "Humidity": "High",
