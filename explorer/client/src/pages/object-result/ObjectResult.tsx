@@ -108,7 +108,7 @@ function DisplayBox({ data }: { data: DataType }) {
     );
 
     if (data.data.contents.display) {
-        data.data.contents.display = hexToAscii(data.data.contents.display);
+        data.data.contents.display = asciiFromNumberBytes(data.data.contents.display);
         return (
             <div className={styles['display-container']}>
                 {!hasDisplayLoaded && (
