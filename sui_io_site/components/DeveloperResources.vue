@@ -1,5 +1,5 @@
 <template>
-    <div class="_sui_dev_resouce bg-color-dark">
+    <div class="_sui_dev_resouce bg-color-dark" >
         <div class="row _dev-content">
             <div class="col-md-6">
                 <h4>Developer<br />Resources</h4>

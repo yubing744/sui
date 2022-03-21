@@ -90,7 +90,7 @@
         </div>
       </div>
       <div class="row mb--40 _rd">
-        <div class="col-md-12">
+        <div class="col-md-12" id="developer">
           <DeveloperResources />
         </div>
       </div>

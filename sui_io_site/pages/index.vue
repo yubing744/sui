@@ -90,6 +90,7 @@
         data-sal="slide-up"
         data-sal-duration="1000"
         data-sal-delay="250"
+         id="developer"
       >
         <div class="col-md-12">
           <DeveloperResources />

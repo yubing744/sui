@@ -215,9 +215,9 @@
       setTimeout(() => {
         const routeData = this.$route;
 
-        if (!routeData.name) return;
+        if (!routeData.name || !this.menu.links) return;
         const parentRouteName = routeData.name?.split("-")[0];
-
+       
         const rCheck = this.menu.links.filter(
           (itm: any) =>
             itm.label.toLowerCase() === parentRouteName.toLowerCase()
@@ -235,12 +235,15 @@
     beforeDestroy() {
       window.removeEventListener("scroll", this.handleScroll);
     }
+    
 
     initSal() {
-      const $this = this;
+      const $this:any = this;
+      const hash = $this.$route.hash
       setTimeout(() => {
         $this.$sal();
-      }, 500);
+        $this.$scrollToElment(hash.replace('#', ''))
+      }, 200);
     }
 
     mounted() {

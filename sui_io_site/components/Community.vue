@@ -1,5 +1,5 @@
 <template>
-    <section class="sui-community section section-padding">
+    <section class="sui-community section section-padding" id="community">
         <div class="container">
             <div class="section-heading heading-dark">
                 <h2 class="title">Sui Community</h2>

@@ -75,7 +75,7 @@
           </div>
         </div>
       </div>
-      <div class="row mb--40 _fl-fix">
+      <div class="row mb--40 _fl-fix" id="developer">
         <div class="col-md-12">
           <DeveloperResources />
         </div>

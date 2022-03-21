@@ -35,6 +35,11 @@ export default {
       ssr: false,
       mode: "client",
     },
+    {
+      src: "@/plugins/scrollTo",
+      ssr: false,
+      mode: "client",
+    },
   ],
   server: {
     default: 3000,
@@ -66,10 +71,13 @@ export default {
     linkActiveClass: "sui_selected",
     // trailingSlash: true,
     scrollBehavior: (to, from, savedPosition) => {
-      return {
-        x: 0,
-        y: 0,
-      };
+      if (savedPosition) {
+        return savedPosition;
+      }
+      if (to.hash) {
+        return { el: to.hash, behavior: "smooth" };
+      }
+      return { x: 0, y: 0 };
     },
   },
   // Content module configuration: https://go.nuxtjs.dev/config-content

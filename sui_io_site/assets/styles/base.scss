@@ -4013,7 +4013,11 @@ Pagination
     margin: 0;
     margin-top: 40px;
     padding-left: 0;
+
     //box-shadow: 0 13px 48px 0 rgba(0, 0, 0, 0.15);
+    @media only screen and (min-width: 992px) and (max-width: 1199px) {
+      min-width: 100%;
+    }
   }
 
   .mainmenu>.menu-item-has-children .sui-submenu li {
