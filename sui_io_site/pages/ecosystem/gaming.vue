@@ -15,7 +15,7 @@
           class="sui-btn btn-fill-primary"
           >Start Building →</a
         >
-        <a href="#" class="sui-btn btn-line">Join community →</a>
+        <a href="#community" class="sui-btn btn-line">Join community →</a>
       </div>
     </LandingBanner>
     <Whysui :content="whySuiGaming">

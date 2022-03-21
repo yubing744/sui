@@ -116,7 +116,7 @@
                 ]"
               >
                 <a
-                  :href="itm.link"
+                  :href="itm.external ? itm.link : '#'"
                   @click="selectActiveMenu(itm.label, itm.external)"
                   :class="[
                     { suiexternal: itm.external },
@@ -142,6 +142,7 @@
                       v-else="submenu.external"
                       :href="submenu.link"
                       target="_blank"
+                      @click="selectActiveMenu(!selectedMenu)"
                       >{{ submenu.label }}</a
                     >
                   </li>

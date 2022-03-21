@@ -18,11 +18,11 @@
           class="sui-btn btn-fill-primary"
           >Start Building →</a
         >
-        <a href="#" class="sui-btn btn-line">Learn more →</a>
+        <a href="#whysui" class="sui-btn btn-line">Learn more →</a>
       </div>
     </LandingBanner>
     <Whysui :content="whySuiGaming">
-      <div class="row mb--40 sui-grid">
+      <div class="row mb--40 sui-grid" id="whysui">
         <div class="_grid-item _sui_ws">
           <div class="project-grid _whysui-list _sui-fast _sui_why-bg6">
             <div class="content">

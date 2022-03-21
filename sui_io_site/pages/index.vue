@@ -10,7 +10,7 @@
       </h1>
       <p class="mb--20" data-sal="slide-up" data-sal-duration="1000">
         Sui is a boundless platform to build rich and dynamic on-chain assets
-        from gaming to finance
+        from gaming to finance.
       </p>
       <div class="sui-gaming-cta">
         <a
@@ -90,7 +90,7 @@
         data-sal="slide-up"
         data-sal-duration="1000"
         data-sal-delay="250"
-         id="developer"
+        id="developer"
       >
         <div class="col-md-12">
           <DeveloperResources />
