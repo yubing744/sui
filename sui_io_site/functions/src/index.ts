@@ -1,9 +1,9 @@
 import * as functions from "firebase-functions";
+import {subscribeToSui} from "./sengridAPI";
+/**
+ *  API endpoint for Email Subscription using SendGrid API
+ *  @param {string} email - email address to subscribe
+ */
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// eslint-disable-next-line max-len
+export const emailSubscription = functions.https.onRequest(subscribeToSui);
