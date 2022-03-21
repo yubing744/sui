@@ -108,7 +108,9 @@ function DisplayBox({ data }: { data: DataType }) {
     );
 
     if (data.data.contents.display) {
-        data.data.contents.display = asciiFromNumberBytes(data.data.contents.display);
+        if(typeof data.data.contents.display === 'object' && 'bytes' in data.data.contents.display)
+            data.data.contents.display = asciiFromNumberBytes(data.data.contents.display.bytes);
+
         return (
             <div className={styles['display-container']}>
                 {!hasDisplayLoaded && (
