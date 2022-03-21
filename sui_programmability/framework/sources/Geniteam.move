@@ -90,11 +90,13 @@ module Sui::Geniteam {
     struct FarmCosmetic has key, store {
         id: VersionedID,
         cosmetic_type: u8,
+        display: String,
     }
 
     struct MonsterCosmetic has key, store {
         id: VersionedID,
         cosmetic_type: u8,
+        display: String,
     }
 
 
@@ -246,27 +248,37 @@ module Sui::Geniteam {
     }
 
     /// Create Farm cosmetic owned by player and add to its inventory
-    public fun create_farm_cosmetics(player: &mut Player, inventory: &mut Collection::Collection, cosmetic_type: u8, ctx: &mut TxContext) {
+    public fun create_farm_cosmetics(player: &mut Player, inventory: &mut Collection::Collection, 
+                                     cosmetic_type: u8, display: vector<u8>, ctx: &mut TxContext) {
         
         // Check if this is the right collection
         assert!(*&player.inventory_id
                     == *ID::id(inventory), EINVENTORY_NOT_OWNED_BY_PLAYER);
         
         // Create the farm cosmetic object
-        let farm_cosmetic = FarmCosmetic {id: TxContext::new_id(ctx), cosmetic_type };
+        let farm_cosmetic = FarmCosmetic {
+            id: TxContext::new_id(ctx), 
+            cosmetic_type, 
+            display: ASCII::string(display) 
+        };
 
         // Add it to the player's inventory
         Collection::add(inventory, farm_cosmetic);
     }
     /// Create Monster cosmetic owned by player and add to its inventory
-    public fun create_monster_cosmetics(player: &mut Player, inventory: &mut Collection::Collection, cosmetic_type: u8, ctx: &mut TxContext) {
+    public fun create_monster_cosmetics(player: &mut Player, inventory: &mut Collection::Collection, 
+                                        cosmetic_type: u8, display: vector<u8>, ctx: &mut TxContext) {
         
         // Check if this is the right collection
         assert!(*&player.inventory_id
                     == *ID::id(inventory), EINVENTORY_NOT_OWNED_BY_PLAYER);
         
         // Create the farm cosmetic object
-        let monster_cosmetic = MonsterCosmetic {id: TxContext::new_id(ctx), cosmetic_type};
+        let monster_cosmetic = MonsterCosmetic {
+            id: TxContext::new_id(ctx), 
+            cosmetic_type,
+            display: ASCII::string(display) 
+        };
 
         // Add it to the player's inventory
         Collection::add(inventory, monster_cosmetic);
