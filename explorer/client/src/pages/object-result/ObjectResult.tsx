@@ -11,7 +11,7 @@ import styles from './ObjectResult.module.css';
 import 'ace-builds/src-noconflict/theme-github';
 
 import { type AddressOwner, SuiRpcClient, DefaultRpcClient } from '../../utils/rpc';
-import { asciiFromNumberBytes, trimStdLibPrefix } from '../../utils/utility_functions';
+import { asciiFromNumberBytes, trimStdLibPrefix, hexToAscii } from '../../utils/utility_functions';
 
 
 type DataType = {
@@ -108,6 +108,7 @@ function DisplayBox({ data }: { data: DataType }) {
     );
 
     if (data.data.contents.display) {
+        data.data.contents.display = hexToAscii(data.data.contents.display);
         return (
             <div className={styles['display-container']}>
                 {!hasDisplayLoaded && (
