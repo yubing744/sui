@@ -47,7 +47,7 @@ export function asciiFromNumberBytes(bytes: number[]) {
 }
 
 export function hexToAscii(hex: string)
- {
+{
     hex = hex.replace(/^0x/, '');
 
     var str = '';
@@ -55,7 +55,7 @@ export function hexToAscii(hex: string)
         str += String.fromCharCode(parseInt(hex.substring(n, 2), 16));
 
     return str;
- }
+}
 
 const stdLibPrefix = /^0x2::/;
 export const trimStdLibPrefix = (str: string): string => str.replace(stdLibPrefix, '');
