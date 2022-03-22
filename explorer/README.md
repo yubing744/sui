@@ -4,14 +4,9 @@ Sui Explorer is a chain explorer for the Sui network, similiar in functionality 
 ## Data source / RPC URL
 The Sui Explorer front end can use any Sui RPC URL as a backend, but it must have Cross-Origin Resource Sharing (CORS) set up.
 
-TODO: Link to guidance for how we want this done. Something generic resembling:
-https://docs.aws.amazon.com/AmazonS3/latest/userguide/enabling-cors-examples.html
-
 To change the RPC URL, pass a [url-encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding) URL to the RPC parameter. So to use http://127.0.0.1:5000, the Sui REST API's default local port, use the URL:
 
 http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F
-
-TODO: Find out if we need the "%2F" URL at the end. Also, can we include the URL without character substitution?
 
 This defaults to https://demo-rpc.sui.io (for now).
 
@@ -56,8 +51,6 @@ Chrome doesn't let you make requests without CORS on the local host, but **Firef
 ## ----------------------------------------------------------------------
 ## no more about running locally
 ## ----------------------------------------------------------------------
-
-TODO: Remove or populate the header above.
 
 ## Proposed basic architecture
 
