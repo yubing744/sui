@@ -82,10 +82,3 @@ h2.clickableheader {
 div.accommodate > h2.clickableheader {
     @apply lg:w-[50vw];
 }
-
-/* Pending State CSS */
-
-div.pending {
-  @apply font-sans mt-2 ml-[5vw];
-}
-

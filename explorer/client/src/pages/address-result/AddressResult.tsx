@@ -78,7 +78,7 @@ function AddressResult() {
         );
     }
   if (data.loadState === 'pending'){
-    return <div>Please wait for results to load</div>;
+    return <div className={theme.pending}>Please wait for results to load</div>;
   }
   if (data.loadState === 'fail'){
     return (

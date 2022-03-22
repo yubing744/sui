@@ -23,3 +23,10 @@ div.textresults > div > div:nth-child(2) {
 div.textresults > div > div:nth-child(2) > div {
     @apply mb-[2vh];
 }
+
+/* Pending State CSS */
+
+div.pending {
+  @apply font-sans mt-2 ml-[5vw];
+}
+

@@ -1,18 +1,15 @@
+import 'ace-builds/src-noconflict/theme-github';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import AceEditor from 'react-ace';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import ErrorResult from '../../components/error-result/ErrorResult';
 import Longtext from '../../components/longtext/Longtext';
 import theme from '../../styles/theme.module.css';
+import { type AddressOwner, SuiRpcClient, DefaultRpcClient } from '../../utils/rpc';
+import { asciiFromNumberBytes, trimStdLibPrefix} from '../../utils/utility_functions';
 
 import styles from './ObjectResult.module.css';
-
-import 'ace-builds/src-noconflict/theme-github';
-
-import { type AddressOwner, SuiRpcClient, DefaultRpcClient } from '../../utils/rpc';
-import { asciiFromNumberBytes, trimStdLibPrefix, hexToAscii } from '../../utils/utility_functions';
-
 
 type DataType = {
     id: string;
@@ -48,6 +45,8 @@ const DATATYPE_DEFAULT: DataType = {
 // TODO - restore or remove this functionality
 const IS_SMART_CONTRACT = (data: DataType) => false;
 
+//TODO - create more comprehensive check thatresults from API are as expected:
+/*
 function instanceOfDataType(object: any) {
     return (
         object !== undefined &&
@@ -55,6 +54,7 @@ function instanceOfDataType(object: any) {
         object['id'].length > 0
     );
 }
+*/
 
 
 const _rpc = DefaultRpcClient;
@@ -187,7 +187,9 @@ const ObjectResult = ((): JSX.Element => {
         /owned/.test(key) || (/_id/.test(key) && value?.bytes) || value?.vec;
     const checkSingleID = (value: any) => value?.bytes;
     const checkVecIDs = (value: any) => value?.vec;
-    const isMoveVecType = (value: { vec?: [] }) => Array.isArray(value?.vec);
+    
+    //TODO - improve move code handling:
+    // const isMoveVecType = (value: { vec?: [] }) => Array.isArray(value?.vec);
 
     const extractOwnerData = (owner: string | AddressOwner): string => {
         switch (typeof(owner)) {
@@ -221,7 +223,7 @@ const ObjectResult = ((): JSX.Element => {
     };
 
     const extractAddressOwner = (addrOwner: number[]): string | null => {
-        if(addrOwner.length != 20) {
+        if(addrOwner.length !== 20) {
             console.log('address owner byte length must be 20');
             return null;
         }
@@ -299,7 +301,7 @@ const ObjectResult = ((): JSX.Element => {
             //TO DO: remove when have distinct 'name' field in Description
             .filter(([key, value]) => !/name/i.test(key))
             .filter(([_, value]) => checkIsPropertyType(value))
-            .filter(([key, _]) => key != 'display');
+            .filter(([key, _]) => key !== 'display');
 
         return (<>
             <div className={styles.resultbox}>
@@ -491,7 +493,7 @@ const ObjectResult = ((): JSX.Element => {
         );
     }
     if (showObjectState.loadState === 'pending') {
-      return <div className={styles.pending}>Please wait for results to load</div>;
+      return <div className={theme.pending}>Please wait for results to load</div>;
     }
     if (showObjectState.loadState === 'fail') {
     return (

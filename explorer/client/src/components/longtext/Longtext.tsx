@@ -44,7 +44,7 @@ function Longtext({
     }
 
 
-    const navigateUnknown = () => navigateWithUnknown(text, navigate);
+    const navigateUnknown = useCallback(() => navigateWithUnknown(text, navigate), [text, navigate]);
     let textComponent;
     if (isLink) {
         if (category === 'objectId') {
