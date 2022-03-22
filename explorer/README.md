@@ -8,7 +8,7 @@ To change the RPC URL, pass a [url-encoded](https://developer.mozilla.org/en-US/
 
 http://127.0.0.1:3000?rpc=http%3A%2F%2F127.0.0.1%3A5000%2F
 
-This defaults to https://demo-rpc.sui.io (for now).
+This defaults to https://explorer-demo.sui.io (for now).
 
 The RPC URL preference will be remembered for three hours before being discarded - this way, it's not necessary to continually pass it on every page.
 
