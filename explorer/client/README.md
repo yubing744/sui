@@ -1,8 +1,5 @@
 # Sui Explorer Client
 
-TODO: Explain the purpose of the client and relationship to the Sui Explorer described in the following page, linking between the two at the top:
-https://github.com/MystenLabs/sui/blob/explorer-rest/explorer/README.md
-
 ## Development
 
 **Requirements**: Node 14.0.0 or later version
@@ -53,5 +50,3 @@ It can be useful during development to format automatically all the files that c
 For guidance on deployment, plese see here: https://create-react-app.dev/docs/deployment/
 
 Because of the addition of `react-router`, further changes will be needed that depend on the exact infrastructure used. Please consult section **Serving Apps with Client-Side Routing**.
-
-TODO: Make link to this section.
