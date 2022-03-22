@@ -168,6 +168,9 @@ function toHexString(byteArray: number[]): string {
         .join('');
 }
 
+var objectStateFetchErr: null | string | Error = null;
+
+
 const ObjectResult = ((): JSX.Element => {
     const { id: objID } = useParams();
 
@@ -229,7 +232,13 @@ const ObjectResult = ((): JSX.Element => {
 
     let dataRef = useRef(DATATYPE_DEFAULT);
 
+
+
     useEffect(() => {
+        setTimeout(() => {
+            console.log('timeout end err');
+            objectStateFetchErr = 'timeout';
+        }, 4000);
         getObjectState(objID as string)
         .then((objState) => {
             if (objState) {
@@ -237,6 +246,9 @@ const ObjectResult = ((): JSX.Element => {
                 setObjectState(asType);
                 dataRef.current = asType;
             }
+        })
+        .catch(err => {
+            objectStateFetchErr = err;
         });
     }, []);
 
@@ -251,7 +263,8 @@ const ObjectResult = ((): JSX.Element => {
         setShowConnectedEntities(true);
     }, [setShowDescription, setShowProperties, setShowConnectedEntities]);
 
-    if (instanceOfDataType(showObjectState)) {
+    if (instanceOfDataType(showObjectState))
+    {
         let data = showObjectState;
         const innerData = data.data;
 
@@ -485,13 +498,18 @@ const ObjectResult = ((): JSX.Element => {
             </div></>
         );
     }
-    return (
-        <ErrorResult
-            id={objID}
-            errorMsg="There was an issue with the data on the following object"
-        />
+    console.log('objStateFetchErr', objectStateFetchErr);
+    if(objectStateFetchErr != null) {
+        return(
+            <ErrorResult
+                id={objID}
+                errorMsg="There was an issue with the data on the following object"
+            />
+        )
+    }
+    else return (
+        <div>loading...</div>
     );
-
 });
 
 
