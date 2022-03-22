@@ -31,7 +31,7 @@ cargo build --release          # build the network and rest server
 ./target/release/rest_server        # run the rest server - defaults to port 5000
 ```
 
-Now in another terminal tab, also run this from the repo root:
+Now in another terminal tab, in another copy of the repo checked out to `experimental-rest-api`, run this from the repo root: 
 
 ```
 cd explorer/client       
