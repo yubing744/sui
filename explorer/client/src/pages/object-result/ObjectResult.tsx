@@ -32,6 +32,7 @@ type DataType = {
         owner?: { AddressOwner: number[] } | string,
         tx_digest?: number[] | string
     };
+   loadState?: string;
 };
 
 const DATATYPE_DEFAULT: DataType = {
@@ -40,7 +41,8 @@ const DATATYPE_DEFAULT: DataType = {
     owner: '',
     version: '',
     objType: '',
-    data: { contents: {} }
+    data: { contents: {} },
+    loadState: 'pending'
 }
 
 // TODO - restore or remove this functionality
@@ -232,13 +234,16 @@ const ObjectResult = ((): JSX.Element => {
     useEffect(() => {
         getObjectState(objID as string)
         .then((objState) => {
-            if (objState) {
                 let asType = objState as DataType;
-                setObjectState(asType);
+                setObjectState({...asType, loadState: 'loaded'} );
                 dataRef.current = asType;
-            }
-        });
-    }, []);
+        })
+        .catch((error) => {
+          console.log(error);
+          setObjectState({...DATATYPE_DEFAULT, loadState: 'fail'})
+        } )
+      ;
+    }, [objID]);
 
     // TODO - merge / replace with other version of same thing
     const stdLibRe = /0x2::/;
@@ -251,7 +256,7 @@ const ObjectResult = ((): JSX.Element => {
         setShowConnectedEntities(true);
     }, [setShowDescription, setShowProperties, setShowConnectedEntities]);
 
-    if (instanceOfDataType(showObjectState)) {
+    if (showObjectState.loadState === 'loaded') {
         let data = showObjectState;
         const innerData = data.data;
 
@@ -485,12 +490,19 @@ const ObjectResult = ((): JSX.Element => {
             </div></>
         );
     }
+    if (showObjectState.loadState === 'pending') {
+      return <div className={styles.pending}>Please wait for results to load</div>;
+    }
+    if (showObjectState.loadState === 'fail') {
     return (
         <ErrorResult
             id={objID}
             errorMsg="There was an issue with the data on the following object"
         />
     );
+    }
+
+    return <div>"Something went wrong"</div>;
 
 });
 
