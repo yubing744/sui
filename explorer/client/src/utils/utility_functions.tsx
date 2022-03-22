@@ -30,12 +30,6 @@ const navigateWithUnknown = async (input: string, navigate: Function) => {
         .catch(_ => navigate(`../missing/${input}`));
 };
 
-const navigateWithObject = async (input: string, navigate: Function) => {
-    console.log('navigate to object:' + input);
-    navigate(`../objects/${input}`);
-};
-
-
 const findDataFromID = (targetID: string | undefined, state: any) =>
     state?.category !== undefined
         ? state
@@ -68,4 +62,4 @@ export function hexToAscii(hex: string)
 const stdLibPrefix = /^0x2::/;
 export const trimStdLibPrefix = (str: string): string => str.replace(stdLibPrefix, '');
 
-export { findDataFromID, navigateWithUnknown, navigateWithObject, logResult };
+export { findDataFromID, navigateWithUnknown, logResult };

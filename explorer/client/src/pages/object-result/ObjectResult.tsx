@@ -364,7 +364,7 @@ const ObjectResult = ((): JSX.Element => {
                                 <div>Owner</div>
                                 <Longtext
                                     text={extractOwnerData(data.owner)}
-                                    category="unknown"
+                                    category="objectId"
                                     isLink={true}
                                 />
                             </div>
@@ -450,7 +450,7 @@ const ObjectResult = ((): JSX.Element => {
                                                 {checkSingleID(value) && (
                                                     <Longtext
                                                         text={value.bytes}
-                                                        category="unknown"
+                                                        category="objectId"
                                                     />
                                                 )}
                                                 {checkVecIDs(value) && (
@@ -466,7 +466,7 @@ const ObjectResult = ((): JSX.Element => {
                                                                     text={
                                                                         value2.bytes
                                                                     }
-                                                                    category="unknown"
+                                                                    category="objectId"
                                                                     key={`ConnectedEntity-${index1}-${index2}`}
                                                                 />
                                                             )
