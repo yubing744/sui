@@ -370,7 +370,7 @@ const ObjectResult = ((): JSX.Element => {
                                 <div>Owner</div>
                                 <Longtext
                                     text={extractOwnerData(data.owner)}
-                                    category="objectId"
+                                    category="unknown"
                                     isLink={true}
                                 />
                             </div>

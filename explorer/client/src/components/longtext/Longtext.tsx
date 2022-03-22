@@ -51,7 +51,6 @@ function Longtext({
             textComponent = (
                 <span
                     className={styles.longtext}
-                    onClick={navigateUnknown}
                 >
                     <a href={'/objects/' + text}>
                         {text}

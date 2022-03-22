@@ -12,12 +12,11 @@ const navigateWithUnknown = async (input: string, navigate: Function) => {
     // feels crude to just search each category for an ID, but works for now
     const addrPromise = rpc.getAddressObjects(input)
     .then(data => {
-        if (data.objects.length > 0) {
             console.log('address found:', data);
             navigate(`../addresses/${input}`, { state: data });
-        }
-        else throw new Error();
-    });
+    })
+    .catch(error => console.log(error))
+  ;
 
     const objInfoPromise = rpc.getObjectInfo(input)
     .then(data => {

@@ -16,7 +16,7 @@ export class SuiRpcClient {
     public getAddresses = async (): Promise<Addresses> =>
         this.fetchJson(this.addressesUrl)
 
-    public getAddressObjects = async (address: SuiAddressHexStr): Promise<AddressObjectsResponse> => {
+    public getAddressObjects = async (address: SuiAddressHexStr) => {
         const url = `${this.host}/objects?address=${address}`;
         return this.fetchJson(url);
     }
@@ -273,7 +273,7 @@ const tryGetRpcLocalStorage = (): string | null => {
         const last = Number.parseInt(lastUpdated);
         const now = Date.now().valueOf();
         console.log(last, now);
-        if(now == last)
+        if(now === last)
             return value;
 
         const elapsed = now.valueOf() - last.valueOf();
