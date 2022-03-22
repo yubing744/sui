@@ -293,7 +293,8 @@ const ObjectResult = ((): JSX.Element => {
         const properties = Object.entries(innerData.contents)
             //TO DO: remove when have distinct 'name' field in Description
             .filter(([key, value]) => !/name/i.test(key))
-            .filter(([_, value]) => checkIsPropertyType(value));
+            .filter(([_, value]) => checkIsPropertyType(value))
+            .filter(([key, _]) => key != 'display');
 
         return (<>
             <div className={styles.resultbox}>
