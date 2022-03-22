@@ -1,6 +1,6 @@
-import 'ace-builds/src-noconflict/theme-github';
+//import 'ace-builds/src-noconflict/theme-github';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import AceEditor from 'react-ace';
+//import AceEditor from 'react-ace';
 import { useParams } from 'react-router-dom';
 
 import ErrorResult from '../../components/error-result/ErrorResult';
@@ -133,6 +133,8 @@ function DisplayBox({ data }: { data: DataType }) {
 
     if (IS_SMART_CONTRACT(data)) {
         return (
+            <div>Smart Contract Support is coming soon</div>
+          /* TODO - implement smart contract support with real data
             <div className={styles['display-container']}>
                 <AceEditor
                     theme="github"
@@ -143,6 +145,7 @@ function DisplayBox({ data }: { data: DataType }) {
                     className={styles.codebox}
                 />
             </div>
+            */
         );
     }
 
