@@ -187,6 +187,7 @@ pub struct AccountConfig {
     )]
     pub address: Option<SuiAddress>,
     pub gas_objects: Vec<ObjectConfig>,
+    pub gas_object_ranges: Option<Vec<ObjectConfigRange>>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -194,6 +195,16 @@ pub struct ObjectConfig {
     #[serde(default = "ObjectID::random")]
     pub object_id: ObjectID,
     #[serde(default = "default_gas_value")]
+    pub gas_value: u64,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ObjectConfigRange {
+    // Starting object id
+    pub offset: ObjectID,
+    // Number of object ids
+    pub count: u64,
+    // Gas value
     pub gas_value: u64,
 }
 
@@ -242,6 +253,7 @@ impl GenesisConfig {
             accounts.push(AccountConfig {
                 address: None,
                 gas_objects: objects,
+                gas_object_ranges: Some(Vec::new()),
             })
         }
         Ok(Self {

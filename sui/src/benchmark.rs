@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #![deny(warnings)]
-
 use futures::{join, StreamExt};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use std::thread;
@@ -10,6 +9,7 @@ use std::{thread::sleep, time::Duration};
 use sui_core::authority_client::{AuthorityAPI, AuthorityClient};
 use sui_network::network::{NetworkClient, NetworkServer};
 use sui_types::batch::UpdateItem;
+use sui_types::crypto::KeyPair;
 use sui_types::messages::{BatchInfoRequest, BatchInfoResponseItem};
 use sui_types::serialize::*;
 use tokio::runtime::{Builder, Runtime};
@@ -19,6 +19,7 @@ pub mod bench_types;
 pub mod load_generator;
 pub mod transaction_creator;
 use crate::benchmark::bench_types::{Benchmark, BenchmarkType};
+#[allow(unused_imports)]
 use crate::benchmark::load_generator::{
     calculate_throughput, check_transaction_response, send_tx_chunks, spawn_authority_server,
     FixedRateLoadGenerator,
@@ -54,7 +55,7 @@ fn run_microbenchmark(benchmark: Benchmark) -> MicroBenchmarkResult {
     };
 
     match type_ {
-        MicroBenchmarkType::Throughput { num_transactions } => run_throughout_microbench(
+        MicroBenchmarkType::Throughput { num_transactions } => run_throughput_microbench(
             network_client,
             network_server,
             connections,
@@ -63,6 +64,7 @@ fn run_microbenchmark(benchmark: Benchmark) -> MicroBenchmarkResult {
             num_transactions,
             benchmark.committee_size,
             benchmark.db_cpus,
+            benchmark.sender,
         ),
         MicroBenchmarkType::Latency {
             num_chunks,
@@ -78,19 +80,21 @@ fn run_microbenchmark(benchmark: Benchmark) -> MicroBenchmarkResult {
             num_chunks,
             chunk_size,
             period_us,
+            benchmark.sender,
         ),
     }
 }
 
-fn run_throughout_microbench(
+fn run_throughput_microbench(
     network_client: NetworkClient,
-    network_server: NetworkServer,
+    _network_server: NetworkServer,
     connections: usize,
     batch_size: usize,
     use_move: bool,
     num_transactions: usize,
     committee_size: usize,
     db_cpus: usize,
+    sender: Option<KeyPair>,
 ) -> MicroBenchmarkResult {
     assert_eq!(
         num_transactions % batch_size,
@@ -112,15 +116,17 @@ fn run_throughout_microbench(
         use_move,
         batch_size * connections,
         num_transactions / chunk_size,
+        sender.as_ref(),
     );
 
     // Make multi-threaded runtime for the authority
     thread::spawn(move || {
         get_multithread_runtime().block_on(async move {
-            let server = spawn_authority_server(network_server, tx_cr.authority_state).await;
-            if let Err(e) = server.join().await {
-                error!("Server ended with an error: {e}");
-            }
+            println!("Skip server spawn");
+            // let server = spawn_authority_server(network_server, tx_cr.authority_state).await;
+            // if let Err(e) = server.join().await {
+            //     error!("Server ended with an error: {e}");
+            // }
         });
     });
 
@@ -151,7 +157,7 @@ fn run_throughout_microbench(
 
 fn run_latency_microbench(
     network_client: NetworkClient,
-    network_server: NetworkServer,
+    _network_server: NetworkServer,
     connections: usize,
     use_move: bool,
     committee_size: usize,
@@ -160,6 +166,7 @@ fn run_latency_microbench(
     num_chunks: usize,
     chunk_size: usize,
     period_us: u64,
+    sender: Option<KeyPair>,
 ) -> MicroBenchmarkResult {
     // In order to simplify things, we send chunks on each connection and try to ensure all connections have equal load
     assert!(
@@ -171,18 +178,26 @@ fn run_latency_microbench(
     let mut tx_cr = TransactionCreator::new(committee_size, db_cpus);
 
     // These TXes are to load the network
-    let load_gen_txes = tx_cr.generate_transactions(connections, use_move, chunk_size, num_chunks);
+    let load_gen_txes = tx_cr.generate_transactions(
+        connections,
+        use_move,
+        chunk_size,
+        num_chunks,
+        sender.as_ref(),
+    );
 
     // These are tracer TXes used for measuring latency
-    let tracer_txes = tx_cr.generate_transactions(1, use_move, 1, num_chunks);
+    let tracer_txes = tx_cr.generate_transactions(1, use_move, 1, num_chunks, sender.as_ref());
 
     // Make multi-threaded runtime for the authority
     thread::spawn(move || {
         get_multithread_runtime().block_on(async move {
-            let server = spawn_authority_server(network_server, tx_cr.authority_state).await;
-            if let Err(e) = server.join().await {
-                error!("Server ended with an error: {e}");
-            }
+            println!("Skip server spawn");
+
+            // let server = spawn_authority_server(network_server, tx_cr.authority_state).await;
+            // if let Err(e) = server.join().await {
+            //     error!("Server ended with an error: {e}");
+            // }
         });
     });
 

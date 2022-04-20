@@ -1,7 +1,7 @@
 // Copyright (c) 2022, Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -19,7 +19,7 @@ use sui_core::authority::{AuthorityState, AuthorityStore};
 use sui_core::authority_server::AuthorityServer;
 use sui_network::transport::SpawnedServer;
 use sui_network::transport::DEFAULT_MAX_DATAGRAM_SIZE;
-use sui_types::base_types::decode_bytes_hex;
+use sui_types::base_types::{decode_bytes_hex, ObjectID};
 use sui_types::base_types::{SequenceNumber, SuiAddress, TxContext};
 use sui_types::committee::Committee;
 use sui_types::error::SuiResult;
@@ -140,7 +140,7 @@ impl SuiCommand {
                     None => GenesisConfig::default_genesis(sui_config_dir)?,
                 };
 
-                let (network_config, accounts, mut keystore) = genesis(genesis_conf).await?;
+                let (network_config, accounts, mut keystore) = genesis(genesis_conf, None).await?;
 
                 info!("Network genesis completed.");
                 let network_config = network_config.persisted(&network_path);
@@ -270,6 +270,7 @@ impl SuiNetwork {
 
 pub async fn genesis(
     genesis_conf: GenesisConfig,
+    single_address: Option<SuiAddress>,
 ) -> Result<(NetworkConfig, Vec<SuiAddress>, SuiKeystore), anyhow::Error> {
     info!(
         "Creating {} new authorities...",
@@ -291,6 +292,7 @@ pub async fn genesis(
     let mut addresses = Vec::new();
     let mut preload_modules: Vec<Vec<CompiledModule>> = Vec::new();
     let mut preload_objects = Vec::new();
+    let mut all_preload_objects_set = BTreeSet::new();
 
     info!("Creating accounts and gas objects...",);
 
@@ -304,12 +306,34 @@ pub async fn genesis(
 
         addresses.push(address);
 
-        for object_conf in account.gas_objects {
+        let mut preload_objects_map = BTreeMap::new();
+        account.gas_objects.iter().for_each(|q| {
+            if !all_preload_objects_set.contains(&q.object_id) {
+                preload_objects_map.insert(q.object_id, q.gas_value);
+            }
+        });
+
+        if let Some(ranges) = account.gas_object_ranges {
+            for rg in ranges {
+                let ids = ObjectID::in_range(rg.offset, rg.count)?;
+
+                for obj_id in ids {
+                    if !preload_objects_map.contains_key(&obj_id)
+                        && !all_preload_objects_set.contains(&obj_id)
+                    {
+                        preload_objects_map.insert(obj_id, rg.gas_value);
+                        all_preload_objects_set.insert(obj_id);
+                    }
+                }
+            }
+        }
+
+        for (object_id, value) in preload_objects_map {
             let new_object = Object::with_id_owner_gas_coin_object_for_testing(
-                object_conf.object_id,
+                object_id,
                 SequenceNumber::new(),
                 address,
-                object_conf.gas_value,
+                value,
             );
             preload_objects.push(new_object);
         }
@@ -359,6 +383,14 @@ pub async fn genesis(
 
     let committee = Committee::new(voting_right);
     for authority in &network_config.authorities {
+        match single_address {
+            Some(a) => {
+                if a != SuiAddress::from(authority.key_pair.public_key_bytes()) {
+                    continue;
+                }
+            }
+            None => (),
+        }
         make_server_with_genesis_ctx(
             authority,
             &committee,
@@ -416,6 +448,8 @@ async fn make_server_with_genesis_ctx(
     )
     .await;
 
+    //preload_objects.par_iter().map(|q| );
+    println!("Preloading {}", preload_objects.len());
     for object in preload_objects {
         state.insert_genesis_object(object.clone()).await;
     }

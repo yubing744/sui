@@ -42,7 +42,7 @@ async fn main() -> Result<(), anyhow::Error> {
     let genesis_conf: GenesisConfig = PersistedConfig::read(&cfg.genesis_config_path)?;
     let address = cfg.address;
 
-    let (network_config, _, _) = genesis(genesis_conf).await?;
+    let (network_config, _, _) = genesis(genesis_conf, Some(address)).await?;
 
     // Find the network config for this validator
     let net_cfg = network_config

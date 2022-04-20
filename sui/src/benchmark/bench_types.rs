@@ -5,10 +5,11 @@ use clap::*;
 use std::default::Default;
 use strum_macros::EnumString;
 use sui_network::transport;
+use sui_types::crypto::KeyPair;
 
 use super::load_generator::calculate_throughput;
 
-#[derive(Debug, Clone, Parser)]
+#[derive(Debug, Parser)]
 #[clap(
     name = "Sui Benchmark",
     about = "Local test and benchmark of the Sui authorities"
@@ -41,6 +42,10 @@ pub struct Benchmark {
     /// Type of benchmark to run
     #[clap(subcommand)]
     pub bench_type: BenchmarkType,
+
+    /// Sender keypair
+    #[clap(long, global = true)]
+    pub sender: Option<KeyPair>,
 }
 
 #[derive(Parser, Debug, Clone, PartialEq, EnumString)]
@@ -130,7 +135,7 @@ impl std::fmt::Display for MicroBenchmarkResult {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             MicroBenchmarkResult::Throughput { chunk_throughput } => {
-                write!(f, "Throughout: {} tps", chunk_throughput)
+                write!(f, "Throughput: {} tps", chunk_throughput)
             }
             MicroBenchmarkResult::Latency {
                 chunk_latencies,

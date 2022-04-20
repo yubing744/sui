@@ -22,7 +22,10 @@ use std::fs;
 use std::path::Path;
 use std::sync::Arc;
 
-const OBJECT_ID_OFFSET: usize = 10000;
+use crate::config::{PersistedConfig, GenesisConfig};
+
+const OBJECT_ID_OFFSET: &str = "0x10000";
+const GAS_PER_TX: u64 = 10000000;
 
 /// Create a transaction for object transfer
 /// This can either use the Move path or the native path
@@ -56,17 +59,13 @@ fn make_transfer_transaction(
 }
 
 /// Creates an object for use in the microbench
-fn create_object(object_id: ObjectID, owner: SuiAddress, use_move: bool) -> Object {
-    if use_move {
-        Object::with_id_owner_gas_coin_object_for_testing(
-            object_id,
-            SequenceNumber::new(),
-            owner,
-            1,
-        )
-    } else {
-        Object::with_id_owner_for_testing(object_id, owner)
-    }
+fn create_gas_object(object_id: ObjectID, owner: SuiAddress) -> Object {
+    Object::with_id_owner_gas_coin_object_for_testing(
+        object_id,
+        SequenceNumber::new(),
+        owner,
+        GAS_PER_TX,
+    )
 }
 
 /// This builds, signs a cert and serializes it
@@ -132,33 +131,58 @@ fn make_gas_objects(
     address: SuiAddress,
     tx_count: usize,
     batch_size: usize,
-    obj_id_offset: usize,
-    use_move: bool,
-) -> Vec<(Vec<Object>, Object)> {
-    (0..tx_count)
-        .into_par_iter()
-        .map(|x| {
-            let mut objects = vec![];
-            for i in 0..batch_size {
-                let mut obj_id = [0; 20];
-                obj_id[..8]
-                    .clone_from_slice(&(obj_id_offset + x * batch_size + i).to_be_bytes()[..8]);
-                objects.push(create_object(ObjectID::from(obj_id), address, use_move));
-            }
+    obj_id_offset: ObjectID,
+) -> (Vec<(Vec<Object>, Object)>, ObjectID) {
+    let total_count = tx_count * batch_size;
+    let mut objects = vec![];
+    let mut gas_objects = vec![];
+    // Objects to be transferred
+    ObjectID::in_range(obj_id_offset, total_count as u64)
+        .unwrap()
+        .iter()
+        .for_each(|q| objects.push(create_gas_object(*q, address)));
 
-            let mut gas_object_id = [0; 20];
-            gas_object_id[8..16].clone_from_slice(&(obj_id_offset + x).to_be_bytes()[..8]);
-            let gas_object = Object::with_id_owner_gas_coin_object_for_testing(
-                ObjectID::from(gas_object_id),
-                SequenceNumber::new(),
-                address,
-                2000000,
-            );
-            assert!(gas_object.version() == SequenceNumber::from(0));
+    // Objects for payment
+    let next_offset = objects[objects.len() - 1].id();
 
-            (objects, gas_object)
-        })
-        .collect()
+    ObjectID::in_range(next_offset.next_increment().unwrap(), tx_count as u64)
+        .unwrap()
+        .iter()
+        .for_each(|q| gas_objects.push(create_gas_object(*q, address)));
+
+    let last_offset = gas_objects[gas_objects.len() - 1].id();
+
+    (
+        objects[..]
+            .chunks(batch_size)
+            .into_iter()
+            .map(|q| q.to_vec())
+            .zip(gas_objects.into_iter())
+            .collect::<Vec<_>>(),
+        last_offset,
+    )
+    // (0..tx_count)
+    //     .into_par_iter()
+    //     .map(|x| {
+    //         let mut objects = vec![];
+    //         ObjectID::in_range(obj_id_offset, batch_size as u64)
+    //             .unwrap()
+    //             .iter()
+    //             .for_each(|q| objects.push(create_object(*q, address, use_move)));
+
+    //         let mut gas_object_id = [0; 20];
+    //         gas_object_id[8..16].clone_from_slice(&(obj_id_offset + x).to_be_bytes()[..8]);
+    //         let gas_object = Object::with_id_owner_gas_coin_object_for_testing(
+    //             ObjectID::from(gas_object_id),
+    //             SequenceNumber::new(),
+    //             address,
+    //             2000000,
+    //         );
+    //         assert!(gas_object.version() == SequenceNumber::from(0));
+
+    //         (objects, gas_object)
+    //     })
+    //     .collect()
 }
 
 fn make_serialized_transactions(
@@ -190,7 +214,7 @@ fn make_serialized_transactions(
                     TransactionKind::Single(single_kinds.into_iter().next().unwrap()),
                     address,
                     gas_object_ref,
-                    10000,
+                    GAS_PER_TX,
                 )
             } else {
                 assert!(single_kinds.len() == batch_size, "Inconsistent batch size");
@@ -224,24 +248,28 @@ fn make_transactions(
     num_chunks: usize,
     conn: usize,
     use_move: bool,
-    object_id_offset: usize,
+    object_id_offset: ObjectID,
     auth_keys: &[(PublicKeyBytes, KeyPair)],
     committee: &Committee,
-) -> (Vec<Bytes>, Vec<Object>) {
-    let (address, keypair) = get_key_pair();
-
+    sender: Option<&KeyPair>,
+) -> (Vec<Bytes>, Vec<Object>, ObjectID) {
+    let (address, keypair) = if let Some(a) = sender {
+        (SuiAddress::from(a.public_key_bytes()), a.copy())
+    } else {
+        get_key_pair()
+    };
+    println!("{}  {:?}", address, keypair);
     assert_eq!(chunk_size % conn, 0);
     let batch_size_per_conn = chunk_size / conn;
 
     // The batch-adjusted number of transactions
     let batch_tx_count = num_chunks * conn;
     // Only need one gas object per batch
-    let account_gas_objects: Vec<_> = make_gas_objects(
+    let (account_gas_objects, last_offset) = make_gas_objects(
         address,
         batch_tx_count,
         batch_size_per_conn,
         object_id_offset,
-        use_move,
     );
 
     // Bulk load objects
@@ -261,7 +289,7 @@ fn make_transactions(
         use_move,
     );
 
-    (serialized_txes, all_objects)
+    (serialized_txes, all_objects, last_offset)
 }
 
 pub struct TransactionCreator {
@@ -269,18 +297,29 @@ pub struct TransactionCreator {
     pub committee: Committee,
 
     pub authority_state: AuthorityState,
-    pub object_id_offset: usize,
+    pub object_id_offset: ObjectID,
     pub authority_store: Arc<AuthorityStore>,
 }
 
 impl TransactionCreator {
-    pub fn new(committee_size: usize, db_cpus: usize) -> Self {
+    pub fn new(_committee_size: usize, db_cpus: usize) -> Self {
+        let gen_cfg: GenesisConfig = PersistedConfig::read(Path::new("gen.json")).unwrap();
+
+
+
         let mut keys = Vec::new();
-        for _ in 0..committee_size {
-            let (_, key_pair) = get_key_pair();
+
+
+        for q in gen_cfg.authorities {
+            let key_pair = q.key_pair;
             let name = *key_pair.public_key_bytes();
             keys.push((name, key_pair));
         }
+        // for _ in 0..committee_size {
+        //     let (_, key_pair) = get_key_pair();
+        //     let name = *key_pair.public_key_bytes();
+        //     keys.push((name, key_pair));
+        // }
         let committee = Committee::new(keys.iter().map(|(k, _)| (*k, 1)).collect());
 
         // Pick an authority and create state.
@@ -300,7 +339,7 @@ impl TransactionCreator {
             authority_state: auth_state.0,
             authority_store: auth_state.1,
             authority_keys: keys,
-            object_id_offset: OBJECT_ID_OFFSET,
+            object_id_offset: ObjectID::from_hex_literal(OBJECT_ID_OFFSET).unwrap(),
         }
     }
 
@@ -310,8 +349,9 @@ impl TransactionCreator {
         use_move: bool,
         chunk_size: usize,
         num_chunks: usize,
+        sender: Option<&KeyPair>,
     ) -> Vec<Bytes> {
-        let load_gen_txes = make_transactions(
+        let (load_gen_txes, objects, last_offset) = make_transactions(
             chunk_size,
             num_chunks,
             tcp_conns,
@@ -319,15 +359,16 @@ impl TransactionCreator {
             self.object_id_offset,
             &self.authority_keys,
             &self.committee,
+            sender,
         );
 
-        self.object_id_offset += chunk_size * num_chunks;
+        self.object_id_offset = last_offset.next_increment().unwrap();
 
         // Insert the objects
         self.authority_store
-            .bulk_object_insert(&load_gen_txes.1[..].iter().collect::<Vec<&Object>>())
+            .bulk_object_insert(&objects[..].iter().collect::<Vec<&Object>>())
             .unwrap();
 
-        load_gen_txes.0
+        load_gen_txes
     }
 }

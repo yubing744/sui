@@ -506,6 +506,34 @@ impl ObjectID {
             .map_err(|_| ObjectIDParseError::TryFromSliceError)
             .map(ObjectID::from)
     }
+
+    // Incremenent by one
+    pub fn next_increment(&self) -> Result<ObjectID, ObjectIDParseError> {
+        let mut prev_val = self.as_slice().to_vec();
+        // This logic increments the integer representation of an ObjectID u8 array
+        for idx in (0..Self::LENGTH).rev() {
+            if prev_val[idx] == 0xFF {
+                prev_val[idx] = 0;
+            } else {
+                prev_val[idx] += 1;
+                break;
+            };
+        }
+        ObjectID::from_bytes(prev_val.clone())
+    }
+
+    // Create `count` object IDs starting with one at `offset`
+    pub fn in_range(offset: ObjectID, count: u64) -> Result<Vec<ObjectID>, ObjectIDParseError> {
+        let mut ret = Vec::new();
+        let mut prev = offset;
+        for o in 0..count {
+            if o != 0 {
+                prev = prev.next_increment()?;
+            }
+            ret.push(prev);
+        }
+        Ok(ret)
+    }
 }
 
 #[derive(PartialEq, Clone, Debug, thiserror::Error)]
