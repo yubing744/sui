@@ -130,3 +130,57 @@ fn seed_zeroize_on_drop() {
     let memory: &[u8] = unsafe { ::std::slice::from_raw_parts(secret_ptr, 32) };
     assert!(!memory.contains(&0x15));
 }
+
+#[cfg(test)]
+#[derive(Serialize, Deserialize)]
+struct Gen {
+    x: Vec<Option<u32>>,
+}
+
+impl BcsSignable for Gen {}
+
+#[test]
+fn test_gen_signing() {
+    let seed = SignatureSeed::default();
+
+    let id_0 = [0u8; 32];
+    let id_1 = [1u8; 32];
+
+    let msg0 = Gen { x: vec![Some(1)] };
+    let msg1 = Gen { x: vec![None, None] };
+
+    // Create two addresses with a different ID.
+    let sui_address_0 = seed
+        .new_deterministic_address(&id_0, Some(&TEST_DOMAIN))
+        .unwrap();
+    let sui_address_1 = seed
+        .new_deterministic_address(&id_1, Some(&TEST_DOMAIN))
+        .unwrap();
+
+    // Sign with both addresses.
+    let sig_0 = seed.sign(&id_0, Some(&TEST_DOMAIN), &msg0);
+    assert!(sig_0.is_ok());
+    let sig_0_ok = sig_0.unwrap();
+
+    let sig_1 = seed.sign(&id_1, Some(&TEST_DOMAIN), &msg0);
+    assert!(sig_1.is_ok());
+
+    // Verify signatures.
+    let ver_0 = sig_0_ok.clone().check(&msg0, sui_address_0);
+    assert!(ver_0.is_ok());
+
+    let ver_1 = sig_1.unwrap().check(&msg0, sui_address_1);
+    assert!(ver_1.is_ok());
+
+    // Ensure that signatures cannot be verified against another address.
+    let ver_0_with_address_1 = sig_0_ok.clone().check(&msg0, sui_address_1);
+    assert!(ver_0_with_address_1.is_err());
+
+    // Ensure that signatures cannot be verified against another message.
+    let ver_0_with_msg1 = sig_0_ok.clone().check(&msg1, sui_address_0);
+    assert!(ver_0_with_msg1.is_err());
+
+    // As we use ed25519, ensure that signatures on the same message are deterministic.
+    let sig_0_1 = seed.sign(&id_0, Some(&TEST_DOMAIN), &msg0).unwrap();
+    assert_eq!(sig_0_ok, sig_0_1)
+}

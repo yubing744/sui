@@ -6,30 +6,30 @@ use std::path::Path;
 
 use anyhow::anyhow;
 use async_trait::async_trait;
-use ed25519_dalek::ed25519::signature::Signature;
 use jsonrpsee::core::RpcResult;
 use jsonrpsee_proc_macros::rpc;
 use move_core_types::identifier::Identifier;
 use move_core_types::language_storage::TypeTag;
 use serde::Deserialize;
 use serde::Serialize;
+use serde_with::base64::Base64;
 use serde_with::serde_as;
-use sui_types::messages::CallArg;
+use signature::Signature;
 use tracing::debug;
 
-use serde_with::base64::Base64;
-use sui_core::gateway_state::gateway_responses::TransactionResponse;
 use sui_core::gateway_state::{GatewayClient, GatewayState, GatewayTxSeqNumber};
+use sui_core::gateway_state::gateway_responses::TransactionResponse;
 use sui_types::base_types::{ObjectID, SuiAddress, TransactionDigest};
 use sui_types::crypto;
 use sui_types::crypto::SignableBytes;
 use sui_types::messages::{CertifiedTransaction, Transaction, TransactionData};
+use sui_types::messages::CallArg;
 use sui_types::object::ObjectRead;
 
 use crate::config::PersistedConfig;
 use crate::gateway_config::GatewayConfig;
-use crate::rest_gateway::responses::GetObjectInfoResponse;
 use crate::rest_gateway::responses::{NamedObjectRef, ObjectResponse};
+use crate::rest_gateway::responses::GetObjectInfoResponse;
 
 #[derive(Serialize, Deserialize)]
 pub enum RpcCallArg {

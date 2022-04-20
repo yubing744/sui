@@ -10,11 +10,14 @@ use anyhow::bail;
 
 pub mod benchmark;
 pub mod config;
+pub mod deterministic_signer_config;
 pub mod gateway_config;
 pub mod keystore;
 pub mod rest_gateway;
 pub mod rpc_gateway;
 pub mod rpc_gateway_client;
+pub mod rpc_signer;
+pub mod rpc_signer_client;
 pub mod shell;
 pub mod sui_commands;
 pub mod sui_json;

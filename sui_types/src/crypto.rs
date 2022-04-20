@@ -20,6 +20,7 @@ use serde_with::Bytes;
 use sha3::Sha3_256;
 use std::borrow::Borrow;
 use std::collections::HashMap;
+use bcs::to_bytes;
 
 // TODO: Make sure secrets are not copyable and movable to control where they are in memory
 #[derive(Debug)]
@@ -466,9 +467,13 @@ where
 {
     fn write(&self, writer: &mut W) {
         let name = serde_name::trace_name::<Self>().expect("Self must be a struct or an enum");
+        //println!("{}", name);
         // Note: This assumes that names never contain the separator `::`.
         write!(writer, "{}::", name).expect("Hasher should not fail");
         bcs::serialize_into(writer, &self).expect("Message serialization should not fail");
+
+        let a = to_bytes(self).unwrap();
+        println!("{:?}", a)
     }
 }
 
