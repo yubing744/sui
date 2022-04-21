@@ -214,7 +214,7 @@ fn make_serialized_transactions(
                     TransactionKind::Single(single_kinds.into_iter().next().unwrap()),
                     address,
                     gas_object_ref,
-                    GAS_PER_TX,
+                    5000,
                 )
             } else {
                 assert!(single_kinds.len() == batch_size, "Inconsistent batch size");
@@ -222,7 +222,7 @@ fn make_serialized_transactions(
                     TransactionKind::Batch(single_kinds),
                     address,
                     gas_object_ref,
-                    2000000,
+                    5000,
                 )
             };
 

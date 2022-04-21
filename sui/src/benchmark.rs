@@ -4,6 +4,7 @@
 #![deny(warnings)]
 use futures::{join, StreamExt};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use std::path::Path;
 use std::thread;
 use std::{thread::sleep, time::Duration};
 use sui_core::authority_client::{AuthorityAPI, AuthorityClient};
@@ -25,6 +26,7 @@ use crate::benchmark::load_generator::{
     FixedRateLoadGenerator,
 };
 use crate::benchmark::transaction_creator::TransactionCreator;
+use crate::config::{NetworkConfig, PersistedConfig, GenesisConfig};
 
 use self::bench_types::{BenchmarkResult, MicroBenchmarkResult, MicroBenchmarkType};
 
@@ -36,6 +38,35 @@ pub fn run_benchmark(benchmark: Benchmark) -> BenchmarkResult {
 }
 
 fn run_microbenchmark(benchmark: Benchmark) -> MicroBenchmarkResult {
+    let connections = if benchmark.tcp_connections > 0 {
+        benchmark.tcp_connections
+    } else {
+        num_cpus::get()
+    };
+
+    let mut net_clients = vec![];
+
+    // Try for multi node
+    if let Some(p) = benchmark.network_config_path {
+        let config: NetworkConfig = PersistedConfig::read(&p).unwrap();
+        let gen_cfg: GenesisConfig = PersistedConfig::read(Path::new("gen.json")).unwrap();
+
+
+
+        for c in gen_cfg.authorities {
+            let network_client = NetworkClient::new(
+                c.host.clone(),
+                c.port,
+                config.buffer_size,
+                Duration::from_micros(benchmark.send_timeout_us),
+                Duration::from_micros(benchmark.recv_timeout_us),
+            );
+
+            println!("Multi {:?}", c);
+            net_clients.push(network_client);
+        }
+    }
+
     let (host, port, type_) = match benchmark.bench_type {
         BenchmarkType::MicroBenchmark { host, port, type_ } => (host, port, type_),
     };
@@ -47,12 +78,8 @@ fn run_microbenchmark(benchmark: Benchmark) -> MicroBenchmarkResult {
         Duration::from_micros(benchmark.send_timeout_us),
         Duration::from_micros(benchmark.recv_timeout_us),
     );
+
     let network_server = NetworkServer::new(host, port, benchmark.buffer_size);
-    let connections = if benchmark.tcp_connections > 0 {
-        benchmark.tcp_connections
-    } else {
-        num_cpus::get()
-    };
 
     match type_ {
         MicroBenchmarkType::Throughput { num_transactions } => run_throughput_microbench(
@@ -70,18 +97,35 @@ fn run_microbenchmark(benchmark: Benchmark) -> MicroBenchmarkResult {
             num_chunks,
             chunk_size,
             period_us,
-        } => run_latency_microbench(
-            network_client,
-            network_server,
-            connections,
-            benchmark.use_move,
-            benchmark.committee_size,
-            benchmark.db_cpus,
-            num_chunks,
-            chunk_size,
-            period_us,
-            benchmark.sender,
-        ),
+        } => {
+            if net_clients.is_empty() {
+                run_latency_microbench(
+                    network_client,
+                    network_server,
+                    connections,
+                    benchmark.use_move,
+                    benchmark.committee_size,
+                    benchmark.db_cpus,
+                    num_chunks,
+                    chunk_size,
+                    period_us,
+                    benchmark.sender,
+                )
+            } else {
+                run_latency_microbench_multi(
+                    net_clients,
+                    network_server,
+                    connections,
+                    benchmark.use_move,
+                    benchmark.committee_size,
+                    benchmark.db_cpus,
+                    num_chunks,
+                    chunk_size,
+                    period_us,
+                    benchmark.sender,
+                )
+            }
+        }
     }
 }
 
@@ -279,4 +323,83 @@ fn get_multithread_runtime() -> Runtime {
         .worker_threads(usize::min(num_cpus::get(), 24))
         .build()
         .unwrap()
+}
+
+fn run_latency_microbench_multi(
+    network_clients: Vec<NetworkClient>,
+    _network_server: NetworkServer,
+    connections: usize,
+    use_move: bool,
+    committee_size: usize,
+    db_cpus: usize,
+
+    num_chunks: usize,
+    chunk_size: usize,
+    period_us: u64,
+    sender: Option<KeyPair>,
+) -> MicroBenchmarkResult {
+    // In order to simplify things, we send chunks on each connection and try to ensure all connections have equal load
+    assert!(
+        (num_chunks * chunk_size % connections) == 0,
+        "num_transactions must {} be multiple of number of TCP connections {}",
+        num_chunks * chunk_size,
+        connections
+    );
+    let mut tx_cr = TransactionCreator::new(committee_size, db_cpus);
+
+    // These TXes are to load the network
+    let load_gen_txes = tx_cr.generate_transactions(
+        connections,
+        use_move,
+        chunk_size,
+        num_chunks,
+        sender.as_ref(),
+    );
+
+    // These are tracer TXes used for measuring latency
+    let tracer_txes = tx_cr.generate_transactions(1, use_move, 1, num_chunks, sender.as_ref());
+
+    // Make multi-threaded runtime for the authority
+    thread::spawn(move || {
+        get_multithread_runtime().block_on(async move {
+            println!("Skip server spawn");
+
+            // let server = spawn_authority_server(network_server, tx_cr.authority_state).await;
+            // if let Err(e) = server.join().await {
+            //     error!("Server ended with an error: {e}");
+            // }
+        });
+    });
+
+    // Wait for server start
+    sleep(Duration::from_secs(3));
+    let runtime = get_multithread_runtime();
+    // Prep the generators
+    let (mut load_gen, mut tracer_gen) = runtime.block_on(async move {
+        join!(
+            FixedRateLoadGenerator::new_for_multi_validator(
+                load_gen_txes,
+                period_us,
+                network_clients.clone(),
+                connections,
+            ),
+            FixedRateLoadGenerator::new_for_multi_validator(
+                tracer_txes,
+                period_us,
+                network_clients,
+                1
+            ),
+        )
+    });
+
+    // Run the load gen and tracers
+    let (load_latencies, tracer_latencies) =
+        runtime.block_on(async move { join!(load_gen.start(), tracer_gen.start()) });
+
+    MicroBenchmarkResult::Latency {
+        load_chunk_size: chunk_size,
+        load_latencies,
+        tick_period_us: period_us as usize,
+        chunk_latencies: tracer_latencies,
+    }
 }

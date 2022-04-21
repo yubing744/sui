@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use clap::*;
-use std::default::Default;
+use std::{default::Default, path::PathBuf};
 use strum_macros::EnumString;
 use sui_network::transport;
 use sui_types::crypto::KeyPair;
@@ -46,6 +46,10 @@ pub struct Benchmark {
     /// Sender keypair
     #[clap(long, global = true)]
     pub sender: Option<KeyPair>,
+
+    /// Network config path
+    #[clap(long, global = true)]
+    pub network_config_path: Option<PathBuf>,
 }
 
 #[derive(Parser, Debug, Clone, PartialEq, EnumString)]

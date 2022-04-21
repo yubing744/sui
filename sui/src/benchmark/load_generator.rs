@@ -56,6 +56,107 @@ pub async fn send_tx_chunks(
     (elapsed, tx_resp)
 }
 
+/// TODO: Add support for stake
+async fn send_tx_for_quorum(
+    notif: Arc<Notify>,
+    order_chunk: Vec<Bytes>,
+    conf_chunk: Vec<Bytes>,
+
+    result_chann_tx: &mut MpscSender<u128>,
+    net_clients: Vec<NetworkClient>,
+    conn: usize,
+) {
+    let num_validators = net_clients.len();
+    // For receiving info back from the subtasks
+    let (order_chann_tx, mut order_chann_rx) = MpscChannel(net_clients.len() * 2);
+
+    // Send intent orders to 3f+1
+    let order_start_notifier = Arc::new(Notify::new());
+    for n in net_clients.clone() {
+        // This is for sending a start signal to the subtasks
+        let notif = order_start_notifier.clone();
+        // This is for getting the elapsed time
+        let mut ch_tx = order_chann_tx.clone();
+        // Chunk to send for order_
+        let chunk = order_chunk.clone();
+
+        tokio::spawn(async move {
+            send_tx_chunks_notif(notif, chunk, &mut ch_tx, n.clone(), conn).await;
+            println!("Spawn for order {:?}", n);
+        });
+    }
+    drop(order_chann_tx);
+
+    // Wait for tick
+    notif.notified().await;
+    // Notify all the subtasks
+    order_start_notifier.notify_waiters();
+    let time_start = Instant::now();
+
+    // Wait for 2f+1
+    let mut count = 0;
+
+    while time::timeout(Duration::from_secs(10), order_chann_rx.next())
+        .await
+        .unwrap_or(None)
+        .is_some()
+    {
+        count += 1;
+
+        if count > 2 * (num_validators - 1) / 3 {
+            break;
+        }
+    }
+    println!("order {}", count);
+    // Confirmation step
+    let (conf_chann_tx, mut conf_chann_rx) = MpscChannel(net_clients.len() * 2);
+
+    // Send the confs
+    let mut handles = vec![];
+    for n in net_clients {
+        let chunk = conf_chunk.clone();
+        let mut chann_tx = conf_chann_tx.clone();
+        handles.push(tokio::spawn(async move {
+            let r = send_tx_chunks(chunk, n.clone(), conn).await;
+            println!("Spawn for conf {:?}", n);
+            match chann_tx.send(r.0).await {
+                Ok(_) => (),
+                Err(e) => if !e.is_disconnected() {
+                    panic!("Send failed! {:?}", n)
+                }
+            }
+
+            let _: Vec<_> =
+                r.1.par_iter()
+                    .map(|q| {
+                        check_transaction_response(deserialize_message(&(q.as_ref().unwrap())[..]))
+                    })
+                    .collect();
+        }));
+    }
+    drop(conf_chann_tx);
+
+    // Reset counter
+    count = 0;
+    while time::timeout(Duration::from_secs(10), conf_chann_rx.next())
+        .await
+        .unwrap_or(None)
+        .is_some()
+    {
+        count += 1;
+
+        if count > 2 * (num_validators - 1) / 3 {
+            break;
+        }
+    }
+    println!("conf {}", count);
+
+    let elapsed = time_start.elapsed().as_micros();
+
+    // Send the total time over
+    result_chann_tx.send(elapsed).await.unwrap();
+}
+
 async fn send_tx_chunks_notif(
     notif: Arc<Notify>,
     tx_chunk: Vec<Bytes>,
@@ -64,8 +165,13 @@ async fn send_tx_chunks_notif(
     conn: usize,
 ) {
     notif.notified().await;
-    let r = send_tx_chunks(tx_chunk, net_client, conn).await;
-    result_chann_tx.send(r.0).await.unwrap();
+    let r = send_tx_chunks(tx_chunk, net_client.clone(), conn).await;
+    match result_chann_tx.send(r.0).await {
+        Ok(_) => (),
+        Err(e) => if !e.is_disconnected() {
+            panic!("Send failed! {:?}", net_client)
+        }
+    }
 
     let _: Vec<_> =
         r.1.par_iter()
@@ -78,7 +184,7 @@ pub struct FixedRateLoadGenerator {
     /// Anything below 10ms causes degradation in resolution
     pub period_us: u64,
     /// The network client to send transactions on
-    pub network_client: NetworkClient,
+    pub network_clients: Vec<NetworkClient>,
 
     pub tick_notifier: Arc<Notify>,
 
@@ -97,6 +203,63 @@ pub struct FixedRateLoadGenerator {
 // new -> ready -> start
 
 impl FixedRateLoadGenerator {
+    pub async fn new_for_multi_validator(
+        transactions: Vec<Bytes>,
+        period_us: u64,
+        network_clients: Vec<NetworkClient>,
+        connections: usize,
+    ) -> Self {
+        let mut handles = vec![];
+        let tick_notifier = Arc::new(Notify::new());
+
+        let (result_chann_tx, results_chann_rx) = MpscChannel(transactions.len() * 2);
+
+        let conn = connections;
+        // Spin up a bunch of worker tasks
+        // Give each task
+        // Step by 2*conn due to order+confirmation, with `conn` tcp connections
+        // Take up to 2*conn for each task
+        let num_chunks_per_task = conn * 2;
+        for tx_chunk in transactions[..].chunks(num_chunks_per_task) {
+            let notif = tick_notifier.clone();
+            let mut result_chann_tx = result_chann_tx.clone();
+            let tx_chunk = tx_chunk.to_vec();
+            let clients = network_clients.clone();
+
+            let mut order_chunk = vec![];
+            let mut conf_chunk = vec![];
+
+            for ch in tx_chunk[..].chunks(2) {
+                order_chunk.push(ch[0].clone());
+                conf_chunk.push(ch[1].clone());
+            }
+
+            handles.push(tokio::spawn(async move {
+                send_tx_for_quorum(
+                    notif,
+                    order_chunk,
+                    conf_chunk,
+                    &mut result_chann_tx,
+                    clients,
+                    conn,
+                )
+                .await;
+            }));
+        }
+
+        drop(result_chann_tx);
+
+        Self {
+            period_us,
+            network_clients,
+            transactions,
+            connections,
+            results_chann_rx,
+            tick_notifier,
+            chunk_size_per_task: num_chunks_per_task,
+        }
+    }
+
     pub async fn new(
         transactions: Vec<Bytes>,
         period_us: u64,
@@ -129,7 +292,7 @@ impl FixedRateLoadGenerator {
 
         Self {
             period_us,
-            network_client,
+            network_clients: vec![network_client],
             transactions,
             connections,
             results_chann_rx,
