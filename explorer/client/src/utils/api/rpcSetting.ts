@@ -1,6 +1,8 @@
 // Copyright (c) 2022, Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+import { JsonRpcProvider } from 'sui.js';
+
 const tryGetRpcParam = (): string | null => {
     const params = new URLSearchParams(window.location.search);
     return params.get('rpc');
@@ -53,3 +55,5 @@ export function getEndpoint(): string {
     // Use DevNet as the fallback option
     return ENDPOINTS.devnet;
 }
+
+export const DefaultRpcClient = new JsonRpcProvider(getEndpoint());
