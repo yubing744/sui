@@ -589,7 +589,7 @@ impl AuthorityAPI for TrustworthyAuthorityClient {
                 seq += 1;
             }
 
-            let new_batch = AuthorityBatch::make_next(&last_batch, &transactions).unwrap();
+            let new_batch = AuthorityBatch::make_next(&last_batch, transactions).unwrap();
             last_batch = new_batch;
             items.push({
                 let item = SignedBatch::new(last_batch.clone(), &*secret, name);
@@ -715,7 +715,7 @@ impl AuthorityAPI for ByzantineAuthorityClient {
             // Insert a different one
             transactions.push((seq, TransactionDigest::random()));
 
-            let new_batch = AuthorityBatch::make_next(&last_batch, &transactions).unwrap();
+            let new_batch = AuthorityBatch::make_next(&last_batch, transactions).unwrap();
             last_batch = new_batch;
             items.push({
                 let item = SignedBatch::new(last_batch.clone(), &*secret, name);

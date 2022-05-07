@@ -106,10 +106,9 @@ impl TransactionNotifier {
                         ));
                     }
 
-                    // It means we got a notification
-                    let last_safe = transaction_notifier
-                        .low_watermark
-                        .load(std::sync::atomic::Ordering::SeqCst);
+                    // Always stop at low watermark guarantees that transactions are
+                    // always returned in order.
+                    let last_safe = transaction_notifier.low_watermark();
 
                     // Get the stream of updates since the last point we requested ...
                     if let Ok(iter) = transaction_notifier
@@ -121,7 +120,8 @@ impl TransactionNotifier {
                     {
                         // ... continued here with take_while. And expand the buffer with the new items.
                         temp_buffer.extend(
-                            iter.take_while(|(tx_seq, _tx_digest)| *tx_seq < last_safe)
+                            // TODO: Why < instead of <= last_safe?
+                            iter.take_while(|(tx_seq, _tx_digest)| *tx_seq <= last_safe)
                                 .map(|(tx_seq, _tx_digest)| (tx_seq, _tx_digest)),
                         );
 
@@ -186,8 +186,8 @@ impl TransactionNotifierTicket {
     }
 }
 
-/// A custom drop that indicates that there may not be a item
-/// associated with this sequence number,
+/// A custom drop to notify authority state's transaction_notifier
+/// that a new certified transaction's has just been executed and committed.
 impl Drop for TransactionNotifierTicket {
     fn drop(&mut self) {
         let mut inner = self.transaction_notifier.inner.lock();

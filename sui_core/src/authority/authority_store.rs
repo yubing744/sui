@@ -904,6 +904,7 @@ impl<const ALL_OBJ_VER: bool, S: Eq + Serialize + for<'de> Deserialize<'de>>
     /// batch (one has not yet been generated) the function returns all transactions at the
     /// end of the sequence that are in TxSequenceOrder (and ignores any that are out of
     /// order.)
+    // TODO: Why include the transaction prior to `start`?
     #[allow(clippy::type_complexity)]
     pub fn batches_and_transactions(
         &self,
@@ -962,6 +963,7 @@ impl<const ALL_OBJ_VER: bool, S: Eq + Serialize + for<'de> Deserialize<'de>>
         if last_seq < end {
             // This means that the request needs items beyond the end of the
             // last batch, so we include all items.
+            // TODO: Why not setting last_seq to `end`?
             last_seq = TxSequenceNumber::MAX;
         }
 

@@ -214,7 +214,7 @@ impl<C> SafeClient<C> {
                     error: "Safe Client: Batches must have some contents.".to_string()
                 }
             );
-            let reconstructed_batch = AuthorityBatch::make_next(prev_batch, transactions)?;
+            let reconstructed_batch = AuthorityBatch::make_next(prev_batch, transactions.clone())?;
 
             fp_ensure!(
                 reconstructed_batch == signed_batch.batch,
@@ -242,7 +242,7 @@ where
     C: AuthorityAPI + Send + Sync + Clone + 'static,
 {
     /// Uses the follower API and augments each digest received with a full transactions info structure.
-    pub async fn handle_transaction_info_request_to_transaction_info(
+    pub async fn handle_batch_stream_request_to_transaction_info(
         &self,
         request: BatchInfoRequest,
     ) -> Result<
@@ -391,7 +391,7 @@ where
 
                 // We check if we have exceeded the batch boundary for this request.
                 // This is to protect against server DoS
-                if *count > 10 * request.length {
+                if *count > 10 + request.length {
                     // If we exceed it return None to end stream
                     return futures::future::ready(None);
                 }

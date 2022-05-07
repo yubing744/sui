@@ -580,7 +580,7 @@ impl AuthorityState {
     ) -> Result<
         (
             VecDeque<UpdateItem>,
-            // Should subscribe, computer start, computed end
+            // Should subscribe, computed start, computed end
             (bool, TxSequenceNumber, TxSequenceNumber),
         ),
         SuiError,
@@ -595,7 +595,8 @@ impl AuthorityState {
             return Err(SuiError::TooManyItemsError(MAX_ITEMS_LIMIT));
         }
 
-        // If we do not have a start, pick the low watermark from the notifier.
+        // If we do not have a start, pick next sequence number that has
+        // not yet been put into a batch.
         let start = match request.start {
             Some(start) => start,
             None => {
@@ -612,6 +613,7 @@ impl AuthorityState {
         let mut dq_batches = std::collections::VecDeque::from(batches);
         let mut dq_transactions = std::collections::VecDeque::from(transactions);
         let mut items = VecDeque::with_capacity(dq_batches.len() + dq_transactions.len());
+        // TODO: Should the default value be 0 or end?
         let mut last_batch_next_seq = 0;
 
         // Send full historical data as [Batch - Transactions - Batch - Transactions - Batch].
