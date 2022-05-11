@@ -424,4 +424,16 @@ describe('End-to-end Tests', () => {
             ).toBe('Balance200');
         });
     });
+    describe('Search Disambiguation', () => {
+        const unambigSearch = 'CollectionObject';
+        // const ambigSearch = 'PnLBbIpbeQWjDiyadgXEOpe4hC7sA1sW0dZ+4x8EtPM=';
+
+        it('when search item unambiguous, go straight to object', async () => {
+            await page.goto(BASE_URL);
+            await searchText(page, unambigSearch);
+            const el = await page.$('#objectID');
+            const value = await page.evaluate((el: any) => el.textContent, el);
+            expect(value.trim()).toBe(unambigSearch);
+        });
+    });
 });
