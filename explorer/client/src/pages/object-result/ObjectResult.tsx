@@ -71,7 +71,7 @@ const ObjectResultAPI = ({ objID }: { objID: string }): JSX.Element => {
 
 const ObjectResultStatic = ({ objID }: { objID: string }): JSX.Element => {
     const { findDataFromID } = require('../../utils/static/searchUtil');
-    const data = findDataFromID(objID, undefined);
+    const data = findDataFromID(objID, undefined, 'other');
 
     if (instanceOfDataType(data)) {
         return <ObjectLoaded data={data} />;

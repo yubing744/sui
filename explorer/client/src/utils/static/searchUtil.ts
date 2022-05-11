@@ -20,10 +20,21 @@ const navigateWithUnknown = async (input: string, navigate: Function) => {
     }
 };
 
-const findDataFromID = (targetID: string | undefined, state: any) =>
+const findDataFromID = (
+    targetID: string | undefined,
+    state: any,
+    across: 'transaction' | 'other' | 'all' = 'all'
+) =>
     state?.category !== undefined
         ? state
-        : mockData.data.find(({ id }) => id === targetID);
+        : mockData.data
+              .filter(({ category }) => {
+                  if (across === 'transaction')
+                      return category === 'transaction';
+                  if (across === 'other') return category !== 'transaction';
+                  return true;
+              })
+              .find(({ id }) => id === targetID);
 
 const findOwnedObjectsfromID = (targetID: string | undefined) =>
     mockOwnedObjectData?.data?.find(({ id }) => id === targetID)?.objects;

@@ -240,6 +240,15 @@
         {
             "id": "senderAddress",
             "objects": []
+        },
+        {
+            "id": "PnLBbIpbeQWjDiyadgXEOpe4hC7sA1sW0dZ+4x8EtPM=",
+            "objects": [
+                {
+                    "objectId": "CollectionObject",
+                    "version": 1
+                }
+            ]
         }
     ]
 }
