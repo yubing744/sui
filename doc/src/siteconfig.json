@@ -122,23 +122,6 @@
     },
     "cta": [
       {
-        "name": "See what's New",
-        "sublist": [
-          {
-            "name": "Explore Sui DevNet!",
-            "url": "/explore/devnet"
-          },
-          {
-            "name": "Interact with local network",
-            "url": "/build/json-rpc"
-          },
-          {
-            "name": "Learn Sui consensus",
-            "url": "/learn/architecture/consensus"
-          }
-        ]
-      },
-      {
         "name": "Get Started",
         "sublist": [
           {
@@ -161,6 +144,23 @@
           {
             "name": "Sui Compared to other Blockchains",
             "url": "/learn/sui-compared"
+          }
+        ]
+      },
+      {
+        "name": "See what's New",
+        "sublist": [
+          {
+            "name": "Explore Sui DevNet!",
+            "url": "/explore/devnet"
+          },
+          {
+            "name": "Interact with local network",
+            "url": "/build/json-rpc"
+          },
+          {
+            "name": "Learn Sui consensus",
+            "url": "/learn/architecture/consensus"
           }
         ]
       },
