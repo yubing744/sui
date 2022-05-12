@@ -44,6 +44,10 @@ const expectHome = async (page: any) => {
     await checkDataTestID(page, 'main > div', 'home-page');
 };
 
+const expectSearchResults = async (page: any) => {
+    await checkDataTestID(page, 'main > div', 'search-results')
+}
+
 const expectErrorResult = async (page: any) => {
     await checkID(page, 'main > div', 'errorResult');
 };
@@ -426,7 +430,7 @@ describe('End-to-end Tests', () => {
     });
     describe('Search Disambiguation', () => {
         const unambigSearch = 'CollectionObject';
-        // const ambigSearch = 'PnLBbIpbeQWjDiyadgXEOpe4hC7sA1sW0dZ+4x8EtPM=';
+        const ambigSearch = 'PnLBbIpbeQWjDiyadgXEOpe4hC7sA1sW0dZ+4x8EtPM=';
 
         it('when search item unambiguous, go straight to object', async () => {
             await page.goto(BASE_URL);
@@ -435,5 +439,11 @@ describe('End-to-end Tests', () => {
             const value = await page.evaluate((el: any) => el.textContent, el);
             expect(value.trim()).toBe(unambigSearch);
         });
+        it('when search item ambiguous, go to choice page', async () => {
+            await page.goto(BASE_URL);
+            await searchText(page, ambigSearch);
+            await expectSearchResults(page);
+        });
+
     });
 });
