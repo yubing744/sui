@@ -5593,7 +5593,6 @@ dependencies = [
  "prometheus_exporter",
  "rand 0.7.3",
  "rayon",
- "regex",
  "rocksdb",
  "rustyline",
  "rustyline-derive",
