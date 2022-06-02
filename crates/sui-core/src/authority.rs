@@ -12,7 +12,6 @@ use crate::{
     query_helpers::QueryHelpers,
     transaction_input_checker,
 };
-use anyhow::anyhow;
 use arc_swap::{ArcSwap, ArcSwapOption};
 use async_trait::async_trait;
 use itertools::Itertools;
