@@ -19,9 +19,7 @@ use sui_config::{
     Config, NetworkConfig, PersistedConfig, SUI_FULLNODE_CONFIG, SUI_GATEWAY_CONFIG,
     SUI_GENESIS_FILENAME, SUI_NETWORK_CONFIG, SUI_WALLET_CONFIG,
 };
-use sui_core::gateway_types::{
-    GetObjectDataResponse, SuiObject, SuiParsedObject, SuiTransactionEffects,
-};
+use sui_core::gateway_types::{GetObjectDataResponse, SuiParsedObject, SuiTransactionEffects};
 use sui_json::SuiJsonValue;
 use sui_types::{
     base_types::{ObjectID, SequenceNumber, SuiAddress},
